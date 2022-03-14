@@ -9,35 +9,40 @@ import javax.persistence.*
 @Table(name = "users")
 data class User(
     @Id
-        @SequenceGenerator(
-                name = "user_sequence",
-                sequenceName = "user_sequence",
-                allocationSize = 1,
-        )
-        @GeneratedValue(
-                strategy = GenerationType.SEQUENCE,
-                generator = "user_sequence"
-        )
-        val id: Long = 0,
+    @SequenceGenerator(
+        name = "user_sequence",
+        sequenceName = "user_sequence",
+        allocationSize = 1,
+    )
+    @GeneratedValue(
+        strategy = GenerationType.SEQUENCE,
+        generator = "user_sequence"
+    )
+    @Column(name = "user_id")
+    val id: Long = 0,
+
+    @Column(unique = true)
+    var email: String? = null,
+
+    @Column(unique = true)
+    var telephone: String? = null,
 
     @JvmField
-        var username: String? = null,
+    var password: String? = null,
 
-    @JvmField
-        var password: String? = null,
 ) : UserDetails {
-        override fun getAuthorities(): MutableCollection<out GrantedAuthority>?  = null
+    override fun getAuthorities(): MutableCollection<out GrantedAuthority>? = null
 
-        override fun getPassword(): String? = password
+    override fun getPassword(): String? = password
 
-        override fun getUsername(): String? = username
+    override fun getUsername(): String? = email
 
-        override fun isAccountNonExpired(): Boolean = true
+    override fun isAccountNonExpired(): Boolean = true
 
-        override fun isAccountNonLocked(): Boolean = true
+    override fun isAccountNonLocked(): Boolean = true
 
-        override fun isCredentialsNonExpired(): Boolean = true
+    override fun isCredentialsNonExpired(): Boolean = true
 
-        override fun isEnabled(): Boolean = true
+    override fun isEnabled(): Boolean = true
 
 }

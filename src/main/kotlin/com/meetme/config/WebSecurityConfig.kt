@@ -16,6 +16,5 @@ class WebSecurityConfig : WebSecurityConfigurerAdapter() {
             .authorizeRequests()
             .anyRequest().permitAll()
             .and()
-            .httpBasic()
     }
 }
