@@ -19,7 +19,7 @@ class UserService : UserDetailsService {
     @Autowired
     private val bCryptPasswordEncoder: BCryptPasswordEncoder? = null
 
-    fun createNewUser(email: String, password: String): User? {
+    fun createNewUserByEmailAndPass(email: String, password: String): User? {
         if (bCryptPasswordEncoder != null && userDao != null) {
             if (loadUserByUsername(email) != null) return null
 

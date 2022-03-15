@@ -19,7 +19,7 @@ class UserController {
 
     @PostMapping
     fun register(@RequestBody credentials: CredentialsDto): ResponseEntity<User> {
-        val newUser = userService?.createNewUser(email = credentials.email, password = credentials.password)
+        val newUser = userService?.createNewUserByEmailAndPass(email = credentials.email, password = credentials.password)
         return if (newUser != null)
             ResponseEntity.ok(newUser)
         else
