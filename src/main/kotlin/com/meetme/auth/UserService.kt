@@ -36,7 +36,7 @@ class UserService : UserDetailsService {
         return null
     }
 
-    override fun loadUserByUsername(email: String): UserDetails? {
+    fun loadUserByEmail(email: String): User? {
         val dbUser = userDao?.findByEmail(email)
 
         if (dbUser != null)
@@ -47,4 +47,9 @@ class UserService : UserDetailsService {
         return dbUser
     }
 
+    override fun loadUserByUsername(username: String): UserDetails? =
+        loadUserByEmail(username)
+
+    fun checkPassword(user: User, password: String): Boolean =
+        bCryptPasswordEncoder?.matches(password, user.password) == true
 }
