@@ -1,12 +1,13 @@
 package com.meetme.auth
 
+import com.fasterxml.jackson.annotation.JsonIgnore
+import com.meetme.meeting.Meeting
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails
 import javax.persistence.*
 
 
-@Entity
-@Table(name = "users")
+@Entity(name = "users")
 data class User(
     @Id
     @SequenceGenerator(
@@ -29,6 +30,10 @@ data class User(
 
     @JvmField
     var password: String? = null,
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "admin")
+    var managedMeetings: Set<Meeting> = setOf()
 
 ) : UserDetails {
     override fun getAuthorities(): MutableCollection<out GrantedAuthority>? = null
