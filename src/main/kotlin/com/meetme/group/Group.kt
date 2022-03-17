@@ -26,6 +26,9 @@ class Group(
     @Column(name = "description")
     var description: String? = null,
 
+    @Column(name = "photo_url")
+    var photoUrl: String? = null,
+
     @ManyToOne(targetEntity = User::class)
     @JoinColumn(name = "user_id")
     val admin: User? = null,
