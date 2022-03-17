@@ -3,7 +3,7 @@ package com.meetme.contorller
 import com.meetme.data.DataResponse
 import com.meetme.meeting.Meeting
 import com.meetme.meeting.MeetingService
-import com.meetme.meeting.dto.CreateMeetingDto
+import com.meetme.dto.meeting.CreateMeetingDto
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody

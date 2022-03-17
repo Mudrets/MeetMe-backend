@@ -1,6 +1,6 @@
 package com.meetme.contorller
 
-import com.meetme.group.dto.CreateGroupDto
+import com.meetme.dto.goup.CreateGroupDto
 import com.meetme.data.DataResponse
 import com.meetme.group.Group
 import com.meetme.group.GroupService
