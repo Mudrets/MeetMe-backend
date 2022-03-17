@@ -7,7 +7,6 @@ import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails
 import javax.persistence.*
 
-
 @Entity(name = "users")
 data class User(
     @Id
@@ -23,6 +22,12 @@ data class User(
     @Column(name = "user_id")
     val id: Long = 0,
 
+    @Column(name = "name")
+    var name: String = "",
+
+    @Column(name = "surname")
+    var surname: String = "",
+
     @Column(unique = true)
     var email: String? = null,
 
@@ -32,27 +37,30 @@ data class User(
     @JvmField
     var password: String? = null,
 
+    @Column(name = "photo_url")
+    var photoUrl: String? = null,
+
     @JsonIgnore
     @OneToMany(mappedBy = "admin")
-    var managedMeetings: Set<Meeting> = setOf(),
+    var managedMeetings: Set<Meeting> = mutableSetOf(),
 
     @JsonIgnore
     @ManyToMany(
         targetEntity = Meeting::class,
         mappedBy = "participants"
     )
-    var meetings: Set<Meeting> = setOf(),
+    var meetings: MutableSet<Meeting> = mutableSetOf(),
 
     @JsonIgnore
     @OneToMany(mappedBy = "admin")
-    var managedGroup: Set<Group> = setOf(),
+    var managedGroup: MutableSet<Group> = mutableSetOf(),
 
     @JsonIgnore
     @ManyToMany(
         targetEntity = Group::class,
         mappedBy = "participants"
     )
-    var groups: Set<Group> = setOf()
+    var groups: MutableSet<Group> = mutableSetOf(),
 
 ) : UserDetails {
     override fun getAuthorities(): MutableCollection<out GrantedAuthority>? = null
@@ -68,5 +76,7 @@ data class User(
     override fun isCredentialsNonExpired(): Boolean = true
 
     override fun isEnabled(): Boolean = true
+
+    val fullname = "$name $surname"
 
 }
