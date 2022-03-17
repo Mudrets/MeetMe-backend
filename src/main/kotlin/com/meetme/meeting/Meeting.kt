@@ -1,5 +1,7 @@
 package com.meetme.meeting
 
+import com.meetme.iterest.Interest
+import com.meetme.medialink.MediaLink
 import com.meetme.auth.User
 import javax.persistence.*
 
@@ -23,13 +25,22 @@ data class Meeting(
     @JoinColumn(name = "user_id")
     val admin: User? = null,
 
-    @ManyToMany
+    @ManyToMany(targetEntity = Interest::class)
     @JoinTable(
         name = "interests_of_meeting",
         joinColumns = [JoinColumn(name = "meeting_id")],
         inverseJoinColumns = [JoinColumn(name = "interest_id")],
     )
     var interests: Set<Interest> = mutableSetOf(),
+
+    @Column(name = "participants")
+    @ManyToMany(targetEntity = User::class)
+    @JoinTable(
+        name = "participants_of_meeting",
+        joinColumns = [JoinColumn(name = "meeting_id")],
+        inverseJoinColumns = [JoinColumn(name = "user_id")],
+    )
+    val participants: MutableList<User> = mutableListOf(),
 
     @OneToMany(targetEntity = MediaLink::class, mappedBy = "meeting")
     var socialMediaLinks: Set<MediaLink> = mutableSetOf()

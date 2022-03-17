@@ -28,7 +28,7 @@ class MeetingController {
         )
 
         return if (newMeeting == null)
-            DataResponse(message = "User with ${createMeetingDto.adminId} does not exist")
+            DataResponse(message = "User with id = ${createMeetingDto.adminId} does not exist")
         else
             DataResponse(data = newMeeting)
     }
