@@ -1,6 +1,8 @@
-package com.meetme.meeting
+package com.meetme.medialink
 
 import com.fasterxml.jackson.annotation.JsonIgnore
+import com.meetme.group.Group
+import com.meetme.meeting.Meeting
 import javax.persistence.*
 
 @Entity
@@ -30,5 +32,13 @@ data class MediaLink(
         cascade = [CascadeType.ALL]
     )
     @JoinColumn(name = "meeting_id")
-    var meeting: Meeting? = null
+    var meeting: Meeting? = null,
+
+    @JsonIgnore
+    @ManyToOne(
+        targetEntity = Group::class,
+        cascade = [CascadeType.ALL]
+    )
+    @JoinColumn(name = "group_id")
+    var group: Group? = null
 )

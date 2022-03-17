@@ -1,6 +1,8 @@
-package com.meetme.meeting
+package com.meetme.iterest
 
 import com.fasterxml.jackson.annotation.JsonIgnore
+import com.meetme.group.Group
+import com.meetme.meeting.Meeting
 import javax.persistence.*
 
 @Entity(name = "Interest")
@@ -29,5 +31,12 @@ data class Interest(
         targetEntity = Meeting::class,
         mappedBy = "interests"
     )
-    var meetings: Set<Meeting> = setOf()
+    var meetings: Set<Meeting> = setOf(),
+
+    @JsonIgnore
+    @ManyToMany(
+        targetEntity = Group::class,
+        mappedBy = "interests"
+    )
+    var groups: Set<Group> = setOf(),
 )

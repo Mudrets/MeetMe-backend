@@ -1,6 +1,7 @@
 package com.meetme.auth
 
 import com.fasterxml.jackson.annotation.JsonIgnore
+import com.meetme.group.Group
 import com.meetme.meeting.Meeting
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails
@@ -33,7 +34,25 @@ data class User(
 
     @JsonIgnore
     @OneToMany(mappedBy = "admin")
-    var managedMeetings: Set<Meeting> = setOf()
+    var managedMeetings: Set<Meeting> = setOf(),
+
+    @JsonIgnore
+    @ManyToMany(
+        targetEntity = Meeting::class,
+        mappedBy = "participants"
+    )
+    var meetings: Set<Meeting> = setOf(),
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "admin")
+    var managedGroup: Set<Group> = setOf(),
+
+    @JsonIgnore
+    @ManyToMany(
+        targetEntity = Group::class,
+        mappedBy = "participants"
+    )
+    var groups: Set<Group> = setOf()
 
 ) : UserDetails {
     override fun getAuthorities(): MutableCollection<out GrantedAuthority>? = null
