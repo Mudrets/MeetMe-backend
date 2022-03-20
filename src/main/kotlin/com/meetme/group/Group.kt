@@ -1,6 +1,7 @@
 package com.meetme.group
 
 import com.meetme.auth.User
+import com.meetme.group.post.Post
 import com.meetme.iterest.Interest
 import com.meetme.medialink.MediaLink
 import javax.persistence.*
@@ -29,9 +30,16 @@ class Group(
     @Column(name = "photo_url")
     var photoUrl: String? = null,
 
+    @Column(name = "is_private")
+    var isPrivate: Boolean = false,
+
     @ManyToOne(targetEntity = User::class)
     @JoinColumn(name = "user_id")
     val admin: User? = null,
+
+    @OneToMany(targetEntity = Post::class)
+    @JoinColumn(name = "post_id")
+    var posts: MutableList<Post> = mutableListOf(),
 
     @Column(name = "participants")
     @ManyToMany(targetEntity = User::class)
