@@ -7,6 +7,7 @@ import com.meetme.auth.UserService
 import com.meetme.data.DataResponse
 import com.meetme.dto.friends.FriendDto
 import com.meetme.friends.Friendship
+import com.meetme.tryExecute
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.*
 @RestController
@@ -103,6 +104,12 @@ class UserController {
                 .toList()
         }
 
+    @GetMapping("/{user_id}")
+    fun getUser(@PathVariable("user_id") userId: Long): DataResponse<User> =
+        tryExecute {
+            userService.getUser(userId)
+        }
+
     @PostMapping("{user_id}/name/{new_name}")
     fun changeName(
         @PathVariable("new_name") newName: String,
@@ -111,13 +118,5 @@ class UserController {
         DataResponse(
             data = userService.changeName(userId, newName)
         )
-
-    private inline fun <T> tryExecute(action: () -> T): DataResponse<T> {
-        return try {
-            DataResponse(data = action())
-        } catch (e: NoSuchElementException) {
-            DataResponse(message = e.message ?: "Failed to complete request")
-        }
-    }
 }
 

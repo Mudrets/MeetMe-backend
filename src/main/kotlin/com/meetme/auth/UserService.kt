@@ -1,8 +1,9 @@
 package com.meetme.auth
 
+import com.meetme.doIfExist
 import com.meetme.friends.Friendship
-import com.meetme.friends.FriendshipDao
 import com.meetme.friends.FriendshipService
+import com.meetme.getEntity
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -26,27 +27,6 @@ class UserService : UserDetailsService {
     private lateinit var passwordEncoder: PasswordEncoder
 
     override fun loadUserByUsername(username: String): UserDetails? = loadUserByEmail(username)
-
-    @Throws(NoSuchElementException::class)
-    private inline fun <T> Long.doIfExist(action: (User) -> T): T {
-        val dbUser = getUserById(this)
-        if (dbUser != null)
-            return action(dbUser)
-        else
-            throw NoSuchElementException("User with id = $this not found")
-    }
-
-    private fun getUserById(id: Long): User? {
-        val userOpt = userDao.findById(id)
-        return if (userOpt.isPresent) {
-            val dbUser = userOpt.get()
-            logger.debug("User $dbUser found by id: $id")
-            dbUser
-        } else {
-            logger.debug("User not found by id: $id")
-            return null
-        }
-    }
 
     fun createNewUserByEmailAndPass(email: String, password: String): User? {
         if (loadUserByUsername(email) != null) return null
@@ -77,8 +57,8 @@ class UserService : UserDetailsService {
 
     @Throws(IllegalArgumentException::class)
     fun addFriend(userId: Long, friendId: Long): Friendship {
-        val dbUser = getUserById(userId)
-        val dbFriend = getUserById(friendId)
+        val dbUser = userId.getEntity(userDao, logger)
+        val dbFriend = userId.getEntity(userDao, logger)
 
         return if (dbUser != null && dbFriend != null)
             friendshipService.createNewFriendship(dbUser, dbFriend)
@@ -95,8 +75,8 @@ class UserService : UserDetailsService {
 
     @Throws(IllegalArgumentException::class)
     fun removeFriend(userId: Long, friendId: Long) {
-        val dbUser = getUserById(userId)
-        val dbFriend = getUserById(friendId)
+        val dbUser = userId.getEntity(userDao, logger)
+        val dbFriend = userId.getEntity(userDao, logger)
 
         if (dbUser != null && dbFriend != null)
             friendshipService.removeFriendShip(dbUser, dbFriend)
@@ -112,24 +92,27 @@ class UserService : UserDetailsService {
     }
 
     fun getFriends(userId: Long): List<User> =
-        userId.doIfExist { user ->
+        userId.doIfExist(userDao, logger) { user ->
             friendshipService.getFriendsOfUser(user)
         }
 
     fun getFriendsRequestToUser(userId: Long): List<User> =
-        userId.doIfExist { user ->
+        userId.doIfExist(userDao, logger) { user ->
             friendshipService.getFriendRequestToUser(user)
         }
 
     fun getFriendsRequestFromUser(userId: Long) =
-        userId.doIfExist { user ->
+        userId.doIfExist(userDao, logger) { user ->
             friendshipService.getFriendRequestFromUser(user)
         }
 
     fun changeName(userId: Long, newName: String): User? {
-        val dbUser = getUserById(userId)
+        val dbUser = userId.getEntity(userDao, logger)
         dbUser?.name = newName
         dbUser?.let { userDao.save(it) }
         return dbUser
     }
+
+    fun getUser(userId: Long): User =
+        userId.doIfExist(userDao, logger) { user -> user }
 }
