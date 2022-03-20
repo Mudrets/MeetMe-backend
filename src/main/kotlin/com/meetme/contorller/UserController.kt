@@ -5,7 +5,7 @@ import com.meetme.dto.auth.AuthorizationUserDto
 import com.meetme.dto.auth.CredentialsDto
 import com.meetme.auth.UserService
 import com.meetme.data.DataResponse
-import com.meetme.dto.friends.FriendDto
+import com.meetme.dto.user.UserInfoDto
 import com.meetme.friends.Friendship
 import com.meetme.tryExecute
 import org.springframework.beans.factory.annotation.Autowired
@@ -57,50 +57,50 @@ class UserController {
         }
 
     @GetMapping("/friends/{user_id}")
-    fun getFriends(@PathVariable(name = "user_id") userId: Long): DataResponse<List<FriendDto>> =
+    fun getFriends(@PathVariable(name = "user_id") userId: Long): DataResponse<List<UserInfoDto>> =
         tryExecute {
             userService.getFriends(userId).asSequence()
                 .map { user ->
-                    FriendDto(
+                    UserInfoDto(
                         id = user.id,
                         name = user.name,
                         surname = user.surname,
                         photoUrl = user.photoUrl
                     )
                 }
-                .sortedBy(FriendDto::fullName)
+                .sortedBy(UserInfoDto::fullName)
                 .toList()
         }
 
     @GetMapping("/friends/to/{user_id}")
-    fun getFriendRequestTo(@PathVariable(name = "user_id") userId: Long): DataResponse<List<FriendDto>> =
+    fun getFriendRequestTo(@PathVariable(name = "user_id") userId: Long): DataResponse<List<UserInfoDto>> =
         tryExecute {
             userService.getFriendsRequestToUser(userId).asSequence()
                 .map { user ->
-                    FriendDto(
+                    UserInfoDto(
                         id = user.id,
                         name = user.name,
                         surname = user.surname,
                         photoUrl = user.photoUrl
                     )
                 }
-                .sortedBy(FriendDto::fullName)
+                .sortedBy(UserInfoDto::fullName)
                 .toList()
         }
 
     @GetMapping("/friends/from/{user_id}")
-    fun getFriendRequestFrom(@PathVariable(name = "user_id") userId: Long): DataResponse<List<FriendDto>> =
+    fun getFriendRequestFrom(@PathVariable(name = "user_id") userId: Long): DataResponse<List<UserInfoDto>> =
         tryExecute {
             userService.getFriendsRequestFromUser(userId).asSequence()
                 .map { user ->
-                    FriendDto(
+                    UserInfoDto(
                         id = user.id,
                         name = user.name,
                         surname = user.surname,
                         photoUrl = user.photoUrl
                     )
                 }
-                .sortedBy(FriendDto::fullName)
+                .sortedBy(UserInfoDto::fullName)
                 .toList()
         }
 

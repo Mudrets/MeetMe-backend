@@ -2,7 +2,7 @@ package com.meetme.contorller
 
 import com.meetme.dto.goup.CreateGroupDto
 import com.meetme.data.DataResponse
-import com.meetme.dto.goup.GroupDto
+import com.meetme.dto.goup.GroupInfoDto
 import com.meetme.dto.goup.ParticipantInfoDto
 import com.meetme.group.Group
 import com.meetme.group.GroupService
@@ -104,11 +104,11 @@ class GroupController {
     fun searchGroup(
         @PathVariable("group_id") groupId: Long,
         @PathVariable("search_query") searchQuery: String,
-    ): DataResponse<List<GroupDto>> =
+    ): DataResponse<List<GroupInfoDto>> =
         tryExecute {
             groupService.searchGroups(searchQuery)
                 .map { group ->
-                    GroupDto(
+                    GroupInfoDto(
                         id = group.id,
                         name = group.name,
                         photoUrl = group.photoUrl,

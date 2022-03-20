@@ -1,6 +1,6 @@
-package com.meetme.dto.friends
+package com.meetme.dto.user
 
-data class FriendDto(
+data class UserInfoDto(
     val id: Long,
     private val name: String,
     private val surname: String,
