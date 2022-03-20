@@ -15,7 +15,7 @@ data class Meeting(
     val id: Long = 0,
 
     @Column(name = "name")
-    var name: String? = null,
+    var name: String = "",
 
     @Column(name = "description")
     var description: String? = null,
@@ -33,7 +33,7 @@ data class Meeting(
     var endDate: Date? = null,
 
     @Column(name = "is_private")
-    var isPrivate: Boolean = false,
+    var private: Boolean = false,
 
     @Column(name = "location")
     var location: String? = null,
