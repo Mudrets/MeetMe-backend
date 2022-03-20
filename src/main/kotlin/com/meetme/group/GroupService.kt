@@ -186,6 +186,10 @@ class GroupService {
             group
         }
 
+    fun searchGroups(search: String): List<Group> =
+        groupDao.findAll()
+            .filter { it.name.contains(search) }
+
     companion object {
         private val POST_TITLE = "Мероприятие %s"
 

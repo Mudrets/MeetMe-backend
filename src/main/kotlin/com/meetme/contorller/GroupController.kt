@@ -2,6 +2,7 @@ package com.meetme.contorller
 
 import com.meetme.dto.goup.CreateGroupDto
 import com.meetme.data.DataResponse
+import com.meetme.dto.goup.GroupDto
 import com.meetme.dto.goup.ParticipantInfoDto
 import com.meetme.group.Group
 import com.meetme.group.GroupService
@@ -57,6 +58,7 @@ class GroupController {
                     ParticipantInfoDto(
                         id = user.id,
                         fullName = "${user.name} ${user.surname}",
+                        photoUrl = null,
                     )
                 }
                 .sortedBy(ParticipantInfoDto::fullName)
@@ -96,5 +98,21 @@ class GroupController {
     ): DataResponse<Invitation> =
         tryExecute {
             groupService.sendInvitationToGroup(groupId, meetingId)
+        }
+
+    @GetMapping("/{group_id}/{search_query}")
+    fun searchGroup(
+        @PathVariable("group_id") groupId: Long,
+        @PathVariable("search_query") searchQuery: String,
+    ): DataResponse<List<GroupDto>> =
+        tryExecute {
+            groupService.searchGroups(searchQuery)
+                .map { group ->
+                    GroupDto(
+                        id = group.id,
+                        name = group.name,
+                        photoUrl = group.photoUrl,
+                    )
+                }
         }
 }
