@@ -21,13 +21,7 @@ class MeetingController {
 
     @PostMapping("/create")
     fun createMeeting(@RequestBody createMeetingDto: CreateMeetingDto): DataResponse<Meeting> {
-        val newMeeting = meetingService.createMeeting(
-            adminId = createMeetingDto.adminId,
-            name = createMeetingDto.name,
-            description = createMeetingDto.description,
-            interests = createMeetingDto.interests,
-            links = createMeetingDto.links,
-        )
+        val newMeeting = meetingService.createMeeting(createMeetingDto)
 
         return if (newMeeting == null)
             DataResponse(message = "User with id = ${createMeetingDto.adminId} does not exist")

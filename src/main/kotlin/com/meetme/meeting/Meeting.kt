@@ -38,6 +38,9 @@ data class Meeting(
     @Column(name = "location")
     var location: String? = null,
 
+    @Column(name = "max_number_of_participants")
+    var maxNumberOfParticipants: Int = 1,
+
     @ManyToOne(targetEntity = User::class)
     @JoinColumn(name = "user_id")
     val admin: User? = null,
@@ -61,4 +64,6 @@ data class Meeting(
 
     @OneToMany(targetEntity = MediaLink::class, mappedBy = "meeting")
     var socialMediaLinks: Set<MediaLink> = mutableSetOf()
-)
+) {
+    val numberOfParticipants: Int = participants.size + 1
+}

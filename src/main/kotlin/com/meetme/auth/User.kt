@@ -42,7 +42,7 @@ data class User(
 
     @JsonIgnore
     @OneToMany(mappedBy = "admin")
-    var managedMeetings: Set<Meeting> = mutableSetOf(),
+    var managedMeetings: MutableSet<Meeting> = mutableSetOf(),
 
     @JsonIgnore
     @ManyToMany(

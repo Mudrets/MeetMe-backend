@@ -3,6 +3,7 @@ package com.meetme.meeting
 import com.meetme.auth.User
 import com.meetme.auth.UserDao
 import com.meetme.doIfExist
+import com.meetme.dto.meeting.CreateMeetingDto
 import com.meetme.dto.meeting.EditMeetingDto
 import com.meetme.group.Group
 import com.meetme.iterest.InterestService
@@ -11,6 +12,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
+import java.util.*
 
 @Service
 class MeetingService {
@@ -29,26 +31,24 @@ class MeetingService {
     @Autowired
     private lateinit var mediaLinkService: MediaLinkService
 
-    fun createMeeting(
-        adminId: Long,
-        name: String,
-        description: String = "",
-        interests: Set<String> = setOf(),
-        links: MutableMap<String, String> = mutableMapOf(),
-    ): Meeting? {
+    fun createMeeting(createMeetingDto: CreateMeetingDto): Meeting? {
         var meeting: Meeting? = null
 
-        userDao.findById(adminId).ifPresent { admin ->
+        userDao.findById(createMeetingDto.adminId).ifPresent { admin ->
             val interestsSet =
-                interestService.convertToInterestEntityAndAddNewInterests(interests = interests)
+                interestService.convertToInterestEntityAndAddNewInterests(interests = createMeetingDto.interests)
 
             val linksSet =
-                mediaLinkService.createNewLinks(links = links)
+                mediaLinkService.createNewLinks(links = createMeetingDto.links)
 
             meeting = meetingDao.save(
                 Meeting(
-                    name = name,
-                    description = description,
+                    name = createMeetingDto.name,
+                    description = createMeetingDto.description,
+                    startDate = Date(createMeetingDto.startDate),
+                    endDate = if (createMeetingDto.endDate == null) null else Date(createMeetingDto.endDate),
+                    isOnline = createMeetingDto.isOnline,
+                    private = createMeetingDto.isPrivate,
                     interests = interestsSet,
                     socialMediaLinks = linksSet,
                     admin = admin,
@@ -64,14 +64,16 @@ class MeetingService {
 
     fun editMeeting(meetingId: Long, changes: EditMeetingDto): Meeting =
         meetingId.doIfExist(meetingDao, logger) { meeting ->
-            val newMeeting = meeting.copy(
-                name = changes.name ?: meeting.name,
-                description = changes.description ?: meeting.description,
-                startDate = changes.startDate ?: meeting.startDate,
+            meeting.apply {
+                name = changes.name ?: meeting.name
+                description = changes.description ?: meeting.description
+                startDate = changes.startDate ?: meeting.startDate
                 endDate = if (changes.hasEndDate) changes.endDate else meeting.endDate
-            )
-            meetingDao.save(newMeeting)
-            newMeeting
+                isOnline = changes.isOnline
+                location = if (changes.isOnline) meeting.location else changes.locate
+            }
+            meetingDao.save(meeting)
+            meeting
         }
 
     fun deleteMeeting(meetingId: Long) =
@@ -79,6 +81,9 @@ class MeetingService {
 
     fun addParticipant(meetingId: Long, userId: Long): Meeting =
         (meetingId to userId).doIfExist(meetingDao, userDao, logger) { meeting, user ->
+            if (meeting.numberOfParticipants >= meeting.maxNumberOfParticipants)
+                throw IllegalArgumentException("The maximum number of participants in the meeting has been exceeded")
+
             user.meetings.add(meeting)
             meeting.participants.add(user)
             meetingDao.save(meeting)
@@ -88,11 +93,18 @@ class MeetingService {
 
     fun deleteParticipant(meetingId: Long, userId: Long): Meeting =
         (meetingId to userId).doIfExist(meetingDao, userDao, logger) { meeting, user ->
-            meeting.participants.remove(user)
-            user.meetings.remove(meeting)
-            meetingDao.save(meeting)
-            userDao.save(user)
-            meeting
+            if (meeting.admin == user) {
+                user.managedMeetings.remove(meeting)
+                meetingDao.delete(meeting)
+                userDao.save(user)
+                meeting
+            } else {
+                meeting.participants.remove(user)
+                user.meetings.remove(meeting)
+                meetingDao.save(meeting)
+                userDao.save(user)
+                meeting
+            }
         }
 
     fun search(userId: Long, searchQuery: String): List<Meeting> =

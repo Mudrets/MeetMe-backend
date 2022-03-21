@@ -8,4 +8,6 @@ data class EditMeetingDto(
     val startDate: Date? = null,
     val endDate: Date? = null,
     val hasEndDate: Boolean = false,
+    val isOnline: Boolean = false,
+    val locate: String? = null,
 )
