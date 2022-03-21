@@ -115,4 +115,9 @@ class UserService : UserDetailsService {
 
     fun getUser(userId: Long): User =
         userId.doIfExist(userDao, logger) { user -> user }
+
+    fun searchFriends(searchQuery: String): List<User> =
+        userDao.findAll()
+            .filter { user -> user.fullname.contains(searchQuery) }
+            .sortedBy(User::fullname)
 }

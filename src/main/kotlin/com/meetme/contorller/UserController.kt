@@ -118,5 +118,20 @@ class UserController {
         DataResponse(
             data = userService.changeName(userId, newName)
         )
+
+    @GetMapping("/{search_query}")
+    fun search(@PathVariable("search_query") searchQuery: String): DataResponse<List<UserInfoDto>> =
+        tryExecute {
+            userService.searchFriends(searchQuery).asSequence()
+                .map { user ->
+                    UserInfoDto(
+                        id = user.id,
+                        name = user.name,
+                        surname = user.surname,
+                        photoUrl = user.photoUrl
+                    )
+                }
+                .toList()
+        }
 }
 
