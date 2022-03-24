@@ -5,14 +5,12 @@ import com.meetme.auth.UserDao
 import com.meetme.doIfExist
 import com.meetme.dto.meeting.CreateMeetingDto
 import com.meetme.dto.meeting.EditMeetingDto
-import com.meetme.group.Group
 import com.meetme.iterest.InterestService
 import com.meetme.medialink.MediaLinkService
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
-import java.util.*
 
 @Service
 class MeetingService {
@@ -34,7 +32,7 @@ class MeetingService {
     fun createMeeting(createMeetingDto: CreateMeetingDto): Meeting? {
         var meeting: Meeting? = null
 
-        userDao.findById(createMeetingDto.adminId).ifPresent { admin ->
+        createMeetingDto.adminId.doIfExist(userDao, logger) { admin ->
             val interestsSet =
                 interestService.convertToInterestEntityAndAddNewInterests(interests = createMeetingDto.interests)
 
@@ -45,13 +43,14 @@ class MeetingService {
                 Meeting(
                     name = createMeetingDto.name,
                     description = createMeetingDto.description,
-                    startDate = Date(createMeetingDto.startDate),
-                    endDate = if (createMeetingDto.endDate == null) null else Date(createMeetingDto.endDate),
+                    startDate = createMeetingDto.startDate,
+                    endDate = createMeetingDto.endDate,
                     isOnline = createMeetingDto.isOnline,
                     private = createMeetingDto.isPrivate,
                     interests = interestsSet,
                     socialMediaLinks = linksSet,
                     admin = admin,
+                    maxNumberOfParticipants = createMeetingDto.maxNumberParticipants
                 )
             )
         }
@@ -70,7 +69,8 @@ class MeetingService {
                 startDate = changes.startDate ?: meeting.startDate
                 endDate = if (changes.hasEndDate) changes.endDate else meeting.endDate
                 isOnline = changes.isOnline
-                location = if (changes.isOnline) meeting.location else changes.locate
+                location = if (changes.isOnline) changes.locate else meeting.location
+                maxNumberOfParticipants = changes.maxNumberOfParticipants
             }
             meetingDao.save(meeting)
             meeting
@@ -83,6 +83,8 @@ class MeetingService {
         (meetingId to userId).doIfExist(meetingDao, userDao, logger) { meeting, user ->
             if (meeting.numberOfParticipants >= meeting.maxNumberOfParticipants)
                 throw IllegalArgumentException("The maximum number of participants in the meeting has been exceeded")
+            if (meeting.participants.contains(user))
+                throw IllegalArgumentException("User $user already is participant of meeting $meeting")
 
             user.meetings.add(meeting)
             meeting.participants.add(user)

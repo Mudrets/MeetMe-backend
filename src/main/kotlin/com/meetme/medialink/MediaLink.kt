@@ -25,6 +25,7 @@ data class MediaLink(
 
     @Column(name = "link")
     var link: String = "",
+) {
 
     @JsonIgnore
     @ManyToOne(
@@ -32,7 +33,7 @@ data class MediaLink(
         cascade = [CascadeType.ALL]
     )
     @JoinColumn(name = "meeting_id")
-    var meeting: Meeting? = null,
+    var meeting: Meeting? = null
 
     @JsonIgnore
     @ManyToOne(
@@ -41,4 +42,12 @@ data class MediaLink(
     )
     @JoinColumn(name = "group_id")
     var group: Group? = null
-)
+
+    override fun toString(): String {
+        return "MeetingLink(" +
+            "id: $id, " +
+            "name: $name, " +
+            "link: $link" +
+            ")"
+    }
+}

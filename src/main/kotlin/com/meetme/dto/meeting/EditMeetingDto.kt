@@ -10,4 +10,5 @@ data class EditMeetingDto(
     val hasEndDate: Boolean = false,
     val isOnline: Boolean = false,
     val locate: String? = null,
+    val maxNumberOfParticipants: Int = 1,
 )

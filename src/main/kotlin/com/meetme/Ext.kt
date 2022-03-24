@@ -44,7 +44,7 @@ inline fun <reified T1, reified T2, M> Pair<Long, Long>.doIfExist(
 inline fun <T> tryExecute(action: () -> T): DataResponse<T> {
     return try {
         DataResponse(data = action())
-    } catch (e: NoSuchElementException) {
+    } catch (e: Exception) {
         DataResponse(message = e.message ?: "Failed to complete request")
     }
 }

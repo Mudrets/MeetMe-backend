@@ -39,30 +39,30 @@ data class User(
 
     @Column(name = "photo_url")
     var photoUrl: String? = null,
+) : UserDetails {
 
     @JsonIgnore
     @OneToMany(mappedBy = "admin")
-    var managedMeetings: MutableSet<Meeting> = mutableSetOf(),
+    var managedMeetings: MutableSet<Meeting> = mutableSetOf()
 
     @JsonIgnore
     @ManyToMany(
         targetEntity = Meeting::class,
         mappedBy = "participants"
     )
-    var meetings: MutableSet<Meeting> = mutableSetOf(),
+    var meetings: MutableSet<Meeting> = mutableSetOf()
 
     @JsonIgnore
     @OneToMany(mappedBy = "admin")
-    var managedGroup: MutableSet<Group> = mutableSetOf(),
+    var managedGroup: MutableSet<Group> = mutableSetOf()
 
     @JsonIgnore
     @ManyToMany(
         targetEntity = Group::class,
         mappedBy = "participants"
     )
-    var groups: MutableSet<Group> = mutableSetOf(),
+    var groups: MutableSet<Group> = mutableSetOf()
 
-) : UserDetails {
     override fun getAuthorities(): MutableCollection<out GrantedAuthority>? = null
 
     override fun getPassword(): String? = password
@@ -79,4 +79,11 @@ data class User(
 
     val fullname = "$name $surname"
 
+    override fun toString(): String {
+        return "User(" +
+            "id: $id, " +
+            "name: $name, " +
+            "surname: $surname, " +
+            ")"
+    }
 }

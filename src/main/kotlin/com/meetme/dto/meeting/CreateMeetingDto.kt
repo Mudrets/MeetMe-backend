@@ -12,7 +12,7 @@ data class CreateMeetingDto(
     val locate: String? = null,
     val isOnline: Boolean = false,
     val isPrivate: Boolean = false,
-    val startDate: Long = Date.from(Instant.now()).time,
-    val endDate: Long? = null,
-    val maxAmountParticipants: Int = 1,
+    val startDate: Date = Date.from(Instant.now()),
+    val endDate: Date? = null,
+    val maxNumberParticipants: Int = 1,
 )

@@ -25,18 +25,26 @@ data class Interest(
         unique = true,
     )
     val name: String = "",
+) {
 
     @JsonIgnore
     @ManyToMany(
         targetEntity = Meeting::class,
         mappedBy = "interests"
     )
-    var meetings: Set<Meeting> = setOf(),
+    var meetings: Set<Meeting> = setOf()
 
     @JsonIgnore
     @ManyToMany(
         targetEntity = Group::class,
         mappedBy = "interests"
     )
-    var groups: Set<Group> = setOf(),
-)
+    var groups: Set<Group> = setOf()
+
+    override fun toString(): String {
+        return "Interest(" +
+            "id: $id, " +
+            "name: $name" +
+            ")"
+    }
+}

@@ -68,7 +68,7 @@ class MeetingController {
                 .map(::mapMeetingToDto)
         }
 
-    @GetMapping("/{user_id}")
+    @GetMapping("/user/{user_id}")
     fun getAllMeetingsForUser(
         @PathVariable("user_id") userId: Long
     ): DataResponse<List<MeetingInfoDto>> =
