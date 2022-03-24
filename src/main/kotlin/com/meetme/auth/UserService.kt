@@ -30,13 +30,13 @@ class UserService : UserDetailsService {
 
     fun createNewUserByEmailAndPass(email: String, password: String, fullName: String): User? {
         if (loadUserByUsername(email) != null) return null
-        val (name, surname) = fullName.split(" ")
+        val nameArr = fullName.split(" ")
         val newUser = userDao.save(
             User(
                 email = email,
                 password = passwordEncoder.encode(password),
-                name = name,
-                surname = surname,
+                name = nameArr[0],
+                surname = if (nameArr.size > 1) nameArr.subList(1, nameArr.lastIndex).joinToString(" ") else "",
             )
         )
 
