@@ -19,7 +19,8 @@ class UserController {
 
     @PostMapping("/register")
     fun register(@RequestBody credentials: CredentialsDto): DataResponse<AuthorizationUserDto> {
-        val newUser = userService.createNewUserByEmailAndPass(email = credentials.email, password = credentials.password)
+        val newUser =
+            userService.createNewUserByEmailAndPass(email = credentials.email, password = credentials.password, fullName = credentials.fullName)
         return if (newUser != null)
             DataResponse(data = AuthorizationUserDto(id = newUser.id))
         else
