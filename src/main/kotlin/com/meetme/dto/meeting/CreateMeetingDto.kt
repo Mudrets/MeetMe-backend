@@ -8,7 +8,6 @@ data class CreateMeetingDto(
     val name: String,
     val description: String = "",
     val interests: Set<String> = setOf(),
-    val links: MutableMap<String, String> = mutableMapOf(),
     val location: String? = null,
     val isOnline: Boolean = false,
     val isPrivate: Boolean = false,
