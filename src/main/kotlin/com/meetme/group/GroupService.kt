@@ -73,27 +73,6 @@ class GroupService {
     private fun getPostTitle(meeting: Meeting): String =
         POST_TITLE.format(meeting.name)
 
-    private fun getDateInRus(date: Date): String {
-        val dateFormat = SimpleDateFormat("dd MMM yyyy года")
-        val dateStr = dateFormat.format(date)
-        val dateArr = dateStr.split(" ")
-        return when (val month = dateArr[1]) {
-            "Jan" -> dateStr.replace(month, "января")
-            "Feb" -> dateStr.replace(month, "февраля")
-            "Mar" -> dateStr.replace(month, "марта")
-            "Apr" -> dateStr.replace(month, "апреля")
-            "May" -> dateStr.replace(month, "мая")
-            "Jun" -> dateStr.replace(month, "июня")
-            "Jul" -> dateStr.replace(month, "июля")
-            "Aug" -> dateStr.replace(month, "августа")
-            "Sep" -> dateStr.replace(month, "сентября")
-            "Oct" -> dateStr.replace(month, "октября")
-            "Nov" -> dateStr.replace(month, "ноября")
-            "Dec" -> dateStr.replace(month, "декабря")
-            else -> dateStr
-        }
-    }
-
     private fun getLocation(meeting: Meeting): String =
         if (meeting.isOnline)
             "онлайн"
@@ -101,9 +80,8 @@ class GroupService {
             meeting.location ?: "в неизвестном на данный момент месте"
 
     private fun getPostText(meeting: Meeting): String {
-        val date = getDateInRus(meeting.startDate)
         val location = getLocation(meeting)
-        return POST_TEXT.format(meeting.startDate, date, location)
+        return POST_TEXT.format(meeting.startDate, meeting.startDate, location)
     }
 
     private fun addPost(group: Group, meeting: Meeting) {

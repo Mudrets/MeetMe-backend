@@ -27,10 +27,10 @@ data class Meeting(
     var isOnline: Boolean = false,
 
     @Column(name = "start_date")
-    var startDate: Date = Date.from(Instant.now()),
+    var startDate: String = "",
 
     @Column(name = "end_date")
-    var endDate: Date? = null,
+    var endDate: String? = null,
 
     @Column(name = "is_private")
     var private: Boolean = false,
