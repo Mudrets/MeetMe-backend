@@ -1,4 +1,4 @@
-package com.meetme.invitation
+package com.meetme.invitation.group
 
 import com.meetme.group.Group
 import com.meetme.meeting.Meeting
@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Repository
 
 @Repository(value = "invitationRepository")
-interface InvitationDao: JpaRepository<Invitation, Long> {
+interface InvitationGroupToMeetingDao: JpaRepository<InvitationGroupToMeeting, Long> {
 
-    fun findByGroupAndMeeting(group: Group, meeting: Meeting): Invitation?
+    fun findByGroupAndMeeting(group: Group, meeting: Meeting): InvitationGroupToMeeting?
 }

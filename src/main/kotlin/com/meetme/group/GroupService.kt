@@ -5,8 +5,8 @@ import com.meetme.auth.UserDao
 import com.meetme.doIfExist
 import com.meetme.group.post.Post
 import com.meetme.group.post.PostDao
-import com.meetme.invitation.Invitation
-import com.meetme.invitation.InvitationService
+import com.meetme.invitation.group.InvitationGroupToMeeting
+import com.meetme.invitation.group.InvitationGroupToMeetingService
 import com.meetme.iterest.InterestService
 import com.meetme.medialink.MediaLinkService
 import com.meetme.meeting.Meeting
@@ -39,7 +39,7 @@ class GroupService {
     private lateinit var mediaLinkService: MediaLinkService
 
     @Autowired
-    private lateinit var invitationService: InvitationService
+    private lateinit var invitationGroupToMeetingService: InvitationGroupToMeetingService
 
     @Autowired
     private lateinit var postDao: PostDao
@@ -132,17 +132,17 @@ class GroupService {
             groupDao.delete(group)
         }
 
-    fun sendInvitationToGroup(groupId: Long, meetingId: Long): Invitation =
+    fun sendInvitationToGroup(groupId: Long, meetingId: Long): InvitationGroupToMeeting =
         (groupId to meetingId).doIfExist(groupDao, meetingDao, logger) { group, meeting ->
-            invitationService.sendInvitationToGroup(
+            invitationGroupToMeetingService.sendInvitationToGroup(
                 group = group,
                 meeting = meeting,
             )
         }
 
-    fun acceptInvitation(groupId: Long, meetingId: Long): Invitation =
+    fun acceptInvitation(groupId: Long, meetingId: Long): InvitationGroupToMeeting =
         (groupId to meetingId).doIfExist(groupDao, meetingDao, logger) { group, meeting ->
-            val invitation = invitationService.acceptInvitation(
+            val invitation = invitationGroupToMeetingService.acceptInvitation(
                 group = group,
                 meeting = meeting,
             )
@@ -150,9 +150,9 @@ class GroupService {
             invitation
         }
 
-    fun cancelInvitation(groupId: Long, meetingId: Long): Invitation =
+    fun cancelInvitation(groupId: Long, meetingId: Long): InvitationGroupToMeeting =
         (groupId to meetingId).doIfExist(groupDao, meetingDao, logger) { group, meeting ->
-            invitationService.cancelInvitation(
+            invitationGroupToMeetingService.cancelInvitation(
                 group = group,
                 meeting = meeting,
             )

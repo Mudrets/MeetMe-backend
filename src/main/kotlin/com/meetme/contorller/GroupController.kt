@@ -6,7 +6,7 @@ import com.meetme.dto.goup.GroupInfoDto
 import com.meetme.dto.goup.ParticipantInfoDto
 import com.meetme.group.Group
 import com.meetme.group.GroupService
-import com.meetme.invitation.Invitation
+import com.meetme.invitation.group.InvitationGroupToMeeting
 import com.meetme.tryExecute
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.*
@@ -77,7 +77,7 @@ class GroupController {
     fun acceptInvitation(
         @PathVariable("group_id") groupId: Long,
         @PathVariable("meeting_id") meetingId: Long,
-    ): DataResponse<Invitation> =
+    ): DataResponse<InvitationGroupToMeeting> =
         tryExecute {
             groupService.acceptInvitation(groupId, meetingId)
         }
@@ -86,7 +86,7 @@ class GroupController {
     fun cancelInvitation(
         @PathVariable("group_id") groupId: Long,
         @PathVariable("meeting_id") meetingId: Long,
-    ): DataResponse<Invitation> =
+    ): DataResponse<InvitationGroupToMeeting> =
         tryExecute {
             groupService.cancelInvitation(groupId, meetingId)
         }
@@ -95,7 +95,7 @@ class GroupController {
     fun inviteGroupToMeeting(
         @PathVariable("group_id") groupId: Long,
         @PathVariable("meeting_id") meetingId: Long,
-    ): DataResponse<Invitation> =
+    ): DataResponse<InvitationGroupToMeeting> =
         tryExecute {
             groupService.sendInvitationToGroup(groupId, meetingId)
         }

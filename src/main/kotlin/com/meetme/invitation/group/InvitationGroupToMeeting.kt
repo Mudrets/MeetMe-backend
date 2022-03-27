@@ -1,14 +1,14 @@
-package com.meetme.invitation
+package com.meetme.invitation.group
 
 import com.meetme.group.Group
 import com.meetme.meeting.Meeting
 import javax.persistence.*
 
-@Entity(name = "Invitation")
-data class Invitation(
+@Entity(name = "GroupInvitation")
+data class InvitationGroupToMeeting(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "invitation_name")
+    @Column(name = "group_invitation_id")
     val id: Long = 0,
 
     @ManyToOne(targetEntity = Meeting::class, fetch = FetchType.EAGER)
