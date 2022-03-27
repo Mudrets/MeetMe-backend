@@ -23,25 +23,25 @@ class UserController {
     private lateinit var userToUserDto: UserToUserDto
 
     @PostMapping("/register")
-    fun register(@RequestBody credentials: RegisterCredentialsDto): DataResponse<UserDto> {
-        val newUser =
-            userService.createNewUserByEmailAndPass(email = credentials.email, password = credentials.password, fullName = credentials.fullName)
-        return if (newUser != null)
-            DataResponse(data = userToUserDto(newUser))
-        else
-            DataResponse(message = "User already exist")
-    }
+    fun register(@RequestBody credentials: RegisterCredentialsDto): DataResponse<UserDto> =
+        tryExecute {
+            val user = userService.createNewUserByEmailAndPass(
+                email = credentials.email,
+                password = credentials.password,
+                fullName = credentials.fullName
+            )
+            userToUserDto(user)
+        }
 
     @PostMapping("/login")
-    fun login(@RequestBody credentials: LoginCredentialsDto): DataResponse<UserDto> {
-        val dbUser = userService.loadUserByEmail(credentials.email)
-            ?: return DataResponse(message = "User does not exist")
-
-        return if (userService.checkPassword(user = dbUser, password = credentials.password))
-            DataResponse(data = userToUserDto(dbUser))
-        else
-            DataResponse(message = "Incorrect password")
-    }
+    fun login(@RequestBody credentials: LoginCredentialsDto): DataResponse<UserDto> =
+        tryExecute {
+            val user = userService.loginUserByEmailAndPassword(
+                email = credentials.email,
+                password = credentials.password,
+            )
+            userToUserDto(user)
+        }
 
     @PostMapping("/friends/{user_id}/{friend_id}")
     fun addFriend(

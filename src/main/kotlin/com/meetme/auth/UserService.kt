@@ -11,6 +11,7 @@ import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
+import java.util.Date
 
 @Service
 class UserService : UserDetailsService {
@@ -28,15 +29,24 @@ class UserService : UserDetailsService {
 
     override fun loadUserByUsername(username: String): UserDetails? = loadUserByEmail(username)
 
-    fun createNewUserByEmailAndPass(email: String, password: String, fullName: String): User? {
-        if (loadUserByUsername(email) != null) return null
-        val nameArr = fullName.split(" ")
+    private fun getName(fullName: String): String = fullName.split(' ')[0]
+
+    private fun getSurname(fullName: String): String =
+        if (fullName.trim().contains(' '))
+            fullName.split(' ')[1]
+        else
+            ""
+
+    fun createNewUserByEmailAndPass(email: String, password: String, fullName: String): User {
+        if (userDao.findByEmail(email) != null)
+            throw IllegalArgumentException("User with email $email already exists")
+
         val newUser = userDao.save(
             User(
                 email = email,
                 password = passwordEncoder.encode(password),
-                name = nameArr[0],
-                surname = if (nameArr.size > 1) nameArr.subList(1, nameArr.lastIndex).joinToString(" ") else "",
+                name = getName(fullName),
+                surname = getSurname(fullName),
             )
         )
 
@@ -44,54 +54,40 @@ class UserService : UserDetailsService {
         return newUser
     }
 
-    fun loadUserByEmail(email: String): User? {
+    private fun loadUserByEmail(email: String): User {
         val dbUser = userDao.findByEmail(email)
 
-        if (dbUser != null)
+        if (dbUser != null) {
             logger.debug("User $dbUser found by email: $email")
-        else
+        } else {
             logger.debug("User not found by email: $email")
+            throw IllegalArgumentException("User not found by email: $email")
+        }
 
         return dbUser
+    }
+
+    fun loginUserByEmailAndPassword(email: String, password: String): User {
+        val user = loadUserByEmail(email)
+        if (!checkPassword(user, password))
+            throw IllegalArgumentException("Incorrect password")
+        return user
     }
 
     fun checkPassword(user: User, password: String): Boolean = passwordEncoder.matches(password, user.password)
 
     @Throws(IllegalArgumentException::class)
-    fun addFriend(userId: Long, friendId: Long): Friendship {
-        val dbUser = userId.getEntity(userDao, logger)
-        val dbFriend = userId.getEntity(userDao, logger)
+    fun addFriend(userId: Long, friendId: Long): Friendship =
+        (userId to friendId).doIfExist(userDao, logger) { user, friend ->
+            friendshipService.createNewFriendship(user, friend)
+        }
 
-        return if (dbUser != null && dbFriend != null)
-            friendshipService.createNewFriendship(dbUser, dbFriend)
-        else
-            throw IllegalArgumentException(
-                if (dbUser == null && dbFriend == null)
-                    "Users with id = $userId and id = $friendId do not exist"
-                else if (dbUser == null)
-                    "User with id = $userId does not exist"
-                else
-                    "User with id = $friendId does not exist"
-            )
-    }
 
     @Throws(IllegalArgumentException::class)
-    fun removeFriend(userId: Long, friendId: Long) {
-        val dbUser = userId.getEntity(userDao, logger)
-        val dbFriend = userId.getEntity(userDao, logger)
-
-        if (dbUser != null && dbFriend != null)
-            friendshipService.removeFriendShip(dbUser, dbFriend)
-        else
-            throw IllegalArgumentException(
-                if (dbUser == null && dbFriend == null)
-                    "Users with id = $userId and id = $friendId do not exist"
-                else if (dbUser == null)
-                    "User with id = $userId does not exist"
-                else
-                    "User with id = $friendId does not exist"
-            )
-    }
+    fun removeFriend(userId: Long, friendId: Long) =
+        (userId to friendId).doIfExist(userDao, logger) { user, friend ->
+            friendshipService.removeFriendShip(user, friend)
+        }
 
     fun getFriends(userId: Long): List<User> =
         userId.doIfExist(userDao, logger) { user ->

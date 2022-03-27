@@ -6,7 +6,7 @@ data class MeetingDto(
     val id: Long,
     val adminId: Long?,
     val name: String,
-    val description: String?,
+    val description: String? = null,
     val startDate: Date,
     val endDate: Date? = null,
     val isPrivate: Boolean = false,

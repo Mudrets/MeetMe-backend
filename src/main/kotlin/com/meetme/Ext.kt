@@ -26,11 +26,17 @@ inline fun <reified T, M> Long.doIfExist(dao: JpaRepository<T, Long>, logger: Lo
 }
 
 @Throws(NoSuchElementException::class)
+inline fun <reified T, M> Pair<Long, Long>.doIfExist(
+    dao: JpaRepository<T, Long>,
+    logger: Logger, action: (T, T) -> M
+): M = this.doIfExist(dao, dao, logger, action)
+
+@Throws(NoSuchElementException::class)
 inline fun <reified T1, reified T2, M> Pair<Long, Long>.doIfExist(
     dao1: JpaRepository<T1, Long>,
     dao2: JpaRepository<T2, Long>,
-    logger: Logger, action: (T1, T2) -> M): M
-{
+    logger: Logger, action: (T1, T2) -> M
+): M {
     val entity1 = this.first.getEntity(dao1, logger)
     val entity2 = this.second.getEntity(dao2, logger)
     if (entity1 != null && entity2 != null)

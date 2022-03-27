@@ -6,7 +6,7 @@ import java.util.*
 data class CreateMeetingDto(
     val adminId: Long,
     val name: String,
-    val description: String = "",
+    val description: String? = null,
     val interests: Set<String> = setOf(),
     val location: String? = null,
     val isOnline: Boolean = false,
