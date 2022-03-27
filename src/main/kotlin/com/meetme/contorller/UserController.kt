@@ -19,6 +19,7 @@ class UserController {
     @Autowired
     private lateinit var userService: UserService
 
+    @Autowired
     private lateinit var userToUserDto: UserToUserDto
 
     @PostMapping("/register")
