@@ -19,6 +19,7 @@ class UserToUserDtoImpl(
             telephone = user.telephone,
             links = mediaLinksToMap(user.socialMediaLinks),
             interests = interestsToStrings(user.interests),
+            description = user.description,
         )
 
 }

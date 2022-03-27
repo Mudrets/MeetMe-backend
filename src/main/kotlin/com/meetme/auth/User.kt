@@ -39,6 +39,9 @@ data class User(
     @JvmField
     var password: String? = null,
 
+    @Column(name = "description")
+    var description: String? = null,
+
     @Column(name = "photo_url")
     var photoUrl: String? = null,
 
