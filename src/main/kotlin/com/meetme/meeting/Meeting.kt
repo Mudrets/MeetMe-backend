@@ -51,7 +51,7 @@ data class Meeting(
         joinColumns = [JoinColumn(name = "meeting_id")],
         inverseJoinColumns = [JoinColumn(name = "interest_id")],
     )
-    var interests: Set<Interest> = mutableSetOf(),
+    var interests: MutableSet<Interest> = mutableSetOf(),
 
     @Column(name = "participants")
     @ManyToMany(targetEntity = User::class)

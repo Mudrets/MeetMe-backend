@@ -1,12 +1,14 @@
 package com.meetme.contorller
 
 import com.meetme.auth.User
-import com.meetme.dto.auth.AuthorizationUserDto
-import com.meetme.dto.auth.CredentialsDto
+import com.meetme.dto.auth.UserDto
+import com.meetme.dto.auth.RegisterCredentialsDto
 import com.meetme.auth.UserService
 import com.meetme.data.DataResponse
+import com.meetme.dto.auth.LoginCredentialsDto
 import com.meetme.dto.user.UserInfoDto
 import com.meetme.friends.Friendship
+import com.meetme.mapper.UserToUserDto
 import com.meetme.tryExecute
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.*
@@ -17,23 +19,25 @@ class UserController {
     @Autowired
     private lateinit var userService: UserService
 
+    private lateinit var userToUserDto: UserToUserDto
+
     @PostMapping("/register")
-    fun register(@RequestBody credentials: CredentialsDto): DataResponse<AuthorizationUserDto> {
+    fun register(@RequestBody credentials: RegisterCredentialsDto): DataResponse<UserDto> {
         val newUser =
             userService.createNewUserByEmailAndPass(email = credentials.email, password = credentials.password, fullName = credentials.fullName)
         return if (newUser != null)
-            DataResponse(data = AuthorizationUserDto(id = newUser.id))
+            DataResponse(data = userToUserDto(newUser))
         else
             DataResponse(message = "User already exist")
     }
 
     @PostMapping("/login")
-    fun login(@RequestBody credentials: CredentialsDto): DataResponse<AuthorizationUserDto> {
+    fun login(@RequestBody credentials: LoginCredentialsDto): DataResponse<UserDto> {
         val dbUser = userService.loadUserByEmail(credentials.email)
             ?: return DataResponse(message = "User does not exist")
 
         return if (userService.checkPassword(user = dbUser, password = credentials.password))
-            DataResponse(data = AuthorizationUserDto(id = dbUser.id))
+            DataResponse(data = userToUserDto(dbUser))
         else
             DataResponse(message = "Incorrect password")
     }

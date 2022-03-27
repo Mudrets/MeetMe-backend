@@ -9,7 +9,7 @@ class InterestService {
     @Autowired
     private lateinit var interestDao: InterestDao
 
-    fun convertToInterestEntityAndAddNewInterests(interests: Set<String>): Set<Interest> {
+    fun convertToInterestEntityAndAddNewInterests(interests: Set<String>): MutableSet<Interest> {
         val interestsSet = mutableSetOf<Interest>()
         for (interestName in interests) {
             val dbInterest = interestDao.findByName(interestName) ?: interestDao.save(Interest(name = interestName))

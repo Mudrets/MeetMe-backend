@@ -23,7 +23,7 @@ class MeetingToMeetingDtoImpl(
             location = meeting.location,
             maxNumberOfParticipants = meeting.maxNumberOfParticipants,
             numberOfParticipants = meeting.numberOfParticipants,
-            interests = interestsToStrings(meeting.interests.toList())
+            interests = interestsToStrings(meeting.interests)
         )
 
 }

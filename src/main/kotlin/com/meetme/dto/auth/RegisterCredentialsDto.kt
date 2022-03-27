@@ -1,7 +1,8 @@
 package com.meetme.dto.auth
 
-data class CredentialsDto(
+data class RegisterCredentialsDto(
     val fullName: String,
     val email: String,
-    val password: String
+    val password: String,
+
 )

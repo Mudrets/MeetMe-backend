@@ -2,6 +2,8 @@ package com.meetme.auth
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.meetme.group.Group
+import com.meetme.iterest.Interest
+import com.meetme.medialink.MediaLink
 import com.meetme.meeting.Meeting
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails
@@ -39,6 +41,8 @@ data class User(
 
     @Column(name = "photo_url")
     var photoUrl: String? = null,
+
+
 ) : UserDetails {
 
     @JsonIgnore
@@ -62,6 +66,17 @@ data class User(
         mappedBy = "participants"
     )
     var groups: MutableSet<Group> = mutableSetOf()
+
+    @ManyToMany(targetEntity = Interest::class)
+    @JoinTable(
+        name = "interests_of_user",
+        joinColumns = [JoinColumn(name = "user_id")],
+        inverseJoinColumns = [JoinColumn(name = "interest_id")],
+    )
+    var interests: Set<Interest> = mutableSetOf()
+
+    @OneToMany(targetEntity = MediaLink::class, mappedBy = "user")
+    var socialMediaLinks: Set<MediaLink> = mutableSetOf()
 
     override fun getAuthorities(): MutableCollection<out GrantedAuthority>? = null
 

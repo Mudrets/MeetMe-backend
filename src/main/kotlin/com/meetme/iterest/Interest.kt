@@ -1,6 +1,7 @@
 package com.meetme.iterest
 
 import com.fasterxml.jackson.annotation.JsonIgnore
+import com.meetme.auth.User
 import com.meetme.group.Group
 import com.meetme.meeting.Meeting
 import javax.persistence.*
@@ -40,6 +41,13 @@ data class Interest(
         mappedBy = "interests"
     )
     var groups: Set<Group> = setOf()
+
+    @JsonIgnore
+    @ManyToMany(
+        targetEntity = User::class,
+        mappedBy = "interests"
+    )
+    var users: Set<User> = setOf()
 
     override fun toString(): String {
         return "Interest(" +
