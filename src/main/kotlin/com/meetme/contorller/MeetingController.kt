@@ -2,13 +2,18 @@ package com.meetme.contorller
 
 import com.meetme.auth.User
 import com.meetme.data.DataResponse
+import com.meetme.doIfExist
+import com.meetme.dto.auth.UserDto
 import com.meetme.meeting.Meeting
 import com.meetme.meeting.MeetingService
 import com.meetme.dto.meeting.CreateMeetingDto
 import com.meetme.dto.meeting.EditMeetingDto
 import com.meetme.dto.meeting.MeetingDto
 import com.meetme.dto.user.UserInfoDto
+import com.meetme.invitation.participant.Invitation
+import com.meetme.invitation.participant.InvitationService
 import com.meetme.mapper.MeetingToMeetingDto
+import com.meetme.mapper.UserToUserDto
 import com.meetme.tryExecute
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.*
@@ -22,6 +27,9 @@ class MeetingController {
 
     @Autowired
     private lateinit var meetingToMeetingDto: MeetingToMeetingDto
+
+    @Autowired
+    private lateinit var userToUserDto: UserToUserDto
 
     @PostMapping("/create")
     fun createMeeting(@RequestBody createMeetingDto: CreateMeetingDto): DataResponse<MeetingDto> =
@@ -91,18 +99,30 @@ class MeetingController {
     @GetMapping("/{meeting_id}/participants")
     fun getParticipants(
         @PathVariable("meeting_id") meetingId: Long
-    ): DataResponse<List<UserInfoDto>> =
+    ): DataResponse<List<UserDto>> =
         tryExecute {
             meetingService.getParticipants(meetingId)
-                .map(::mapUserToDto)
+                .map(userToUserDto)
         }
 
-    private fun mapUserToDto(user: User): UserInfoDto {
-        return UserInfoDto(
-            id = user.id,
-            name = user.name,
-            surname = user.surname,
-            photoUrl = user.photoUrl,
-        )
-    }
+    @PostMapping("/{meeting_id}/invite/{user_id}")
+    fun sendInvitation(
+        @PathVariable("user_id") userId: Long,
+        @PathVariable("meeting_id") meetingId: Long
+    ): DataResponse<Invitation> =
+        tryExecute { meetingService.sendInvitation(userId, meetingId) }
+
+    @PostMapping("/{meeting_id}/accept/{user_id}")
+    fun acceptInvitation(
+        @PathVariable("user_id") userId: Long,
+        @PathVariable("meeting_id") meetingId: Long
+    ): DataResponse<Invitation> =
+        tryExecute { meetingService.acceptInvitation(userId, meetingId) }
+
+    @PostMapping("/{meeting_id}/cancel/{user_id}")
+    fun cancelInvitation(
+        @PathVariable("user_id") userId: Long,
+        @PathVariable("meeting_id") meetingId: Long
+    ): DataResponse<Invitation> =
+        tryExecute { meetingService.cancelInvitation(userId, meetingId) }
 }

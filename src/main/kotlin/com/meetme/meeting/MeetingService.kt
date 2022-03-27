@@ -5,8 +5,9 @@ import com.meetme.auth.UserDao
 import com.meetme.doIfExist
 import com.meetme.dto.meeting.CreateMeetingDto
 import com.meetme.dto.meeting.EditMeetingDto
+import com.meetme.invitation.participant.Invitation
+import com.meetme.invitation.participant.InvitationService
 import com.meetme.iterest.InterestService
-import com.meetme.medialink.MediaLinkService
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -27,7 +28,7 @@ class MeetingService {
     private lateinit var interestService: InterestService
 
     @Autowired
-    private lateinit var mediaLinkService: MediaLinkService
+    private lateinit var invitationService: InvitationService
 
     fun createMeeting(createMeetingDto: CreateMeetingDto): Meeting =
         createMeetingDto.adminId.doIfExist(userDao, logger) { admin ->
@@ -115,4 +116,29 @@ class MeetingService {
 
     fun getParticipants(meetingId: Long): List<User> =
         meetingId.doIfExist(meetingDao, logger, Meeting::participants)
+
+    fun sendInvitation(userId: Long, meetingId: Long): Invitation =
+        (userId to meetingId).doIfExist(userDao, meetingDao, logger) { user, meeting ->
+            invitationService.sendInvitation(user, meeting)
+        }
+
+    fun acceptInvitation(userId: Long, meetingId: Long): Invitation =
+        (userId to meetingId).doIfExist(userDao, meetingDao, logger) { user, meeting ->
+            val invitation = invitationService.acceptInvitation(user, meeting)
+            meeting.participants.add(user)
+            user.meetings.add(meeting)
+            meetingDao.save(meeting)
+            userDao.save(user)
+            invitation
+        }
+
+    fun cancelInvitation(userId: Long, meetingId: Long): Invitation =
+        (userId to meetingId).doIfExist(userDao, meetingDao, logger) { user, meeting ->
+            val invitation = invitationService.cancelInvitation(user, meeting)
+            meeting.participants.remove(user)
+            user.meetings.remove(meeting)
+            meetingDao.save(meeting)
+            userDao.save(user)
+            invitation
+        }
 }

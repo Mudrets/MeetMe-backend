@@ -43,7 +43,7 @@ data class Meeting(
 
     @ManyToOne(targetEntity = User::class)
     @JoinColumn(name = "user_id")
-    val admin: User? = null,
+    val admin: User = User(),
 
     @ManyToMany(targetEntity = Interest::class)
     @JoinTable(
@@ -60,7 +60,7 @@ data class Meeting(
         joinColumns = [JoinColumn(name = "meeting_id")],
         inverseJoinColumns = [JoinColumn(name = "user_id")],
     )
-    val participants: MutableList<User> = mutableListOf(),
+    val participants: MutableList<User> = mutableListOf(admin),
 ) {
-    val numberOfParticipants: Int = participants.size + 1
+    val numberOfParticipants: Int = participants.size
 }

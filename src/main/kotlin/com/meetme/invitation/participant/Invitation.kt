@@ -1,5 +1,6 @@
 package com.meetme.invitation.participant
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import com.meetme.auth.User
 import com.meetme.meeting.Meeting
 import javax.persistence.*
@@ -11,9 +12,11 @@ class Invitation(
     @Column(name = "user_invitation_id")
     val id: Long = 0,
 
+    @JsonIgnore
     @ManyToOne(targetEntity = Meeting::class, fetch = FetchType.EAGER)
     val meeting: Meeting? = null,
 
+    @JsonIgnore
     @ManyToOne(targetEntity = User::class, fetch = FetchType.EAGER)
     val user: User? = null,
 
