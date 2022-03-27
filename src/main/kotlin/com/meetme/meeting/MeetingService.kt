@@ -29,17 +29,12 @@ class MeetingService {
     @Autowired
     private lateinit var mediaLinkService: MediaLinkService
 
-    fun createMeeting(createMeetingDto: CreateMeetingDto): Meeting? {
-        var meeting: Meeting? = null
-
+    fun createMeeting(createMeetingDto: CreateMeetingDto): Meeting =
         createMeetingDto.adminId.doIfExist(userDao, logger) { admin ->
             val interestsSet =
                 interestService.convertToInterestEntityAndAddNewInterests(interests = createMeetingDto.interests)
 
-            val linksSet =
-                mediaLinkService.createNewLinks(links = createMeetingDto.links)
-
-            meeting = meetingDao.save(
+            meetingDao.save(
                 Meeting(
                     name = createMeetingDto.name,
                     description = createMeetingDto.description,
@@ -48,15 +43,11 @@ class MeetingService {
                     isOnline = createMeetingDto.isOnline,
                     private = createMeetingDto.isPrivate,
                     interests = interestsSet,
-                    socialMediaLinks = linksSet,
                     admin = admin,
                     maxNumberOfParticipants = createMeetingDto.maxNumberParticipants
                 )
             )
         }
-
-        return meeting
-    }
 
     fun getMeeting(meetingId: Long): Meeting =
         meetingId.doIfExist(meetingDao, logger) { meeting -> meeting }
@@ -84,7 +75,9 @@ class MeetingService {
             if (meeting.numberOfParticipants >= meeting.maxNumberOfParticipants)
                 throw IllegalArgumentException("The maximum number of participants in the meeting has been exceeded")
             if (meeting.participants.contains(user))
-                throw IllegalArgumentException("User $user already is participant of meeting $meeting")
+                throw IllegalArgumentException(
+                    "User with id = ${user.id} already is participant of meeting with id = ${meeting.id}"
+                )
 
             user.meetings.add(meeting)
             meeting.participants.add(user)

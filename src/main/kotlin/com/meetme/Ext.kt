@@ -36,9 +36,9 @@ inline fun <reified T1, reified T2, M> Pair<Long, Long>.doIfExist(
     if (entity1 != null && entity2 != null)
         return action(entity1, entity2)
     else if (entity1 == null)
-        throw NoSuchElementException("${T1::class.java.simpleName} with id = $this not found")
+        throw NoSuchElementException("${T1::class.java.simpleName} with id = ${this.first} not found")
     else
-        throw NoSuchElementException("${T2::class.java.simpleName} with id = $this not found")
+        throw NoSuchElementException("${T2::class.java.simpleName} with id = ${this.second} not found")
 }
 
 inline fun <T> tryExecute(action: () -> T): DataResponse<T> {

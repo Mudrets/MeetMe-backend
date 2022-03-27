@@ -29,14 +29,6 @@ data class MediaLink(
 
     @JsonIgnore
     @ManyToOne(
-        targetEntity = Meeting::class,
-        cascade = [CascadeType.ALL]
-    )
-    @JoinColumn(name = "meeting_id")
-    var meeting: Meeting? = null
-
-    @JsonIgnore
-    @ManyToOne(
         targetEntity = Group::class,
         cascade = [CascadeType.ALL]
     )

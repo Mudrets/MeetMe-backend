@@ -61,9 +61,6 @@ data class Meeting(
         inverseJoinColumns = [JoinColumn(name = "user_id")],
     )
     val participants: MutableList<User> = mutableListOf(),
-
-    @OneToMany(targetEntity = MediaLink::class, mappedBy = "meeting")
-    var socialMediaLinks: Set<MediaLink> = mutableSetOf()
 ) {
     val numberOfParticipants: Int = participants.size + 1
 }
