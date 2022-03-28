@@ -3,6 +3,8 @@ package com.meetme.group
 import com.meetme.auth.User
 import com.meetme.auth.UserDao
 import com.meetme.doIfExist
+import com.meetme.dto.goup.CreateGroupDto
+import com.meetme.dto.meeting.CreateMeetingDto
 import com.meetme.group.post.Post
 import com.meetme.group.post.PostDao
 import com.meetme.invitation.group.InvitationGroupToMeeting
@@ -44,28 +46,21 @@ class GroupService {
     @Autowired
     private lateinit var postDao: PostDao
 
-    fun createGroup(
-        adminId: Long,
-        name: String,
-        description: String = "",
-        interests: Set<String> = setOf(),
-        links: MutableMap<String, String> = mutableMapOf(),
-        isPrivate: Boolean = false,
-    ): Group =
-        adminId.doIfExist(userDao, logger) { admin ->
+    fun createGroup(createGroupDto: CreateGroupDto): Group =
+        createGroupDto.adminId.doIfExist(userDao, logger) { admin ->
             val interestsSet =
-                interestService.convertToInterestEntityAndAddNewInterests(interests = interests)
+                interestService.convertToInterestEntityAndAddNewInterests(interests = createGroupDto.interests)
 
             val linksSet =
-                mediaLinkService.createNewLinks(links = links)
+                mediaLinkService.createNewLinks(links = createGroupDto.links)
 
             val group = Group(
-                name = name,
-                description = description,
+                name = createGroupDto.name,
+                description = createGroupDto.description,
                 interests = interestsSet,
                 socialMediaLinks = linksSet,
                 admin = admin,
-                isPrivate = isPrivate,
+                isPrivate = createGroupDto.isPrivate,
             )
             groupDao.save(group)
         }
@@ -138,6 +133,11 @@ class GroupService {
 
     fun addParticipantToGroup(groupId: Long, userId: Long): Group =
         (groupId to userId).doIfExist(groupDao, userDao, logger) { group, user ->
+            if (group.participants.contains(user))
+                throw IllegalArgumentException(
+                    "User with id = ${user.id} already is participant of group with id = ${group.id}"
+                )
+
             user.groups.add(group)
             group.participants.add(user)
             groupDao.save(group)
@@ -157,6 +157,10 @@ class GroupService {
 
     fun deleteUser(groupId: Long, userId: Long): Group =
         (groupId to userId).doIfExist(groupDao, userDao, logger) { group, user ->
+            if (!group.participants.contains(user))
+                throw IllegalArgumentException(
+                    "The user with id = $userId is not a member of the meeting $groupId"
+                )
             group.participants.remove(user)
             user.groups.remove(group)
             groupDao.save(group)
@@ -168,10 +172,15 @@ class GroupService {
         groupDao.findAll()
             .filter { it.name.contains(search) }
 
-    companion object {
-        private val POST_TITLE = "Мероприятие %s"
+    fun getGroupsForUser(userId: Long): List<Group> =
+        userId.doIfExist(userDao, logger) { user ->
+            user.groups.union(user.managedGroup).toList()
+        }
 
-        private val POST_TEXT =
+    companion object {
+        private const val POST_TITLE = "Мероприятие %s"
+
+        private const val POST_TEXT =
             "Группа была приглашена на мероприятие %s, проходящее %s. Мероприятие будет проводиться %s"
     }
 }

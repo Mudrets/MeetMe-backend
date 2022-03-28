@@ -103,6 +103,11 @@ class MeetingService {
                 userDao.save(user)
                 meeting
             } else {
+                if (!meeting.participants.contains(user))
+                    throw IllegalArgumentException(
+                        "The user with id = $userId is not a member of the meeting $meetingId"
+                    )
+
                 meeting.participants.remove(user)
                 user.meetings.remove(meeting)
                 meetingDao.save(meeting)

@@ -1,6 +1,7 @@
 package com.meetme.invitation.group
 
 import com.meetme.group.Group
+import com.meetme.invitation.participant.InvitationService
 import com.meetme.meeting.Meeting
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.core.userdetails.User
@@ -11,6 +12,9 @@ class InvitationGroupToMeetingService {
 
     @Autowired
     private lateinit var invitationGroupToMeetingDao: InvitationGroupToMeetingDao
+
+    @Autowired
+    private lateinit var invitationService: InvitationService
 
     private fun getInvitation(group: Group, meeting: Meeting): InvitationGroupToMeeting =
         invitationGroupToMeetingDao.findByGroupAndMeeting(group, meeting)
@@ -38,6 +42,10 @@ class InvitationGroupToMeetingService {
 
         invitation.isAccepted = true
         invitationGroupToMeetingDao.save(invitation)
+        invitation.group?.participants
+            ?.forEach { participant ->
+                invitationService.sendInvitation(participant, meeting)
+            }
 
         return invitation
     }

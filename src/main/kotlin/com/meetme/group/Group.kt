@@ -35,7 +35,7 @@ class Group(
 
     @ManyToOne(targetEntity = User::class)
     @JoinColumn(name = "user_id")
-    val admin: User? = null,
+    val admin: User = User(),
 
     @OneToMany(targetEntity = Post::class)
     @JoinColumn(name = "post_id")
@@ -48,7 +48,7 @@ class Group(
         joinColumns = [JoinColumn(name = "group_id")],
         inverseJoinColumns = [JoinColumn(name = "user_id")],
     )
-    var participants: MutableList<User> = mutableListOf(),
+    var participants: MutableList<User> = mutableListOf(admin),
 
     @ManyToMany(targetEntity = Interest::class)
     @JoinTable(
