@@ -95,7 +95,7 @@ data class User(
 
     override fun isEnabled(): Boolean = true
 
-    val fullname = "$name $surname"
+    val fullname = "$name${if (surname.isNotBlank()) " $surname" else ""}"
 
     override fun toString(): String {
         return "User(" +
