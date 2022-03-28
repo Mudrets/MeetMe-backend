@@ -3,6 +3,7 @@ package com.meetme.contorller
 import com.meetme.dto.goup.CreateGroupDto
 import com.meetme.data.DataResponse
 import com.meetme.dto.auth.UserDto
+import com.meetme.dto.goup.EditGroupDto
 import com.meetme.dto.goup.GroupDto
 import com.meetme.group.GroupService
 import com.meetme.invitation.group.InvitationGroupToMeeting
@@ -29,6 +30,15 @@ class GroupController {
     fun createGroup(@RequestBody createGroupDto: CreateGroupDto): DataResponse<GroupDto> =
         tryExecute {
             groupToGroupDto(groupService.createGroup(createGroupDto))
+        }
+
+    @PostMapping("/{group_id}/edit")
+    fun editGroup(
+        @PathVariable("group_id") groupId: Long,
+        @RequestBody editCredentials: EditGroupDto,
+    ): DataResponse<GroupDto> =
+        tryExecute {
+            groupToGroupDto(groupService.editGroup(groupId, editCredentials))
         }
 
     @PostMapping("/{group_id}/participant/{user_id}")

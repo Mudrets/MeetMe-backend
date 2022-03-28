@@ -4,6 +4,7 @@ import com.meetme.auth.User
 import com.meetme.auth.UserDao
 import com.meetme.doIfExist
 import com.meetme.dto.goup.CreateGroupDto
+import com.meetme.dto.goup.EditGroupDto
 import com.meetme.dto.meeting.CreateMeetingDto
 import com.meetme.group.post.Post
 import com.meetme.group.post.PostDao
@@ -175,6 +176,26 @@ class GroupService {
     fun getGroupsForUser(userId: Long): List<Group> =
         userId.doIfExist(userDao, logger) { user ->
             user.groups.union(user.managedGroup).toList()
+        }
+
+    fun editGroup(groupId: Long, editCredentials: EditGroupDto): Group =
+        groupId.doIfExist(groupDao, logger) { group ->
+            val interestsSet =
+                interestService.convertToInterestEntityAndAddNewInterests(interests = editCredentials.interests)
+
+            val linksSet =
+                mediaLinkService.createNewLinks(links = editCredentials.socialMediaLinks)
+
+            group.apply {
+                name = editCredentials.name
+                description = editCredentials.description
+                photoUrl = editCredentials.photoUrl
+                isPrivate = editCredentials.isPrivate
+                interests = interestsSet
+                socialMediaLinks = linksSet
+            }
+
+            groupDao.save(group)
         }
 
     companion object {
