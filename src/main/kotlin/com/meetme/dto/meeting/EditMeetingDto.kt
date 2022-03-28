@@ -8,4 +8,5 @@ data class EditMeetingDto(
     val isOnline: Boolean,
     val locate: String,
     val maxNumberOfParticipants: Int,
+    val interests: Set<String> = setOf()
 )

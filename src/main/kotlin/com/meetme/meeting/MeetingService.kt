@@ -63,14 +63,18 @@ class MeetingService {
 
     fun editMeeting(meetingId: Long, changes: EditMeetingDto): Meeting =
         meetingId.doIfExist(meetingDao, logger) { meeting ->
+            val interestsSet =
+                interestService.convertToInterestEntityAndAddNewInterests(interests = changes.interests)
+
             meeting.apply {
-                name = changes.name ?: meeting.name
-                description = changes.description ?: meeting.description
-                startDate = changes.startDate ?: meeting.startDate
+                name = changes.name
+                description = changes.description
+                startDate = changes.startDate
                 endDate = changes.endDate
                 isOnline = changes.isOnline
                 location = if (changes.isOnline) changes.locate else meeting.location
                 maxNumberOfParticipants = changes.maxNumberOfParticipants
+                interests = interestsSet
             }
             meetingDao.save(meeting)
             meeting
