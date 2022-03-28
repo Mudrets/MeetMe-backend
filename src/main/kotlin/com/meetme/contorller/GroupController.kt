@@ -82,36 +82,40 @@ class GroupController {
     fun deleteGroup(
         @PathVariable("group_id") groupId: Long,
         @PathVariable("user_id") userId: Long,
-    ): DataResponse<Unit> =
+    ): DataResponse<Unit?> =
         tryExecute {
             groupService.deleteGroup(groupId, userId)
+            null
         }
 
     @PostMapping("/{group_id}/accept/{meeting_id}")
     fun acceptInvitation(
         @PathVariable("group_id") groupId: Long,
         @PathVariable("meeting_id") meetingId: Long,
-    ): DataResponse<Unit> =
+    ): DataResponse<Unit?> =
         tryExecute {
             groupService.acceptInvitation(groupId, meetingId)
+            null
         }
 
     @PostMapping("/{group_id}/cancel/{meeting_id}")
     fun cancelInvitation(
         @PathVariable("group_id") groupId: Long,
         @PathVariable("meeting_id") meetingId: Long,
-    ): DataResponse<Unit> =
+    ): DataResponse<Unit?> =
         tryExecute {
             groupService.cancelInvitation(groupId, meetingId)
+            null
         }
 
     @PostMapping("/{group_id}/invite/{meeting_id}")
     fun inviteGroupToMeeting(
         @PathVariable("group_id") groupId: Long,
         @PathVariable("meeting_id") meetingId: Long,
-    ): DataResponse<Unit> =
+    ): DataResponse<Unit?> =
         tryExecute {
             groupService.sendInvitationToGroup(groupId, meetingId)
+            null
         }
 
     @GetMapping("/user/{user_id}")

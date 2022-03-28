@@ -49,9 +49,10 @@ class MeetingController {
         }
 
     @DeleteMapping("/{meeting_id}")
-    fun deleteMeeting(@PathVariable("meeting_id") meetingId: Long): DataResponse<Unit> =
+    fun deleteMeeting(@PathVariable("meeting_id") meetingId: Long): DataResponse<Unit?> =
         tryExecute {
             meetingService.deleteMeeting(meetingId)
+            null
         }
 
     @PostMapping("/{meeting_id}/add/{user_id}")
@@ -95,22 +96,31 @@ class MeetingController {
     fun sendInvitation(
         @PathVariable("user_id") userId: Long,
         @PathVariable("meeting_id") meetingId: Long
-    ): DataResponse<Invitation> =
-        tryExecute { meetingService.sendInvitation(userId, meetingId) }
+    ): DataResponse<Unit?> =
+        tryExecute {
+            meetingService.sendInvitation(userId, meetingId)
+            null
+        }
 
     @PostMapping("/{meeting_id}/accept/{user_id}")
     fun acceptInvitation(
         @PathVariable("user_id") userId: Long,
         @PathVariable("meeting_id") meetingId: Long
-    ): DataResponse<Invitation> =
-        tryExecute { meetingService.acceptInvitation(userId, meetingId) }
+    ): DataResponse<Unit?> =
+        tryExecute {
+            meetingService.acceptInvitation(userId, meetingId)
+            null
+        }
 
     @PostMapping("/{meeting_id}/cancel/{user_id}")
     fun cancelInvitation(
         @PathVariable("user_id") userId: Long,
         @PathVariable("meeting_id") meetingId: Long
-    ): DataResponse<Invitation> =
-        tryExecute { meetingService.cancelInvitation(userId, meetingId) }
+    ): DataResponse<Unit?> =
+        tryExecute {
+            meetingService.cancelInvitation(userId, meetingId)
+            null
+        }
 
     @GetMapping("/{user_id}/planned")
     fun getPlannedMeetings(@PathVariable("user_id") userId: Long): DataResponse<List<MeetingDto>> =
