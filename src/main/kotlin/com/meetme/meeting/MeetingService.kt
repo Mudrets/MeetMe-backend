@@ -12,6 +12,9 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
+import java.text.SimpleDateFormat
+import java.time.Instant
+import java.util.*
 
 @Service
 class MeetingService {
@@ -109,10 +112,30 @@ class MeetingService {
             .union(getAllMeetingsForUser(userId))
             .toList()
 
-    fun getAllMeetingsForUser(userId: Long): List<Meeting> =
+    private fun getAllMeetingsForUser(userId: Long): List<Meeting> =
         userId.doIfExist(userDao, logger) { user ->
             user.meetings.union(user.managedMeetings).toList()
         }
+
+    fun getVisitedMeetingForUser(userId: Long): List<Meeting> {
+        val now = Date.from(Instant.now())
+        return getAllMeetingsForUser(userId)
+            .filter { meeting ->
+                val format = SimpleDateFormat("MM-dd-yyyy HH:mm")
+                val endDate = format.parse(meeting.endDate)
+                endDate.before(now)
+            }
+    }
+
+    fun getPlannedMeetingsForUser(userId: Long): List<Meeting> {
+        val now = Date.from(Instant.now())
+        return getAllMeetingsForUser(userId)
+            .filter { meeting ->
+                val format = SimpleDateFormat("MM-dd-yyyy HH:mm")
+                val endDate = format.parse(meeting.endDate)
+                endDate.after(now)
+            }
+    }
 
     fun getParticipants(meetingId: Long): List<User> =
         meetingId.doIfExist(meetingDao, logger, Meeting::participants)

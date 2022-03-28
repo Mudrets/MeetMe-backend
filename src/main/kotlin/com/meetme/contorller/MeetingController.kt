@@ -1,17 +1,12 @@
 package com.meetme.contorller
 
-import com.meetme.auth.User
 import com.meetme.data.DataResponse
-import com.meetme.doIfExist
 import com.meetme.dto.auth.UserDto
-import com.meetme.meeting.Meeting
 import com.meetme.meeting.MeetingService
 import com.meetme.dto.meeting.CreateMeetingDto
 import com.meetme.dto.meeting.EditMeetingDto
 import com.meetme.dto.meeting.MeetingDto
-import com.meetme.dto.user.UserInfoDto
 import com.meetme.invitation.participant.Invitation
-import com.meetme.invitation.participant.InvitationService
 import com.meetme.mapper.MeetingToMeetingDto
 import com.meetme.mapper.UserToUserDto
 import com.meetme.tryExecute
@@ -87,15 +82,6 @@ class MeetingController {
                 .map(meetingToMeetingDto)
         }
 
-    @GetMapping("/user/{user_id}")
-    fun getAllMeetingsForUser(
-        @PathVariable("user_id") userId: Long
-    ): DataResponse<List<MeetingDto>> =
-        tryExecute {
-            meetingService.getAllMeetingsForUser(userId)
-                .map(meetingToMeetingDto)
-        }
-
     @GetMapping("/{meeting_id}/participants")
     fun getParticipants(
         @PathVariable("meeting_id") meetingId: Long
@@ -125,4 +111,18 @@ class MeetingController {
         @PathVariable("meeting_id") meetingId: Long
     ): DataResponse<Invitation> =
         tryExecute { meetingService.cancelInvitation(userId, meetingId) }
+
+    @GetMapping("/{user_id}/planned")
+    fun getPlannedMeetings(@PathVariable("user_id") userId: Long): DataResponse<List<MeetingDto>> =
+        tryExecute {
+            meetingService.getPlannedMeetingsForUser(userId)
+                .map(meetingToMeetingDto)
+        }
+
+    @GetMapping("/{user_id}/visited")
+    fun getVisitedMeetings(@PathVariable("user_id") userId: Long): DataResponse<List<MeetingDto>> =
+        tryExecute {
+            meetingService.getVisitedMeetingForUser(userId)
+                .map(meetingToMeetingDto)
+        }
 }
