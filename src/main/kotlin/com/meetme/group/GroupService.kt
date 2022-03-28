@@ -5,9 +5,6 @@ import com.meetme.auth.UserDao
 import com.meetme.doIfExist
 import com.meetme.dto.goup.CreateGroupDto
 import com.meetme.dto.goup.EditGroupDto
-import com.meetme.dto.meeting.CreateMeetingDto
-import com.meetme.group.post.Post
-import com.meetme.group.post.PostDao
 import com.meetme.invitation.group.InvitationGroupToMeeting
 import com.meetme.invitation.group.InvitationGroupToMeetingService
 import com.meetme.iterest.InterestService
@@ -18,8 +15,6 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
-import java.text.SimpleDateFormat
-import java.util.*
 
 @Service
 class GroupService {
@@ -44,9 +39,6 @@ class GroupService {
     @Autowired
     private lateinit var invitationGroupToMeetingService: InvitationGroupToMeetingService
 
-    @Autowired
-    private lateinit var postDao: PostDao
-
     fun createGroup(createGroupDto: CreateGroupDto): Group =
         createGroupDto.adminId.doIfExist(userDao, logger) { admin ->
             val interestsSet =
@@ -65,31 +57,6 @@ class GroupService {
             )
             groupDao.save(group)
         }
-
-    private fun getPostTitle(meeting: Meeting): String =
-        POST_TITLE.format(meeting.name)
-
-    private fun getLocation(meeting: Meeting): String =
-        if (meeting.isOnline)
-            "онлайн"
-        else
-            meeting.location ?: "в неизвестном на данный момент месте"
-
-    private fun getPostText(meeting: Meeting): String {
-        val location = getLocation(meeting)
-        return POST_TEXT.format(meeting.startDate, meeting.startDate, location)
-    }
-
-    private fun addPost(group: Group, meeting: Meeting) {
-        val newPost = Post(
-            title = getPostTitle(meeting),
-            text = getPostText(meeting),
-            group = group,
-        )
-        postDao.save(newPost)
-        group.posts.add(newPost)
-        groupDao.save(group)
-    }
 
     fun getGroup(groupId: Long): Group =
         groupId.doIfExist(groupDao, logger) { group -> group }
@@ -120,7 +87,8 @@ class GroupService {
                 group = group,
                 meeting = meeting,
             )
-            addPost(group, meeting)
+            group.meetings.add(meeting)
+            groupDao.save(group)
             invitation
         }
 
@@ -198,10 +166,6 @@ class GroupService {
             groupDao.save(group)
         }
 
-    companion object {
-        private const val POST_TITLE = "Мероприятие %s"
-
-        private const val POST_TEXT =
-            "Группа была приглашена на мероприятие %s, проходящее %s. Мероприятие будет проводиться %s"
-    }
+    fun getMeetings(groupId: Long): List<Meeting> =
+        groupId.doIfExist(groupDao, logger) { group -> group.meetings }
 }

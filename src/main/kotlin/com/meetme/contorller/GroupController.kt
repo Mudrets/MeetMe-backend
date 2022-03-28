@@ -5,9 +5,11 @@ import com.meetme.data.DataResponse
 import com.meetme.dto.auth.UserDto
 import com.meetme.dto.goup.EditGroupDto
 import com.meetme.dto.goup.GroupDto
+import com.meetme.dto.meeting.MeetingDto
 import com.meetme.group.GroupService
 import com.meetme.invitation.group.InvitationGroupToMeeting
 import com.meetme.mapper.GroupToGroupDto
+import com.meetme.mapper.MeetingToMeetingDto
 import com.meetme.mapper.UserToUserDto
 import com.meetme.tryExecute
 import org.springframework.beans.factory.annotation.Autowired
@@ -25,6 +27,9 @@ class GroupController {
 
     @Autowired
     private lateinit var userToUserDto: UserToUserDto
+
+    @Autowired
+    private lateinit var meetingToMeetingDto: MeetingToMeetingDto
 
     @PostMapping("/create")
     fun createGroup(@RequestBody createGroupDto: CreateGroupDto): DataResponse<GroupDto> =
@@ -86,7 +91,7 @@ class GroupController {
     fun acceptInvitation(
         @PathVariable("group_id") groupId: Long,
         @PathVariable("meeting_id") meetingId: Long,
-    ): DataResponse<InvitationGroupToMeeting> =
+    ): DataResponse<Unit> =
         tryExecute {
             groupService.acceptInvitation(groupId, meetingId)
         }
@@ -95,7 +100,7 @@ class GroupController {
     fun cancelInvitation(
         @PathVariable("group_id") groupId: Long,
         @PathVariable("meeting_id") meetingId: Long,
-    ): DataResponse<InvitationGroupToMeeting> =
+    ): DataResponse<Unit> =
         tryExecute {
             groupService.cancelInvitation(groupId, meetingId)
         }
@@ -104,7 +109,7 @@ class GroupController {
     fun inviteGroupToMeeting(
         @PathVariable("group_id") groupId: Long,
         @PathVariable("meeting_id") meetingId: Long,
-    ): DataResponse<InvitationGroupToMeeting> =
+    ): DataResponse<Unit> =
         tryExecute {
             groupService.sendInvitationToGroup(groupId, meetingId)
         }
@@ -127,5 +132,12 @@ class GroupController {
             groupService.searchGroups(searchQuery)
                 .map(groupToGroupDto)
                 .sortedBy(GroupDto::name)
+        }
+
+    @GetMapping("/{group_id}/meetings")
+    fun getMeetingsOfGroup(@PathVariable("group_id") groupId: Long): DataResponse<List<MeetingDto>> =
+        tryExecute {
+            groupService.getMeetings(groupId)
+                .map(meetingToMeetingDto)
         }
 }

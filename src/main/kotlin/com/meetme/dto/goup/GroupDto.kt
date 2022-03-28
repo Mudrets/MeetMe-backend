@@ -1,9 +1,6 @@
 package com.meetme.dto.goup
 
-import com.meetme.auth.User
-import com.meetme.group.post.Post
-import com.meetme.iterest.Interest
-import com.meetme.medialink.MediaLink
+import com.meetme.dto.meeting.MeetingDto
 
 data class GroupDto(
     val id: Long,
@@ -12,7 +9,6 @@ data class GroupDto(
     val description: String,
     val photoUrl: String?,
     val isPrivate: Boolean,
-    val posts: MutableList<Post> = mutableListOf(),
     val interests: List<String> = listOf(),
     val socialMediaLinks: Map<String, String> = mapOf()
 )

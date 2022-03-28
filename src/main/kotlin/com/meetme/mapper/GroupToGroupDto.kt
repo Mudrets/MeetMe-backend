@@ -18,7 +18,6 @@ class GroupToGroupDtoImpl(
             description = group.description ?: "",
             photoUrl = group.photoUrl,
             isPrivate = group.isPrivate,
-            posts = group.posts,
             interests = interestsToStrings(group.interests),
             socialMediaLinks = mediaLinksToMap(group.socialMediaLinks)
         )
