@@ -59,7 +59,7 @@ class MeetingService {
                 name = changes.name ?: meeting.name
                 description = changes.description ?: meeting.description
                 startDate = changes.startDate ?: meeting.startDate
-                endDate = if (changes.hasEndDate) changes.endDate else meeting.endDate
+                endDate = changes.endDate
                 isOnline = changes.isOnline
                 location = if (changes.isOnline) changes.locate else meeting.location
                 maxNumberOfParticipants = changes.maxNumberOfParticipants
