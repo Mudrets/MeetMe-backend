@@ -51,6 +51,6 @@ inline fun <T> tryExecute(action: () -> T): DataResponse<T> {
     return try {
         DataResponse(data = action())
     } catch (e: Exception) {
-        DataResponse(message = e.message ?: "Failed to complete request")
+        DataResponse(message = e.message ?: "Failed to complete request: exception $e\nstack trace: ${e.stackTrace}")
     }
 }
