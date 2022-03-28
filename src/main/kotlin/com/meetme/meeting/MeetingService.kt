@@ -131,11 +131,20 @@ class MeetingService {
         val now = Date.from(Instant.now())
         return getAllMeetingsForUser(userId)
             .filter { meeting ->
-                val format = SimpleDateFormat("MM-dd-yyyy HH:mm")
-                val endDate = format.parse(meeting.endDate)
-                endDate.after(now)
+                if (meeting.endDate != null) {
+                    val format = SimpleDateFormat("MM-dd-yyyy HH:mm")
+                    val endDate = format.parse(meeting.endDate)
+                    endDate.after(now)
+                } else {
+                    true
+                }
             }
     }
+
+//    fun getInvitesOnMeetings(userId: Long): List<Meeting> {
+//        val now = Date.from(Instant.now())
+//
+//    }
 
     fun getParticipants(meetingId: Long): List<User> =
         meetingId.doIfExist(meetingDao, logger, Meeting::participants)
