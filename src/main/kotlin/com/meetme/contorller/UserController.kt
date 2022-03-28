@@ -43,70 +43,50 @@ class UserController {
             userToUserDto(user)
         }
 
-    @PostMapping("/friends/{user_id}/{friend_id}")
+    @PostMapping("/{user_id}/friends/{friend_id}")
     fun addFriend(
         @PathVariable(name = "user_id") userId: Long,
         @PathVariable(name = "friend_id") friendId: Long,
-    ): DataResponse<Friendship> =
-        tryExecute { userService.addFriend(userId, friendId) }
+    ): DataResponse<Unit?> =
+        tryExecute {
+            userService.addFriend(userId, friendId)
+            null
+        }
 
-    @DeleteMapping("/friends/{user_id}/{friend_id}")
+    @DeleteMapping("/{user_id}/friends/{friend_id}")
     fun removeFriend(
         @PathVariable(name = "user_id") userId: Long,
         @PathVariable(name = "friend_id") friendId: Long,
-    ): DataResponse<Boolean> =
-        try {
+    ): DataResponse<Unit?> =
+        tryExecute {
             userService.removeFriend(userId, friendId)
-            DataResponse(data = true)
-        } catch (e: IllegalArgumentException) {
-            DataResponse(message = e.message ?: "Bad request", data = false)
+            null
         }
 
-    @GetMapping("/friends/{user_id}")
-    fun getFriends(@PathVariable(name = "user_id") userId: Long): DataResponse<List<UserInfoDto>> =
+    @GetMapping("/{user_id}/friends")
+    fun getFriends(@PathVariable(name = "user_id") userId: Long): DataResponse<List<UserDto>> =
         tryExecute {
             userService.getFriends(userId).asSequence()
-                .map { user ->
-                    UserInfoDto(
-                        id = user.id,
-                        name = user.name,
-                        surname = user.surname,
-                        photoUrl = user.photoUrl
-                    )
-                }
-                .sortedBy(UserInfoDto::fullName)
+                .map(userToUserDto)
+                .sortedBy(UserDto::fullName)
                 .toList()
         }
 
-    @GetMapping("/friends/to/{user_id}")
-    fun getFriendRequestTo(@PathVariable(name = "user_id") userId: Long): DataResponse<List<UserInfoDto>> =
+    @GetMapping("/{user_id}/friends/to")
+    fun getFriendRequestTo(@PathVariable(name = "user_id") userId: Long): DataResponse<List<UserDto>> =
         tryExecute {
             userService.getFriendsRequestToUser(userId).asSequence()
-                .map { user ->
-                    UserInfoDto(
-                        id = user.id,
-                        name = user.name,
-                        surname = user.surname,
-                        photoUrl = user.photoUrl
-                    )
-                }
-                .sortedBy(UserInfoDto::fullName)
+                .map(userToUserDto)
+                .sortedBy(UserDto::fullName)
                 .toList()
         }
 
-    @GetMapping("/friends/from/{user_id}")
-    fun getFriendRequestFrom(@PathVariable(name = "user_id") userId: Long): DataResponse<List<UserInfoDto>> =
+    @GetMapping("/{user_id}/friends/from")
+    fun getFriendRequestFrom(@PathVariable(name = "user_id") userId: Long): DataResponse<List<UserDto>> =
         tryExecute {
             userService.getFriendsRequestFromUser(userId).asSequence()
-                .map { user ->
-                    UserInfoDto(
-                        id = user.id,
-                        name = user.name,
-                        surname = user.surname,
-                        photoUrl = user.photoUrl
-                    )
-                }
-                .sortedBy(UserInfoDto::fullName)
+                .map(userToUserDto)
+                .sortedBy(UserDto::fullName)
                 .toList()
         }
 
@@ -126,17 +106,10 @@ class UserController {
         )
 
     @GetMapping("/{search_query}")
-    fun search(@PathVariable("search_query") searchQuery: String): DataResponse<List<UserInfoDto>> =
+    fun search(@PathVariable("search_query") searchQuery: String): DataResponse<List<UserDto>> =
         tryExecute {
             userService.searchFriends(searchQuery).asSequence()
-                .map { user ->
-                    UserInfoDto(
-                        id = user.id,
-                        name = user.name,
-                        surname = user.surname,
-                        photoUrl = user.photoUrl
-                    )
-                }
+                .map(userToUserDto)
                 .toList()
         }
 }
