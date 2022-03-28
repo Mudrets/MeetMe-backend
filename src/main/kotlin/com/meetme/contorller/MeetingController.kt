@@ -125,4 +125,14 @@ class MeetingController {
             meetingService.getVisitedMeetingForUser(userId)
                 .map(meetingToMeetingDto)
         }
+
+    @GetMapping("/{user_id}/invites")
+    fun getInvitesOnMeetings(@PathVariable("user_id") userId: Long): DataResponse<Map<String, List<MeetingDto>>> =
+        tryExecute {
+            meetingService.getInvitesOnMeetings(userId)
+                .map { (name, meetings) ->
+                    name to meetings.map(meetingToMeetingDto)
+                }
+                .toMap()
+        }
 }

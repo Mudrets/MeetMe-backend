@@ -28,8 +28,8 @@ class UserConfig {
         val meeting2 = Meeting(
             name = "Курсач",
             description = "очень очень сложна",
-            endDate = "03-26-2022 23:59",
-            startDate = "03-26-2022 00:00",
+            endDate = "04-26-2022 23:59",
+            startDate = "04-26-2022 00:00",
             admin = alex,
         )
         alex.meetings.add(meeting2)

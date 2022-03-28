@@ -9,4 +9,6 @@ import org.springframework.stereotype.Repository
 interface InvitationGroupToMeetingDao: JpaRepository<InvitationGroupToMeeting, Long> {
 
     fun findByGroupAndMeeting(group: Group, meeting: Meeting): InvitationGroupToMeeting?
+
+    fun findAllByGroup(group: Group): List<InvitationGroupToMeeting>
 }

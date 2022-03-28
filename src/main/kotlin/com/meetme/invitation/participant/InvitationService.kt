@@ -1,8 +1,6 @@
 package com.meetme.invitation.participant
 
 import com.meetme.auth.User
-import com.meetme.group.Group
-import com.meetme.invitation.group.InvitationGroupToMeeting
 import com.meetme.meeting.Meeting
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
@@ -56,4 +54,9 @@ class InvitationService {
 
         return invitation
     }
+
+    fun getAllInvitationsForUser(user: User): List<Invitation> =
+        invitationDao.findAllByUser(user)
+            .filter { invitation -> !invitation.isAccepted && !invitation.isCanceled }
+
 }

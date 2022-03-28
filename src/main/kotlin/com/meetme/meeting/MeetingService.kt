@@ -5,6 +5,8 @@ import com.meetme.auth.UserDao
 import com.meetme.doIfExist
 import com.meetme.dto.meeting.CreateMeetingDto
 import com.meetme.dto.meeting.EditMeetingDto
+import com.meetme.group.Group
+import com.meetme.invitation.group.InvitationGroupToMeetingService
 import com.meetme.invitation.participant.Invitation
 import com.meetme.invitation.participant.InvitationService
 import com.meetme.iterest.InterestService
@@ -32,6 +34,9 @@ class MeetingService {
 
     @Autowired
     private lateinit var invitationService: InvitationService
+
+    @Autowired
+    private lateinit var invitationGroupToMeetingService: InvitationGroupToMeetingService
 
     fun createMeeting(createMeetingDto: CreateMeetingDto): Meeting =
         createMeetingDto.adminId.doIfExist(userDao, logger) { admin ->
@@ -117,34 +122,35 @@ class MeetingService {
             user.meetings.union(user.managedMeetings).toList()
         }
 
-    fun getVisitedMeetingForUser(userId: Long): List<Meeting> {
-        val now = Date.from(Instant.now())
-        return getAllMeetingsForUser(userId)
-            .filter { meeting ->
-                val format = SimpleDateFormat("MM-dd-yyyy HH:mm")
-                val endDate = format.parse(meeting.endDate)
-                endDate.before(now)
-            }
-    }
+    fun getVisitedMeetingForUser(userId: Long): List<Meeting> =
+        getAllMeetingsForUser(userId)
+            .filter { meeting -> isVisitedMeeting(meeting) }
 
-    fun getPlannedMeetingsForUser(userId: Long): List<Meeting> {
-        val now = Date.from(Instant.now())
-        return getAllMeetingsForUser(userId)
-            .filter { meeting ->
-                if (meeting.endDate != null) {
-                    val format = SimpleDateFormat("MM-dd-yyyy HH:mm")
-                    val endDate = format.parse(meeting.endDate)
-                    endDate.after(now)
-                } else {
-                    true
+    fun getPlannedMeetingsForUser(userId: Long): List<Meeting> =
+        getAllMeetingsForUser(userId)
+            .filter { meeting -> !isVisitedMeeting(meeting) }
+
+    fun getInvitesOnMeetings(userId: Long): Map<String, List<Meeting>> =
+        userId.doIfExist(userDao, logger) { user ->
+            val resMap = mutableMapOf<String, List<Meeting>>()
+            val personalInvitesMeetings = invitationService.getAllInvitationsForUser(user)
+                .mapNotNull { invitation -> invitation.meeting }
+                .filter { meeting -> !isVisitedMeeting(meeting) }
+            resMap[user.fullname] = personalInvitesMeetings
+
+            user.managedGroup
+                .map { group ->
+                    val meetings = invitationGroupToMeetingService.getAllInvitationForGroup(group)
+                        .mapNotNull { invitation -> invitation.meeting }
+                        .filter { meeting -> !isVisitedMeeting(meeting) }
+                    group to meetings
                 }
-            }
-    }
+                .forEach { (group, meetings) ->
+                    resMap[group.name] = meetings
+                }
 
-//    fun getInvitesOnMeetings(userId: Long): List<Meeting> {
-//        val now = Date.from(Instant.now())
-//
-//    }
+            resMap
+        }
 
     fun getParticipants(meetingId: Long): List<User> =
         meetingId.doIfExist(meetingDao, logger, Meeting::participants)
@@ -173,4 +179,11 @@ class MeetingService {
             userDao.save(user)
             invitation
         }
+
+    private fun isVisitedMeeting(meeting: Meeting): Boolean {
+        val now = Date.from(Instant.now())
+        val format = SimpleDateFormat("MM-dd-yyyy HH:mm")
+        val endDateStr = meeting.endDate
+        return endDateStr != null && format.parse(endDateStr).before(now)
+    }
 }

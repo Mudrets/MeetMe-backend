@@ -8,4 +8,6 @@ import org.springframework.stereotype.Repository
 @Repository("UserInvitationRepository")
 interface InvitationDao : JpaRepository<Invitation, Long> {
     fun findByUserAndMeeting(user: User, meeting: Meeting): Invitation?
+
+    fun findAllByUser(user: User): List<Invitation>
 }
