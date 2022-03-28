@@ -69,6 +69,7 @@ class GroupService {
                 )
 
             user.managedGroup.remove(group)
+            invitationGroupToMeetingService.removeAllGroupInvitation(group)
             userDao.save(user)
             groupDao.delete(group)
         }

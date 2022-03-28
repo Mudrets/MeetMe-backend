@@ -4,7 +4,6 @@ import com.meetme.group.Group
 import com.meetme.invitation.participant.InvitationService
 import com.meetme.meeting.Meeting
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.security.core.userdetails.User
 import org.springframework.stereotype.Service
 
 @Service
@@ -66,4 +65,12 @@ class InvitationGroupToMeetingService {
     fun getAllInvitationForGroup(group: Group): List<InvitationGroupToMeeting> =
         invitationGroupToMeetingDao.findAllByGroup(group)
             .filter { invitation -> !invitation.isAccepted && !invitation.isCanceled }
+
+    fun removeAllMeetingInvitation(meeting: Meeting) {
+        invitationGroupToMeetingDao.deleteAllByMeeting(meeting)
+    }
+
+    fun removeAllGroupInvitation(group: Group) {
+        invitationGroupToMeetingDao.deleteAllByGroup(group)
+    }
 }

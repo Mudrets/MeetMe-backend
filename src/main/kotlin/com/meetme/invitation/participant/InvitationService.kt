@@ -59,4 +59,8 @@ class InvitationService {
         invitationDao.findAllByUser(user)
             .filter { invitation -> !invitation.isAccepted && !invitation.isCanceled }
 
+    fun removeAllMeetingInvitations(meeting: Meeting) {
+        invitationDao.deleteAllByMeeting(meeting)
+    }
+
 }

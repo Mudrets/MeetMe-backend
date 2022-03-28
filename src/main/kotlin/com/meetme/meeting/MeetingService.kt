@@ -5,7 +5,6 @@ import com.meetme.auth.UserDao
 import com.meetme.doIfExist
 import com.meetme.dto.meeting.CreateMeetingDto
 import com.meetme.dto.meeting.EditMeetingDto
-import com.meetme.group.Group
 import com.meetme.invitation.group.InvitationGroupToMeetingService
 import com.meetme.invitation.participant.Invitation
 import com.meetme.invitation.participant.InvitationService
@@ -81,7 +80,11 @@ class MeetingService {
         }
 
     fun deleteMeeting(meetingId: Long) =
-        meetingId.doIfExist(meetingDao, logger) { meeting -> meetingDao.delete(meeting) }
+        meetingId.doIfExist(meetingDao, logger) { meeting ->
+            invitationService.removeAllMeetingInvitations(meeting)
+            invitationGroupToMeetingService.removeAllMeetingInvitation(meeting)
+            meetingDao.delete(meeting)
+        }
 
     fun addParticipant(meetingId: Long, userId: Long): Meeting =
         (meetingId to userId).doIfExist(meetingDao, userDao, logger) { meeting, user ->
@@ -103,6 +106,8 @@ class MeetingService {
         (meetingId to userId).doIfExist(meetingDao, userDao, logger) { meeting, user ->
             if (meeting.admin == user) {
                 user.managedMeetings.remove(meeting)
+                invitationService.removeAllMeetingInvitations(meeting)
+                invitationGroupToMeetingService.removeAllMeetingInvitation(meeting)
                 meetingDao.delete(meeting)
                 userDao.save(user)
                 meeting
