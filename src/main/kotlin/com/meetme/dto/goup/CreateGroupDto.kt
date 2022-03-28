@@ -6,5 +6,5 @@ data class CreateGroupDto(
     val description: String = "",
     val interests: Set<String> = setOf(),
     val isPrivate: Boolean = false,
-    val links: MutableMap<String, String> = mutableMapOf()
+    val socialMediaLinks: MutableMap<String, String> = mutableMapOf()
 )
