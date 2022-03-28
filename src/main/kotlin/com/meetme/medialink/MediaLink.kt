@@ -31,9 +31,9 @@ data class MediaLink(
     @JsonIgnore
     @ManyToOne(
         targetEntity = Group::class,
+        fetch = FetchType.EAGER,
         cascade = [CascadeType.ALL]
     )
-    @JoinColumn(name = "group_id")
     var group: Group? = null
 
     @JsonIgnore

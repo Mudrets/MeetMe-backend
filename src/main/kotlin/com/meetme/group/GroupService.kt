@@ -44,17 +44,16 @@ class GroupService {
             val interestsSet =
                 interestService.convertToInterestEntityAndAddNewInterests(interests = createGroupDto.interests)
 
-            val linksSet =
-                mediaLinkService.createNewLinks(links = createGroupDto.socialMediaLinks)
-
             val group = Group(
                 name = createGroupDto.name,
                 description = createGroupDto.description,
                 interests = interestsSet,
-                socialMediaLinks = linksSet,
                 admin = admin,
                 isPrivate = createGroupDto.isPrivate,
             )
+
+            group.socialMediaLinks = mediaLinkService.createNewLinks(createGroupDto.socialMediaLinks, group)
+
             groupDao.save(group)
         }
 
@@ -153,7 +152,7 @@ class GroupService {
                 interestService.convertToInterestEntityAndAddNewInterests(interests = editCredentials.interests)
 
             val linksSet =
-                mediaLinkService.createNewLinks(links = editCredentials.socialMediaLinks)
+                mediaLinkService.createNewLinks(editCredentials.socialMediaLinks, group)
 
             group.apply {
                 name = editCredentials.name
