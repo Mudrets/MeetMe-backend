@@ -150,7 +150,7 @@ class MeetingService {
             val personalInvitesMeetings = invitationService.getAllInvitationsForUser(user)
                 .mapNotNull { invitation -> invitation.meeting }
                 .filter { meeting -> !isVisitedMeeting(meeting) }
-            resMap[user.fullName] = personalInvitesMeetings
+            resMap["${user.fullName}:${user.id}"] = personalInvitesMeetings
 
             user.managedGroup
                 .map { group ->
@@ -160,7 +160,7 @@ class MeetingService {
                     group to meetings
                 }
                 .forEach { (group, meetings) ->
-                    resMap[group.name] = meetings
+                    resMap["${group.name}:${group.id}"] = meetings
                 }
 
             resMap
