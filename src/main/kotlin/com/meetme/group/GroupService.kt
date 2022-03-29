@@ -3,8 +3,8 @@ package com.meetme.group
 import com.meetme.auth.User
 import com.meetme.auth.UserDao
 import com.meetme.doIfExist
-import com.meetme.dto.goup.CreateGroupDto
-import com.meetme.dto.goup.EditGroupDto
+import com.meetme.data.dto.goup.CreateGroupDto
+import com.meetme.data.dto.goup.EditGroupDto
 import com.meetme.invitation.group.InvitationGroupToMeeting
 import com.meetme.invitation.group.InvitationGroupToMeetingService
 import com.meetme.iterest.InterestService

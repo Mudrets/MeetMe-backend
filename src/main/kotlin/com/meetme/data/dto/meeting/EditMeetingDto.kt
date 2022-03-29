@@ -1,4 +1,4 @@
-package com.meetme.dto.meeting
+package com.meetme.data.dto.meeting
 
 data class EditMeetingDto(
     val name: String,

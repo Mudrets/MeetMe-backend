@@ -1,4 +1,4 @@
-package com.meetme.dto.user
+package com.meetme.data.dto.user
 
 data class UserInfoDto(
     val id: Long,

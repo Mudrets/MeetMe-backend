@@ -1,4 +1,4 @@
-package com.meetme.dto.goup
+package com.meetme.data.dto.goup
 
 data class CreateGroupDto(
     val adminId: Long,

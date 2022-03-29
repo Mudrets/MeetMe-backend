@@ -1,6 +1,6 @@
-package com.meetme.dto.goup
+package com.meetme.data.dto.goup
 
-import com.meetme.dto.meeting.MeetingDto
+import com.meetme.data.dto.meeting.MeetingDto
 
 data class GroupDto(
     val id: Long,

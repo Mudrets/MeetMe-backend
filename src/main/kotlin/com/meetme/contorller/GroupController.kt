@@ -1,11 +1,11 @@
 package com.meetme.contorller
 
-import com.meetme.dto.goup.CreateGroupDto
+import com.meetme.data.dto.goup.CreateGroupDto
 import com.meetme.data.DataResponse
-import com.meetme.dto.auth.UserDto
-import com.meetme.dto.goup.EditGroupDto
-import com.meetme.dto.goup.GroupDto
-import com.meetme.dto.meeting.MeetingDto
+import com.meetme.data.dto.auth.UserDto
+import com.meetme.data.dto.goup.EditGroupDto
+import com.meetme.data.dto.goup.GroupDto
+import com.meetme.data.dto.meeting.MeetingDto
 import com.meetme.group.GroupService
 import com.meetme.invitation.group.InvitationGroupToMeeting
 import com.meetme.mapper.GroupToGroupDto

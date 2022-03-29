@@ -1,6 +1,6 @@
 package com.meetme.mapper
 
-import com.meetme.dto.goup.GroupDto
+import com.meetme.data.dto.goup.GroupDto
 import com.meetme.group.Group
 
 interface GroupToGroupDto : (Group) -> GroupDto

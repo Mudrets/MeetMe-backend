@@ -1,6 +1,6 @@
 package com.meetme.mapper
 
-import com.meetme.dto.meeting.MeetingDto
+import com.meetme.data.dto.meeting.MeetingDto
 import com.meetme.meeting.Meeting
 import org.springframework.beans.factory.annotation.Autowired
 

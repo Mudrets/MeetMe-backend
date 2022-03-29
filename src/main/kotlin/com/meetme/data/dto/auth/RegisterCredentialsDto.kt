@@ -1,4 +1,4 @@
-package com.meetme.dto.auth
+package com.meetme.data.dto.auth
 
 data class RegisterCredentialsDto(
     val fullName: String,
