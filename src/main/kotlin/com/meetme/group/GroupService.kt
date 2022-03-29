@@ -168,4 +168,13 @@ class GroupService {
 
     fun getMeetings(groupId: Long): List<Meeting> =
         groupId.doIfExist(groupDao, logger) { group -> group.meetings }
+
+    fun sendInvitationToGroups(groupsIds: List<Long>, meetingId: Long) {
+        (meetingId to groupsIds).doIfExist(meetingDao, groupDao, logger) { meeting, group ->
+            invitationGroupToMeetingService.sendInvitationToGroup(
+                group = group,
+                meeting = meeting,
+            )
+        }
+    }
 }

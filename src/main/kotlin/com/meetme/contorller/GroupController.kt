@@ -118,6 +118,16 @@ class GroupController {
             null
         }
 
+    @PostMapping("/invite/{meeting_id}")
+    fun invitesGroupsToMeeting(
+        @PathVariable("meeting_id") meetingId: Long,
+        @RequestBody groupsIds: List<Long>,
+    ): DataResponse<Unit?> =
+        tryExecute {
+            groupService.sendInvitationToGroups(groupsIds, meetingId)
+            null
+        }
+
     @GetMapping("/user/{user_id}")
     fun getGroups(
         @PathVariable("user_id") userId: Long,
@@ -143,5 +153,15 @@ class GroupController {
         tryExecute {
             groupService.getMeetings(groupId)
                 .map(meetingToMeetingDto)
+        }
+
+    @PostMapping("/{group_id}/participant")
+    fun addUsers(
+        @PathVariable("group_id") groupId: Long,
+        @RequestBody userIds: List<Long>,
+    ): DataResponse<Unit?> =
+        tryExecute {
+            groupService.addParticipantsToGroup(groupId, userIds)
+            null
         }
 }

@@ -200,4 +200,13 @@ class MeetingService {
         val endDateStr = meeting.endDate
         return endDateStr != null && format.parse(endDateStr).before(now)
     }
+
+    fun sendInvitationToUsers(userIds: List<Long>, meetingId: Long) {
+        (meetingId to userIds).doIfExist(meetingDao, userDao, logger) { meeting, user ->
+            invitationService.sendInvitation(
+                user = user,
+                meeting = meeting,
+            )
+        }
+    }
 }

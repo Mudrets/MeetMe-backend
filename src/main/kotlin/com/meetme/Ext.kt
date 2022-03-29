@@ -54,3 +54,40 @@ inline fun <T> tryExecute(action: () -> T): DataResponse<T> {
         DataResponse(message = e.message ?: "Failed to complete request: exception $e\nstack trace: ${e.stackTrace}")
     }
 }
+
+inline fun <reified T, M> List<Long>.doIfExist(
+    dao: JpaRepository<T, Long>,
+    logger: Logger,
+    action: (T) -> M
+) {
+    var exceptionMessage = ""
+    forEach { id ->
+        val entity = id.getEntity(dao, logger)
+        if (entity != null)
+            action(entity)
+        else
+            exceptionMessage += "${T::class.java.simpleName} with id = $id not found\n"
+    }
+    if (exceptionMessage.isNotBlank())
+        throw NoSuchElementException(exceptionMessage.trim())
+}
+
+inline fun <reified T1, reified T2, M> Pair<Long, List<Long>>.doIfExist(
+    dao1: JpaRepository<T1, Long>,
+    dao2: JpaRepository<T2, Long>,
+    logger: Logger,
+    action: (T1, T2) -> M
+) {
+    var exceptionMessage = ""
+    val entity1 = this.first.getEntity(dao1, logger)
+        ?: throw NoSuchElementException("${T1::class.java.simpleName} with id = ${this.first} not found")
+    this.second.forEach { id ->
+        val entity2 = id.getEntity(dao2, logger)
+        if (entity2 != null)
+            action(entity1, entity2)
+        else
+            exceptionMessage += "${T2::class.java.simpleName} with id = $id not found\n"
+    }
+    if (exceptionMessage.isNotBlank())
+        throw NoSuchElementException(exceptionMessage.trim())
+}

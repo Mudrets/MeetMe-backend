@@ -102,6 +102,16 @@ class MeetingController {
             null
         }
 
+    @PostMapping("/{meeting_id}/invite")
+    fun sendInvitations(
+        @PathVariable("meeting_id") meetingId: Long,
+        @RequestBody userIds: List<Long>,
+    ): DataResponse<Unit?> =
+        tryExecute {
+            meetingService.sendInvitationToUsers(userIds, meetingId)
+            null
+        }
+
     @PostMapping("/{meeting_id}/accept/{user_id}")
     fun acceptInvitation(
         @PathVariable("user_id") userId: Long,
