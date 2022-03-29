@@ -6,12 +6,15 @@ import com.meetme.data.dto.auth.RegisterCredentialsDto
 import com.meetme.auth.UserService
 import com.meetme.data.DataResponse
 import com.meetme.data.dto.auth.LoginCredentialsDto
+import com.meetme.data.dto.user.EditUserDto
 import com.meetme.data.dto.user.UserInfoDto
 import com.meetme.friends.Friendship
 import com.meetme.mapper.UserToUserDto
 import com.meetme.tryExecute
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.*
+import org.springframework.web.multipart.MultipartFile
+
 @RestController
 @RequestMapping("/api/v1/user")
 class UserController {
@@ -96,14 +99,14 @@ class UserController {
             userService.getUser(userId)
         }
 
-    @PostMapping("{user_id}/name/{new_name}")
-    fun changeName(
-        @PathVariable("new_name") newName: String,
+    @PostMapping("{user_id}/edit")
+    fun editUser(
         @PathVariable("user_id") userId: Long,
-    ): DataResponse<User?> =
-        DataResponse(
-            data = userService.changeName(userId, newName)
-        )
+        @RequestBody editUserDto: EditUserDto,
+    ): DataResponse<UserDto> =
+        tryExecute {
+            userToUserDto(userService.editUser(userId, editUserDto))
+        }
 
     @GetMapping("/{search_query}")
     fun search(@PathVariable("search_query") searchQuery: String): DataResponse<List<UserDto>> =
@@ -111,6 +114,15 @@ class UserController {
             userService.searchFriends(searchQuery).asSequence()
                 .map(userToUserDto)
                 .toList()
+        }
+
+    @PostMapping("/{user_id}/image")
+    fun uploadImage(
+        @RequestParam("image") image: MultipartFile,
+        @PathVariable("user_id") userId: Long,
+    ): DataResponse<UserDto> =
+        tryExecute {
+            userToUserDto(userService.uploadImage(image, userId))
         }
 }
 

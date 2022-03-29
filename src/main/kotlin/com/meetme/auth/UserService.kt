@@ -1,17 +1,24 @@
 package com.meetme.auth
 
+import com.meetme.data.dto.user.EditUserDto
 import com.meetme.doIfExist
 import com.meetme.friends.Friendship
 import com.meetme.friends.FriendshipService
 import com.meetme.getEntity
+import com.meetme.iterest.InterestService
+import com.meetme.medialink.MediaLinkService
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
-import java.util.Date
+import org.springframework.web.multipart.MultipartFile
+import java.nio.file.Files
+import java.nio.file.Path
+import java.nio.file.Paths
 
 @Service
 class UserService : UserDetailsService {
@@ -26,6 +33,12 @@ class UserService : UserDetailsService {
 
     @Autowired
     private lateinit var passwordEncoder: PasswordEncoder
+
+    @Autowired
+    private lateinit var interestService: InterestService
+
+    @Autowired
+    private lateinit var mediaLinkService: MediaLinkService
 
     override fun loadUserByUsername(username: String): UserDetails? = loadUserByEmail(username)
 
@@ -116,6 +129,41 @@ class UserService : UserDetailsService {
 
     fun searchFriends(searchQuery: String): List<User> =
         userDao.findAll()
-            .filter { user -> user.fullname.contains(searchQuery) }
-            .sortedBy(User::fullname)
+            .filter { user -> user.fullName.contains(searchQuery) }
+            .sortedBy(User::fullName)
+
+    fun editUser(userId: Long, editUserDto: EditUserDto): User =
+        userId.doIfExist(userDao, logger) { user ->
+            val interestsSet =
+                interestService.convertToInterestEntityAndAddNewInterests(interests = editUserDto.interests)
+
+            val links = mediaLinkService.createNewLinks(editUserDto.mediaLinks, user)
+
+            user.apply {
+                name = getName(editUserDto.fullName)
+                surname = getSurname(editUserDto.fullName)
+                description = editUserDto.description
+                interests = interestsSet
+                socialMediaLinks = links
+            }
+            userDao.save(user)
+        }
+
+    fun uploadImage(file: MultipartFile, userId: Long): User =
+        userId.doIfExist(userDao, logger) { user ->
+            if (!Files.exists(rootLocation))
+                Files.createDirectory(rootLocation)
+
+            Files.deleteIfExists(rootLocation.resolve("${user.id}.png"))
+            Files.copy(file.inputStream, rootLocation.resolve("${user.id}.png"))
+            user.photoUrl = "uploads/${user.id}.png"
+            userDao.save(user)
+        }
+
+    companion object {
+        /**
+         * Корневая папка для хранения изображений.
+         */
+        private val rootLocation: Path = Paths.get("uploads")
+    }
 }

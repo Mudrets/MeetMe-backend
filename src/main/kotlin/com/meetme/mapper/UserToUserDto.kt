@@ -13,7 +13,7 @@ class UserToUserDtoImpl(
     override fun invoke(user: User): UserDto =
         UserDto(
             id = user.id,
-            fullName = user.fullname,
+            fullName = user.fullName,
             photoUrl = user.photoUrl,
             email = user.email,
             telephone = user.telephone,

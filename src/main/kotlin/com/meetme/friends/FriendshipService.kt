@@ -46,7 +46,7 @@ class FriendshipService {
                 else
                     friendship.user1!!
             }
-            ?.sortedBy(User::fullname)
+            ?.sortedBy(User::fullName)
             ?.toList() ?: listOf()
 
     fun getFriendRequestToUser(user: User): List<User> =
