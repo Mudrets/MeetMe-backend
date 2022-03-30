@@ -14,7 +14,7 @@ class UserToUserDtoImpl(
         UserDto(
             id = user.id,
             fullName = user.fullName,
-            photoUrl = user.photoUrl,
+            photoUrl = if (user.photoUrl == null) null else "http://localhost:8080/${user.photoUrl}",
             email = user.email,
             telephone = user.telephone,
             links = mediaLinksToMap(user.socialMediaLinks),

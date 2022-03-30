@@ -156,6 +156,7 @@ class UserService : UserDetailsService {
 
             Files.deleteIfExists(rootLocation.resolve("${user.id}.png"))
             Files.copy(file.inputStream, rootLocation.resolve("${user.id}.png"))
+
             user.photoUrl = "uploads/${user.id}.png"
             userDao.save(user)
         }
