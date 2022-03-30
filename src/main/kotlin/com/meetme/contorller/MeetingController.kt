@@ -151,7 +151,6 @@ class MeetingController {
         tryExecute {
             meetingService.getInvitesOnMeetings(userId)
                 .map { (name, meetings) ->
-                    print("\"$name\": ${meetings.map(meetingToMeetingDto)}\n")
                     name to meetings.map(meetingToMeetingDto)
                 }
                 .toMap()
