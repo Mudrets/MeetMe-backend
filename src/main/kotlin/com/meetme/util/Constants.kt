@@ -1,5 +1,8 @@
 package com.meetme.util
 
+import io.jsonwebtoken.security.Keys
+import javax.crypto.SecretKey
+
 object Constants {
     // STORAGE
     const val ROOT_IMAGE_DIR = "uploads"
@@ -12,4 +15,10 @@ object Constants {
 
     // SERVER
     const val SERVER_ROOT = "http://localhost:8080"
+
+    //JWT
+    private const val KEY = "securesecuresecuresecuresecuresecuresecuresecuresecuresecuresecuresecuresecuresecure"
+    const val TOKEN_PREFIX = "Bearer "
+    const val TOKEN_EXPIRATION_AFTER_DAYS = 14L
+    val secretKey: SecretKey = Keys.hmacShaKeyFor(KEY.toByteArray())!!
 }

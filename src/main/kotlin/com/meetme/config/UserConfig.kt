@@ -4,17 +4,22 @@ import com.meetme.services.auth.User
 import com.meetme.services.auth.UserDao
 import com.meetme.services.meeting.Meeting
 import com.meetme.services.meeting.MeetingDao
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.CommandLineRunner
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 
 @Configuration
 class UserConfig {
 
+    @Autowired
+    private lateinit var passwordEncoder: BCryptPasswordEncoder
+
     @Bean
     fun userCommandLineRunner(userDao: UserDao, meetingDao: MeetingDao) = CommandLineRunner {
-        val alex = User(email = "alex", password = "123456")
-        val mariam = User(email = "mariam", password = "123456")
+        val alex = User(email = "lol@kek.com", password = passwordEncoder.encode("123456"))
+        val mariam = User(email = "mariam", password = passwordEncoder.encode("123456"))
 
         val meeting1 = Meeting(
             name = "My birthday",
