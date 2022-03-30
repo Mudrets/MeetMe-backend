@@ -2,11 +2,10 @@ package com.meetme.contorller
 
 import com.meetme.data.DataResponse
 import com.meetme.data.dto.auth.UserDto
-import com.meetme.meeting.MeetingService
+import com.meetme.services.meeting.MeetingService
 import com.meetme.data.dto.meeting.CreateMeetingDto
 import com.meetme.data.dto.meeting.EditMeetingDto
 import com.meetme.data.dto.meeting.MeetingDto
-import com.meetme.invitation.participant.Invitation
 import com.meetme.mapper.MeetingToMeetingDto
 import com.meetme.mapper.UserToUserDto
 import com.meetme.tryExecute

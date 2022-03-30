@@ -6,8 +6,7 @@ import com.meetme.data.dto.auth.UserDto
 import com.meetme.data.dto.goup.EditGroupDto
 import com.meetme.data.dto.goup.GroupDto
 import com.meetme.data.dto.meeting.MeetingDto
-import com.meetme.group.GroupService
-import com.meetme.invitation.group.InvitationGroupToMeeting
+import com.meetme.services.group.GroupService
 import com.meetme.mapper.GroupToGroupDto
 import com.meetme.mapper.MeetingToMeetingDto
 import com.meetme.mapper.UserToUserDto

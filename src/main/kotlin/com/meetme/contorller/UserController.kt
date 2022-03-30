@@ -1,15 +1,13 @@
 package com.meetme.contorller
 
-import com.meetme.auth.User
-import com.meetme.data.dto.auth.UserDto
-import com.meetme.data.dto.auth.RegisterCredentialsDto
-import com.meetme.auth.UserService
 import com.meetme.data.DataResponse
 import com.meetme.data.dto.auth.LoginCredentialsDto
+import com.meetme.data.dto.auth.RegisterCredentialsDto
+import com.meetme.data.dto.auth.UserDto
 import com.meetme.data.dto.user.EditUserDto
-import com.meetme.data.dto.user.UserInfoDto
-import com.meetme.friends.Friendship
 import com.meetme.mapper.UserToUserDto
+import com.meetme.services.auth.User
+import com.meetme.services.auth.UserService
 import com.meetme.tryExecute
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.*

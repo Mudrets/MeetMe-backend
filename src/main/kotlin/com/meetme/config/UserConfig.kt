@@ -1,9 +1,9 @@
 package com.meetme.config
 
-import com.meetme.auth.User
-import com.meetme.auth.UserDao
-import com.meetme.meeting.Meeting
-import com.meetme.meeting.MeetingDao
+import com.meetme.services.auth.User
+import com.meetme.services.auth.UserDao
+import com.meetme.services.meeting.Meeting
+import com.meetme.services.meeting.MeetingDao
 import org.springframework.boot.CommandLineRunner
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration

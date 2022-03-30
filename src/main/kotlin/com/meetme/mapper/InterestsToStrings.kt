@@ -1,6 +1,6 @@
 package com.meetme.mapper
 
-import com.meetme.iterest.Interest
+import com.meetme.services.iterest.Interest
 import org.springframework.context.annotation.Bean
 
 interface InterestsToStrings : (Set<Interest>) -> List<String>

@@ -1,6 +1,6 @@
 package com.meetme.mapper
 
-import com.meetme.medialink.MediaLink
+import com.meetme.services.medialink.MediaLink
 
 interface MediaLinksToMap : (Set<MediaLink>) -> Map<String, String>
 
