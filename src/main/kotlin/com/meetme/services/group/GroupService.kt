@@ -5,6 +5,7 @@ import com.meetme.doIfExist
 import com.meetme.data.dto.goup.CreateGroupDto
 import com.meetme.data.dto.goup.EditGroupDto
 import com.meetme.services.auth.User
+import com.meetme.services.file.FileStoreService
 import com.meetme.services.invitation.group.InvitationGroupToMeeting
 import com.meetme.services.invitation.group.InvitationGroupToMeetingService
 import com.meetme.services.iterest.InterestService
@@ -15,6 +16,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
+import org.springframework.web.multipart.MultipartFile
 
 @Service
 class GroupService {
@@ -38,6 +40,9 @@ class GroupService {
 
     @Autowired
     private lateinit var invitationGroupToMeetingService: InvitationGroupToMeetingService
+
+    @Autowired
+    private lateinit var fileStoreService: FileStoreService
 
     fun createGroup(createGroupDto: CreateGroupDto): Group =
         createGroupDto.adminId.doIfExist(userDao, logger) { admin ->
@@ -177,4 +182,11 @@ class GroupService {
             )
         }
     }
+
+    fun uploadImage(file: MultipartFile, groupId: Long): Group =
+        groupId.doIfExist(groupDao, logger) { group ->
+            val imageUrl = fileStoreService.store(file, group::class.java, group.id)
+            group.photoUrl = imageUrl
+            groupDao.save(group)
+        }
 }

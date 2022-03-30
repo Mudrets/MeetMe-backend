@@ -8,6 +8,7 @@ import com.meetme.data.dto.user.EditUserDto
 import com.meetme.mapper.UserToUserDto
 import com.meetme.services.auth.User
 import com.meetme.services.auth.UserService
+import com.meetme.services.file.FileStoreService
 import com.meetme.tryExecute
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.*

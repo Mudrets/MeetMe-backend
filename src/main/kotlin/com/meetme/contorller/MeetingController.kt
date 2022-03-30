@@ -2,6 +2,7 @@ package com.meetme.contorller
 
 import com.meetme.data.DataResponse
 import com.meetme.data.dto.auth.UserDto
+import com.meetme.data.dto.goup.GroupDto
 import com.meetme.services.meeting.MeetingService
 import com.meetme.data.dto.meeting.CreateMeetingDto
 import com.meetme.data.dto.meeting.EditMeetingDto
@@ -11,6 +12,7 @@ import com.meetme.mapper.UserToUserDto
 import com.meetme.tryExecute
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.*
+import org.springframework.web.multipart.MultipartFile
 
 @RestController
 @RequestMapping("/api/v1/meetings")
@@ -153,5 +155,14 @@ class MeetingController {
                     name to meetings.map(meetingToMeetingDto)
                 }
                 .toMap()
+        }
+
+    @PostMapping("/{meeting_id}/image")
+    fun uploadImage(
+        @RequestParam("image") image: MultipartFile,
+        @PathVariable("meeting_id") meetingId: Long,
+    ): DataResponse<MeetingDto> =
+        tryExecute {
+            meetingToMeetingDto(meetingService.uploadImage(image, meetingId))
         }
 }

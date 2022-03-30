@@ -1,6 +1,8 @@
 package com.meetme.contorller
 
+import com.meetme.services.file.FileStoreService
 import org.apache.tomcat.util.http.fileupload.FileUtils
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.io.ByteArrayResource
 import org.springframework.core.io.Resource
 import org.springframework.http.HttpStatus
@@ -21,18 +23,18 @@ import java.nio.file.Paths
 @RequestMapping("/uploads")
 class FileController {
 
-    @GetMapping("/{filename}", produces = [MediaType.IMAGE_PNG_VALUE, MediaType.IMAGE_JPEG_VALUE])
+    @Autowired
+    private lateinit var fileStoreService: FileStoreService
+
+    @GetMapping("/{dir_name}/{file_name}", produces = [MediaType.IMAGE_PNG_VALUE, MediaType.IMAGE_JPEG_VALUE])
     fun getImage(
-        @PathVariable("filename") fileName: String
+        @PathVariable("dir_name") dirName: String,
+        @PathVariable("file_name") fileName: String,
     ): ResponseEntity<Resource> {
-        val inputStream = ByteArrayResource(Files.readAllBytes(rootLocation.resolve(fileName)))
+        val inputStream = fileStoreService.getImage(dirName, fileName)
         return ResponseEntity
             .status(HttpStatus.OK)
             .contentLength(inputStream.contentLength())
             .body(inputStream)
-    }
-
-    companion object {
-        private val rootLocation: Path = Paths.get("uploads")
     }
 }

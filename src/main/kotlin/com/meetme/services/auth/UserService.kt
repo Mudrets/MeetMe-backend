@@ -5,6 +5,7 @@ import com.meetme.doIfExist
 import com.meetme.services.friends.Friendship
 import com.meetme.services.friends.FriendshipService
 import com.meetme.getEntity
+import com.meetme.services.file.FileStoreService
 import com.meetme.services.medialink.MediaLinkService
 import com.meetme.services.iterest.InterestService
 import org.slf4j.Logger
@@ -38,6 +39,9 @@ class UserService : UserDetailsService {
 
     @Autowired
     private lateinit var mediaLinkService: MediaLinkService
+
+    @Autowired
+    private lateinit var fileStoreService: FileStoreService
 
     override fun loadUserByUsername(username: String): UserDetails? = loadUserByEmail(username)
 
@@ -150,20 +154,8 @@ class UserService : UserDetailsService {
 
     fun uploadImage(file: MultipartFile, userId: Long): User =
         userId.doIfExist(userDao, logger) { user ->
-            if (!Files.exists(rootLocation))
-                Files.createDirectory(rootLocation)
-
-            Files.deleteIfExists(rootLocation.resolve("${user.id}.png"))
-            Files.copy(file.inputStream, rootLocation.resolve("${user.id}.png"))
-
-            user.photoUrl = "uploads/${user.id}.png"
+            val imageUrl = fileStoreService.store(file, user::class.java, user.id)
+            user.photoUrl = imageUrl
             userDao.save(user)
         }
-
-    companion object {
-        /**
-         * Корневая папка для хранения изображений.
-         */
-        private val rootLocation: Path = Paths.get("uploads")
-    }
 }

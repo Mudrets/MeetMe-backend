@@ -5,6 +5,7 @@ import com.meetme.services.auth.UserDao
 import com.meetme.doIfExist
 import com.meetme.data.dto.meeting.CreateMeetingDto
 import com.meetme.data.dto.meeting.EditMeetingDto
+import com.meetme.services.file.FileStoreService
 import com.meetme.services.invitation.group.InvitationGroupToMeetingService
 import com.meetme.services.invitation.participant.Invitation
 import com.meetme.services.invitation.participant.InvitationService
@@ -13,6 +14,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
+import org.springframework.web.multipart.MultipartFile
 import java.text.SimpleDateFormat
 import java.time.Instant
 import java.util.*
@@ -24,6 +26,9 @@ class MeetingService {
 
     @Autowired
     private lateinit var meetingDao: MeetingDao
+
+    @Autowired
+    private lateinit var fileStoreService: FileStoreService
 
     @Autowired
     private lateinit var userDao: UserDao
@@ -209,4 +214,11 @@ class MeetingService {
             )
         }
     }
+
+    fun uploadImage(image: MultipartFile, meetingId: Long): Meeting =
+        meetingId.doIfExist(meetingDao, logger) { meeting ->
+            val imageUrl = fileStoreService.store(image, meeting::class.java, meeting.id)
+            meeting.photoUrl = imageUrl
+            meetingDao.save(meeting)
+        }
 }

@@ -18,7 +18,7 @@ data class Meeting(
     var description: String? = null,
 
     @Column(name = "photo_url")
-    var imageUrl: String? = null,
+    var photoUrl: String? = null,
 
     @Column(name = "is_online")
     var isOnline: Boolean = false,

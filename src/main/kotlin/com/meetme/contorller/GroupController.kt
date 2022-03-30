@@ -10,9 +10,11 @@ import com.meetme.services.group.GroupService
 import com.meetme.mapper.GroupToGroupDto
 import com.meetme.mapper.MeetingToMeetingDto
 import com.meetme.mapper.UserToUserDto
+import com.meetme.services.file.FileStoreService
 import com.meetme.tryExecute
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.*
+import org.springframework.web.multipart.MultipartFile
 
 @RestController
 @RequestMapping("/api/v1/groups")
@@ -29,6 +31,7 @@ class GroupController {
 
     @Autowired
     private lateinit var meetingToMeetingDto: MeetingToMeetingDto
+
 
     @PostMapping("/create")
     fun createGroup(@RequestBody createGroupDto: CreateGroupDto): DataResponse<GroupDto> =
@@ -162,5 +165,14 @@ class GroupController {
         tryExecute {
             groupService.addParticipantsToGroup(groupId, userIds)
             null
+        }
+
+    @PostMapping("/{group_id}/image")
+    fun uploadImage(
+        @RequestParam("image") image: MultipartFile,
+        @PathVariable("group_id") groupId: Long,
+    ): DataResponse<GroupDto> =
+        tryExecute {
+            groupToGroupDto(groupService.uploadImage(image, groupId))
         }
 }

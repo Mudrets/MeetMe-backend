@@ -12,7 +12,7 @@ class MeetingToMeetingDtoImpl(
     override fun invoke(meeting: Meeting): MeetingDto =
         MeetingDto(
             id = meeting.id,
-            adminId = meeting.admin?.id,
+            adminId = meeting.admin.id,
             name = meeting.name,
             description = meeting.description,
             startDate = meeting.startDate,
@@ -22,7 +22,8 @@ class MeetingToMeetingDtoImpl(
             location = meeting.location,
             maxNumberOfParticipants = meeting.maxNumberOfParticipants,
             numberOfParticipants = meeting.numberOfParticipants,
-            interests = interestsToStrings(meeting.interests)
+            interests = interestsToStrings(meeting.interests),
+            imageUrl = meeting.photoUrl,
         )
 
 }
