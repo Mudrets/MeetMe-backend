@@ -1,6 +1,6 @@
 package com.meetme.mapper
 
-import com.meetme.data.dto.goup.GroupDto
+import com.meetme.domain.dto.goup.GroupDto
 import com.meetme.services.group.Group
 
 interface GroupToGroupDto : (Group) -> GroupDto
@@ -17,7 +17,7 @@ class GroupToGroupDtoImpl(
             name = group.name,
             description = group.description ?: "",
             photoUrl = group.photoUrl,
-            isPrivate = group.isPrivate,
+            isPrivate = group.private,
             interests = interestsToStrings(group.interests),
             socialMediaLinks = mediaLinksToMap(group.socialMediaLinks)
         )

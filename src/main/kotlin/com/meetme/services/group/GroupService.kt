@@ -2,8 +2,12 @@ package com.meetme.services.group
 
 import com.meetme.services.auth.UserDao
 import com.meetme.doIfExist
-import com.meetme.data.dto.goup.CreateGroupDto
-import com.meetme.data.dto.goup.EditGroupDto
+import com.meetme.domain.dto.goup.CreateGroupDto
+import com.meetme.domain.dto.goup.EditGroupDto
+import com.meetme.domain.dto.meeting.SearchQuery
+import com.meetme.domain.filter.InterestsFilter
+import com.meetme.domain.filter.NameFilter
+import com.meetme.domain.filter.FilterType
 import com.meetme.services.auth.User
 import com.meetme.services.file.FileStoreService
 import com.meetme.services.invitation.group.InvitationGroupToMeeting
@@ -44,6 +48,20 @@ class GroupService {
     @Autowired
     private lateinit var fileStoreService: FileStoreService
 
+    @Autowired
+    private lateinit var nameFilter: NameFilter
+
+    @Autowired
+    private lateinit var interestsFilter: InterestsFilter
+
+    private fun Iterable<Group>.filter(searchQuery: SearchQuery) =
+        this
+            .asSequence()
+            .filter { nameFilter(it, searchQuery.searchQuery) }
+            .filter { interestsFilter(it, searchQuery.interests) }
+            .sortedBy(Group::name)
+            .toList()
+
     fun createGroup(createGroupDto: CreateGroupDto): Group =
         createGroupDto.adminId.doIfExist(userDao, logger) { admin ->
             val interestsSet =
@@ -54,7 +72,7 @@ class GroupService {
                 description = createGroupDto.description,
                 interests = interestsSet,
                 admin = admin,
-                isPrivate = createGroupDto.isPrivate,
+                private = createGroupDto.isPrivate,
             )
 
             group.socialMediaLinks = mediaLinkService.createNewLinks(createGroupDto.socialMediaLinks, group)
@@ -142,9 +160,22 @@ class GroupService {
             group
         }
 
-    fun searchGroups(search: String): List<Group> =
-        groupDao.findAll()
-            .filter { it.name.contains(search) }
+    fun search(userId: Long, searchQuery: SearchQuery): Map<FilterType, List<Group>> =
+        userId.doIfExist(userDao, logger) { user ->
+            val resMap = mutableMapOf<FilterType, List<Group>>()
+            val userGroups = user
+                .groups
+                .union(user.managedGroup)
+
+            resMap[FilterType.GLOBAL_FILTER] = groupDao.findAllByPrivate(false)
+                .subtract(userGroups)
+                .filter(searchQuery)
+
+            resMap[FilterType.MY_FILTER] = userGroups
+                .filter(searchQuery)
+
+            resMap
+        }
 
     fun getGroupsForUser(userId: Long): List<Group> =
         userId.doIfExist(userDao, logger) { user ->
@@ -163,7 +194,7 @@ class GroupService {
                 name = editCredentials.name
                 description = editCredentials.description
                 photoUrl = editCredentials.photoUrl
-                isPrivate = editCredentials.isPrivate
+                private = editCredentials.isPrivate
                 interests = interestsSet
                 socialMediaLinks = linksSet
             }

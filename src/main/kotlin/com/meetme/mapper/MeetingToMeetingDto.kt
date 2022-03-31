@@ -1,6 +1,6 @@
 package com.meetme.mapper
 
-import com.meetme.data.dto.meeting.MeetingDto
+import com.meetme.domain.dto.meeting.MeetingDto
 import com.meetme.services.meeting.Meeting
 
 interface MeetingToMeetingDto: (Meeting) -> MeetingDto

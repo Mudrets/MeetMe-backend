@@ -1,16 +1,17 @@
 package com.meetme.contorller
 
-import com.meetme.data.dto.goup.CreateGroupDto
-import com.meetme.data.DataResponse
-import com.meetme.data.dto.auth.UserDto
-import com.meetme.data.dto.goup.EditGroupDto
-import com.meetme.data.dto.goup.GroupDto
-import com.meetme.data.dto.meeting.MeetingDto
+import com.meetme.domain.dto.goup.CreateGroupDto
+import com.meetme.domain.dto.DataResponse
+import com.meetme.domain.dto.auth.UserDto
+import com.meetme.domain.dto.goup.EditGroupDto
+import com.meetme.domain.dto.goup.GroupDto
+import com.meetme.domain.dto.meeting.MeetingDto
+import com.meetme.domain.dto.meeting.SearchQuery
+import com.meetme.domain.filter.FilterType
 import com.meetme.services.group.GroupService
 import com.meetme.mapper.GroupToGroupDto
 import com.meetme.mapper.MeetingToMeetingDto
 import com.meetme.mapper.UserToUserDto
-import com.meetme.services.file.FileStoreService
 import com.meetme.tryExecute
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.*
@@ -139,15 +140,17 @@ class GroupController {
                 .map(groupToGroupDto)
         }
 
-    @GetMapping("/{group_id}/{search_query}")
-    fun searchGroup(
-        @PathVariable("group_id") groupId: Long,
-        @PathVariable("search_query") searchQuery: String,
-    ): DataResponse<List<GroupDto>> =
+    @GetMapping("/{user_id}/search")
+    fun search(
+        @PathVariable("user_id") userId: Long,
+        @RequestBody searchQuery: SearchQuery
+    ): DataResponse<Map<String, List<GroupDto>>> =
         tryExecute {
-            groupService.searchGroups(searchQuery)
-                .map(groupToGroupDto)
-                .sortedBy(GroupDto::name)
+            val map = groupService.search(userId, searchQuery)
+            mapOf(
+                FilterType.MY_FILTER.typeName to map[FilterType.MY_FILTER]!!.map(groupToGroupDto),
+                FilterType.GLOBAL_FILTER.typeName to map[FilterType.GLOBAL_FILTER]!!.map(groupToGroupDto),
+            )
         }
 
     @GetMapping("/{group_id}/meetings")

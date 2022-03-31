@@ -1,5 +1,7 @@
 package com.meetme.services.group
 
+import com.meetme.domain.filter.entity.FilteredByInterests
+import com.meetme.domain.filter.entity.FilteredByName
 import com.meetme.services.auth.User
 import com.meetme.services.iterest.Interest
 import com.meetme.services.medialink.MediaLink
@@ -31,7 +33,7 @@ class Group(
     var photoUrl: String? = null,
 
     @Column(name = "is_private")
-    var isPrivate: Boolean = false,
+    var private: Boolean = false,
 
     @ManyToOne(targetEntity = User::class)
     val admin: User = User(),
@@ -64,4 +66,12 @@ class Group(
 
     @OneToMany(targetEntity = MediaLink::class, mappedBy = "group")
     var socialMediaLinks: Set<MediaLink> = mutableSetOf()
-)
+) : FilteredByName, FilteredByInterests {
+
+    override val filteredInterests: List<String>
+        get() = interests.map(Interest::name)
+
+    override val filteredName: String
+        get() = name
+
+}

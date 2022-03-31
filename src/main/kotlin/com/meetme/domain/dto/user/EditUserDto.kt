@@ -1,4 +1,4 @@
-package com.meetme.data.dto.user
+package com.meetme.domain.dto.user
 
 data class EditUserDto(
     val fullName: String,

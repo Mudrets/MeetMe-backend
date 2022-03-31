@@ -1,6 +1,7 @@
 package com.meetme.services.auth
 
 import com.fasterxml.jackson.annotation.JsonIgnore
+import com.meetme.domain.filter.entity.FilteredByName
 import com.meetme.services.group.Group
 import com.meetme.services.iterest.Interest
 import com.meetme.services.medialink.MediaLink
@@ -46,7 +47,7 @@ data class User(
     var photoUrl: String? = null,
 
 
-) : UserDetails {
+) : UserDetails, FilteredByName {
 
     @JsonIgnore
     @OneToMany(mappedBy = "admin")
@@ -97,6 +98,9 @@ data class User(
 
     val fullName: String
         get() = "$name${if (surname.isNotBlank()) " $surname" else ""}"
+
+    override val filteredName: String
+        get() = fullName
 
     override fun toString(): String {
         return "User(" +

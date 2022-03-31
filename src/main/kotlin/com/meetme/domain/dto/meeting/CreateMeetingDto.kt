@@ -1,4 +1,4 @@
-package com.meetme.data.dto.meeting
+package com.meetme.domain.dto.meeting
 
 data class CreateMeetingDto(
     val adminId: Long,

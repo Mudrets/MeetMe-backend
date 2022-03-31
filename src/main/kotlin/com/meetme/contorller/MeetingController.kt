@@ -1,12 +1,15 @@
 package com.meetme.contorller
 
-import com.meetme.data.DataResponse
-import com.meetme.data.dto.auth.UserDto
-import com.meetme.data.dto.goup.GroupDto
+import com.meetme.domain.dto.DataResponse
+import com.meetme.domain.dto.auth.UserDto
 import com.meetme.services.meeting.MeetingService
-import com.meetme.data.dto.meeting.CreateMeetingDto
-import com.meetme.data.dto.meeting.EditMeetingDto
-import com.meetme.data.dto.meeting.MeetingDto
+import com.meetme.domain.dto.meeting.CreateMeetingDto
+import com.meetme.domain.dto.meeting.EditMeetingDto
+import com.meetme.domain.dto.meeting.MeetingDto
+import com.meetme.domain.dto.meeting.SearchQuery
+import com.meetme.domain.filter.InterestsFilter
+import com.meetme.domain.filter.NameFilter
+import com.meetme.domain.filter.FilterType
 import com.meetme.mapper.MeetingToMeetingDto
 import com.meetme.mapper.UserToUserDto
 import com.meetme.tryExecute
@@ -26,6 +29,12 @@ class MeetingController {
 
     @Autowired
     private lateinit var userToUserDto: UserToUserDto
+
+    @Autowired
+    private lateinit var nameFilter: NameFilter
+
+    @Autowired
+    private lateinit var interestsFilter: InterestsFilter
 
     @PostMapping("/create")
     fun createMeeting(@RequestBody createMeetingDto: CreateMeetingDto): DataResponse<MeetingDto> =
@@ -74,14 +83,40 @@ class MeetingController {
             meetingToMeetingDto(meetingService.deleteParticipant(meetingId, userId))
         }
 
-    @GetMapping("/{user_id}/search/{search_query}")
-    fun search(
+    @GetMapping("/{user_id}/planned/search")
+    fun searchPlanned(
         @PathVariable("user_id") userId: Long,
-        @PathVariable("search_query") searchQuery: String
+        @RequestBody searchQuery: SearchQuery
+    ): DataResponse<Map<String, List<MeetingDto>>> =
+        tryExecute {
+            val map = meetingService.searchPlanned(userId, searchQuery)
+            mapOf(
+                FilterType.MY_FILTER.typeName to map[FilterType.MY_FILTER]!!.map(meetingToMeetingDto),
+                FilterType.GLOBAL_FILTER.typeName to map[FilterType.GLOBAL_FILTER]!!.map(meetingToMeetingDto),
+            )
+        }
+
+    @GetMapping("/{user_id}/visited/search")
+    fun searchVisited(
+        @PathVariable("user_id") userId: Long,
+        @RequestBody searchQuery: SearchQuery,
     ): DataResponse<List<MeetingDto>> =
         tryExecute {
-            meetingService.search(userId, searchQuery)
+            meetingService.searchVisited(userId, searchQuery)
                 .map(meetingToMeetingDto)
+        }
+
+    @GetMapping("/{user_id}/invites/search")
+    fun searchInvites(
+        @PathVariable("user_id") userId: Long,
+        @RequestBody searchQuery: SearchQuery,
+    ): DataResponse<Map<String, List<MeetingDto>>> =
+        tryExecute {
+            meetingService.searchInvites(userId, searchQuery)
+                .map { (name, meetings) ->
+                    name to meetings.map(meetingToMeetingDto)
+                }
+                .toMap()
         }
 
     @GetMapping("/{meeting_id}/participants")

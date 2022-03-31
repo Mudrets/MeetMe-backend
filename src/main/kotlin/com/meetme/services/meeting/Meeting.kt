@@ -1,5 +1,7 @@
 package com.meetme.services.meeting
 
+import com.meetme.domain.filter.entity.FilteredByInterests
+import com.meetme.domain.filter.entity.FilteredByName
 import com.meetme.services.auth.User
 import com.meetme.services.iterest.Interest
 import javax.persistence.*
@@ -58,6 +60,12 @@ data class Meeting(
         inverseJoinColumns = [JoinColumn(name = "user_id")],
     )
     val participants: MutableList<User> = mutableListOf(admin),
-) {
+) : FilteredByName, FilteredByInterests {
     val numberOfParticipants: Int = participants.size
+
+    override val filteredInterests: List<String>
+        get() = interests.map(Interest::name)
+
+    override val filteredName: String
+        get() = name
 }

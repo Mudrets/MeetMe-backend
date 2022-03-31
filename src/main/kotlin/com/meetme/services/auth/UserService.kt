@@ -1,7 +1,9 @@
 package com.meetme.services.auth
 
-import com.meetme.data.dto.user.EditUserDto
+import com.meetme.domain.dto.user.EditUserDto
 import com.meetme.doIfExist
+import com.meetme.domain.filter.InterestsFilter
+import com.meetme.domain.filter.NameFilter
 import com.meetme.services.friends.Friendship
 import com.meetme.services.friends.FriendshipService
 import com.meetme.getEntity
@@ -42,6 +44,9 @@ class UserService : UserDetailsService {
 
     @Autowired
     private lateinit var fileStoreService: FileStoreService
+
+    @Autowired
+    private lateinit var nameFilter: NameFilter
 
     override fun loadUserByUsername(username: String): UserDetails? = loadUserByEmail(username)
 
@@ -134,7 +139,7 @@ class UserService : UserDetailsService {
         userId.doIfExist(userDao, logger) { user ->
             val friends = friendshipService.getFriendsOfUser(user)
             userDao.findAll()
-                .filter { friend -> friend.fullName.contains(searchQuery) }
+                .filter { nameFilter(it, searchQuery) }
                 .groupBy { friend -> friends.contains(friend) }
         }
 

@@ -1,18 +1,19 @@
 package com.meetme.contorller
 
-import com.meetme.data.DataResponse
-import com.meetme.data.dto.auth.LoginCredentialsDto
-import com.meetme.data.dto.auth.RegisterCredentialsDto
-import com.meetme.data.dto.auth.UserDto
-import com.meetme.data.dto.user.EditUserDto
+import com.meetme.domain.dto.DataResponse
+import com.meetme.domain.dto.auth.LoginCredentialsDto
+import com.meetme.domain.dto.auth.RegisterCredentialsDto
+import com.meetme.domain.dto.auth.UserDto
+import com.meetme.domain.dto.user.EditUserDto
+import com.meetme.domain.filter.NameFilter
 import com.meetme.mapper.UserToUserDto
 import com.meetme.services.auth.User
 import com.meetme.services.auth.UserService
-import com.meetme.services.file.FileStoreService
 import com.meetme.tryExecute
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
+import javax.websocket.server.PathParam
 
 @RestController
 @RequestMapping("/api/v1/user")
@@ -23,6 +24,9 @@ class UserController {
 
     @Autowired
     private lateinit var userToUserDto: UserToUserDto
+
+    @Autowired
+    private lateinit var nameFilter: NameFilter
 
     @PostMapping("/register")
     fun register(@RequestBody credentials: RegisterCredentialsDto): DataResponse<UserDto> =
@@ -66,7 +70,9 @@ class UserController {
         }
 
     @GetMapping("/{user_id}/friends")
-    fun getFriends(@PathVariable(name = "user_id") userId: Long): DataResponse<List<UserDto>> =
+    fun getFriends(
+        @PathVariable(name = "user_id") userId: Long,
+    ): DataResponse<List<UserDto>> =
         tryExecute {
             userService.getFriends(userId).asSequence()
                 .map(userToUserDto)
@@ -75,18 +81,26 @@ class UserController {
         }
 
     @GetMapping("/{user_id}/friends/to")
-    fun getFriendRequestTo(@PathVariable(name = "user_id") userId: Long): DataResponse<List<UserDto>> =
+    fun getFriendRequestTo(
+        @PathVariable(name = "user_id") userId: Long,
+        @RequestParam("query") searchQuery: String,
+    ): DataResponse<List<UserDto>> =
         tryExecute {
             userService.getFriendsRequestToUser(userId).asSequence()
+                .filter { user -> nameFilter(user, searchQuery) }
                 .map(userToUserDto)
                 .sortedBy(UserDto::fullName)
                 .toList()
         }
 
     @GetMapping("/{user_id}/friends/from")
-    fun getFriendRequestFrom(@PathVariable(name = "user_id") userId: Long): DataResponse<List<UserDto>> =
+    fun getFriendRequestFrom(
+        @PathVariable(name = "user_id") userId: Long,
+        @RequestParam("query") searchQuery: String,
+    ): DataResponse<List<UserDto>> =
         tryExecute {
             userService.getFriendsRequestFromUser(userId).asSequence()
+                .filter { user -> nameFilter(user, searchQuery) }
                 .map(userToUserDto)
                 .sortedBy(UserDto::fullName)
                 .toList()
@@ -107,16 +121,16 @@ class UserController {
             userToUserDto(userService.editUser(userId, editUserDto))
         }
 
-    @GetMapping("{user_id}/friends/{search_query}")
+    @GetMapping("{user_id}/friends/search")
     fun search(
         @PathVariable("user_id") userId: Long,
-        @PathVariable("search_query") searchQuery: String,
+        @RequestParam("query") searchQuery: String,
     ): DataResponse<Map<String, List<UserDto>>> =
         tryExecute {
             val map = userService.searchFriends(userId, searchQuery)
             mutableMapOf(
-                "friends" to map[true]!!.map(userToUserDto),
-                "global" to map[false]!!.map(userToUserDto),
+                "friends" to (map[true]?.map(userToUserDto) ?: listOf()),
+                "global" to (map[false]?.map(userToUserDto) ?: listOf()),
             )
         }
 

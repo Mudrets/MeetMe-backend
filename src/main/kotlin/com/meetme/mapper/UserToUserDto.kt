@@ -1,7 +1,7 @@
 package com.meetme.mapper
 
 import com.meetme.services.auth.User
-import com.meetme.data.dto.auth.UserDto
+import com.meetme.domain.dto.auth.UserDto
 
 interface UserToUserDto : (User) -> UserDto
 

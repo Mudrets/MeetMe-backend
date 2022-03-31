@@ -1,4 +1,4 @@
-package com.meetme.data.dto.goup
+package com.meetme.domain.dto.goup
 
 data class EditGroupDto(
     val name: String,

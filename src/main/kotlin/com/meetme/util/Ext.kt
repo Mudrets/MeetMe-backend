@@ -1,6 +1,12 @@
 package com.meetme
 
-import com.meetme.data.DataResponse
+import com.meetme.domain.dto.DataResponse
+import com.meetme.domain.dto.meeting.SearchQuery
+import com.meetme.domain.filter.InterestsFilter
+import com.meetme.domain.filter.NameFilter
+import com.meetme.domain.filter.entity.FilteredByInterests
+import com.meetme.domain.filter.entity.FilteredByName
+import com.meetme.services.meeting.Meeting
 import org.slf4j.Logger
 import org.springframework.data.jpa.repository.JpaRepository
 
@@ -91,3 +97,19 @@ inline fun <reified T1, reified T2, M> Pair<Long, List<Long>>.doIfExist(
     if (exceptionMessage.isNotBlank())
         throw NoSuchElementException(exceptionMessage.trim())
 }
+
+inline fun <reified T : FilteredByName> Iterable<T>.filter(nameFilter: NameFilter, searchQuery: String) =
+    this
+        .filter { nameFilter(it, searchQuery) }
+
+inline fun <reified T : FilteredByInterests> Iterable<T>.filter(interestsFilter: InterestsFilter, interests: Collection<String>) =
+    this
+        .filter { interestsFilter(it, interests) }
+
+inline fun <reified T : FilteredByName> Sequence<T>.filter(nameFilter: NameFilter, searchQuery: String) =
+    this
+        .filter { nameFilter(it, searchQuery) }
+
+inline fun <reified T : FilteredByInterests> Sequence<T>.filter(interestsFilter: InterestsFilter, interests: Collection<String>) =
+    this
+        .filter { interestsFilter(it, interests) }

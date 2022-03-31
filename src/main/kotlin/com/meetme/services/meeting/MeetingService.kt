@@ -3,8 +3,12 @@ package com.meetme.services.meeting
 import com.meetme.services.auth.User
 import com.meetme.services.auth.UserDao
 import com.meetme.doIfExist
-import com.meetme.data.dto.meeting.CreateMeetingDto
-import com.meetme.data.dto.meeting.EditMeetingDto
+import com.meetme.domain.dto.meeting.CreateMeetingDto
+import com.meetme.domain.dto.meeting.EditMeetingDto
+import com.meetme.domain.dto.meeting.SearchQuery
+import com.meetme.domain.filter.InterestsFilter
+import com.meetme.domain.filter.NameFilter
+import com.meetme.domain.filter.FilterType
 import com.meetme.services.file.FileStoreService
 import com.meetme.services.invitation.group.InvitationGroupToMeetingService
 import com.meetme.services.invitation.participant.Invitation
@@ -41,6 +45,20 @@ class MeetingService {
 
     @Autowired
     private lateinit var invitationGroupToMeetingService: InvitationGroupToMeetingService
+
+    @Autowired
+    private lateinit var nameFilter: NameFilter
+
+    @Autowired
+    private lateinit var interestsFilter: InterestsFilter
+
+    private fun Iterable<Meeting>.filter(searchQuery: SearchQuery) =
+        this
+            .asSequence()
+            .filter { nameFilter(it, searchQuery.searchQuery) }
+            .filter { interestsFilter(it, searchQuery.interests) }
+            .sortedBy(Meeting::name)
+            .toList()
 
     fun createMeeting(createMeetingDto: CreateMeetingDto): Meeting =
         createMeetingDto.adminId.doIfExist(userDao, logger) { admin ->
@@ -130,11 +148,58 @@ class MeetingService {
             }
         }
 
-    fun search(userId: Long, searchQuery: String): List<Meeting> =
-        meetingDao.findAllByPrivate(false)
-            .filter { meeting -> meeting.name.contains(searchQuery) }
-            .union(getAllMeetingsForUser(userId))
-            .toList()
+    fun searchPlanned(userId: Long, searchQuery: SearchQuery): Map<FilterType, List<Meeting>> =
+        userId.doIfExist(userDao, logger) { user ->
+            val resMap = mutableMapOf<FilterType, List<Meeting>>()
+            val userMeetings = user
+                .meetings
+                .union(user.managedMeetings)
+                .filter { meeting -> !isVisitedMeeting(meeting) }
+                .toSet()
+
+            resMap[FilterType.GLOBAL_FILTER] = meetingDao.findAllByPrivate(false)
+                .filter { meeting -> !isVisitedMeeting(meeting) }
+                .subtract(userMeetings)
+                .filter(searchQuery)
+
+            resMap[FilterType.MY_FILTER] = userMeetings
+                .filter(searchQuery)
+
+            resMap
+        }
+
+    fun searchVisited(userId: Long, searchQuery: SearchQuery): List<Meeting> =
+        userId.doIfExist(userDao, logger) { user ->
+            user
+                .meetings
+                .union(user.managedMeetings)
+                .filter(::isVisitedMeeting)
+                .filter(searchQuery)
+        }
+
+    fun searchInvites(userId: Long, searchQuery: SearchQuery): Map<String, List<Meeting>> =
+        userId.doIfExist(userDao, logger) { user ->
+            val resMap = mutableMapOf<String, List<Meeting>>()
+            val personalInvitesMeetings = invitationService.getAllInvitationsForUser(user)
+                .mapNotNull { invitation -> invitation.meeting }
+                .filter { meeting -> !isVisitedMeeting(meeting) }
+                .filter(searchQuery)
+            resMap["${user.fullName}:${user.id}"] = personalInvitesMeetings
+
+            user.managedGroup
+                .map { group ->
+                    val meetings = invitationGroupToMeetingService.getAllInvitationForGroup(group)
+                        .mapNotNull { invitation -> invitation.meeting }
+                        .filter { meeting -> !isVisitedMeeting(meeting) }
+                        .filter(searchQuery)
+                    group to meetings
+                }
+                .forEach { (group, meetings) ->
+                    resMap["${group.name}:${group.id}"] = meetings
+                }
+
+            resMap
+        }
 
     private fun getAllMeetingsForUser(userId: Long): List<Meeting> =
         userId.doIfExist(userDao, logger) { user ->
