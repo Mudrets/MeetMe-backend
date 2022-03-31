@@ -107,12 +107,17 @@ class UserController {
             userToUserDto(userService.editUser(userId, editUserDto))
         }
 
-    @GetMapping("/{search_query}")
-    fun search(@PathVariable("search_query") searchQuery: String): DataResponse<List<UserDto>> =
+    @GetMapping("{user_id}/friends/{search_query}")
+    fun search(
+        @PathVariable("user_id") userId: Long,
+        @PathVariable("search_query") searchQuery: String,
+    ): DataResponse<Map<String, List<UserDto>>> =
         tryExecute {
-            userService.searchFriends(searchQuery).asSequence()
-                .map(userToUserDto)
-                .toList()
+            val map = userService.searchFriends(userId, searchQuery)
+            mutableMapOf(
+                "friends" to map[true]!!.map(userToUserDto),
+                "global" to map[false]!!.map(userToUserDto),
+            )
         }
 
     @PostMapping("/{user_id}/image")

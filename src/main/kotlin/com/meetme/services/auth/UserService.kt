@@ -130,10 +130,13 @@ class UserService : UserDetailsService {
     fun getUser(userId: Long): User =
         userId.doIfExist(userDao, logger) { user -> user }
 
-    fun searchFriends(searchQuery: String): List<User> =
-        userDao.findAll()
-            .filter { user -> user.fullName.contains(searchQuery) }
-            .sortedBy(User::fullName)
+    fun searchFriends(userId: Long, searchQuery: String): Map<Boolean, List<User>> =
+        userId.doIfExist(userDao, logger) { user ->
+            val friends = friendshipService.getFriendsOfUser(user)
+            userDao.findAll()
+                .filter { friend -> friend.fullName.contains(searchQuery) }
+                .groupBy { friend -> friends.contains(friend) }
+        }
 
     fun editUser(userId: Long, editUserDto: EditUserDto): User =
         userId.doIfExist(userDao, logger) { user ->
