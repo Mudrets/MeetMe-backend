@@ -3,6 +3,7 @@ package com.meetme.services.meeting
 import com.meetme.domain.filter.entity.FilteredByInterests
 import com.meetme.domain.filter.entity.FilteredByName
 import com.meetme.services.auth.User
+import com.meetme.services.chat.Chat
 import com.meetme.services.iterest.Interest
 import javax.persistence.*
 
@@ -60,6 +61,9 @@ data class Meeting(
         inverseJoinColumns = [JoinColumn(name = "user_id")],
     )
     val participants: MutableList<User> = mutableListOf(admin),
+
+    @OneToOne(targetEntity = Chat::class, cascade = [CascadeType.ALL])
+    var chat: Chat = Chat()
 ) : FilteredByName, FilteredByInterests {
     val numberOfParticipants: Int = participants.size
 

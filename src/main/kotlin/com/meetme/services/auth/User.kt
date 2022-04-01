@@ -44,7 +44,7 @@ data class User(
     var description: String? = null,
 
     @Column(name = "photo_url")
-    var photoUrl: String? = null,
+    var photoUrl: String = "",
 
 
 ) : UserDetails, FilteredByName {

@@ -30,4 +30,8 @@ class MapperConfig {
             interestsToStrings(),
             mediaLinksToMap(),
         )
+
+    @Bean
+    fun messageToMessageDto(): MessageToMessageDto =
+        MessageToMessageDtoImpl()
 }

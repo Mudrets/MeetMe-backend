@@ -9,6 +9,7 @@ import com.meetme.domain.dto.meeting.SearchQuery
 import com.meetme.domain.filter.InterestsFilter
 import com.meetme.domain.filter.NameFilter
 import com.meetme.domain.filter.FilterType
+import com.meetme.services.chat.ChatService
 import com.meetme.services.file.FileStoreService
 import com.meetme.services.invitation.group.InvitationGroupToMeetingService
 import com.meetme.services.invitation.participant.Invitation
@@ -41,6 +42,9 @@ class MeetingService {
     private lateinit var interestService: InterestService
 
     @Autowired
+    private lateinit var chatService: ChatService
+
+    @Autowired
     private lateinit var invitationService: InvitationService
 
     @Autowired
@@ -65,19 +69,19 @@ class MeetingService {
             val interestsSet =
                 interestService.convertToInterestEntityAndAddNewInterests(interests = createMeetingDto.interests)
 
-            meetingDao.save(
-                Meeting(
-                    name = createMeetingDto.name,
-                    description = createMeetingDto.description,
-                    startDate = createMeetingDto.startDate,
-                    endDate = createMeetingDto.endDate,
-                    isOnline = createMeetingDto.isOnline,
-                    private = createMeetingDto.isPrivate,
-                    interests = interestsSet,
-                    admin = admin,
-                    maxNumberOfParticipants = createMeetingDto.maxNumberParticipants
-                )
+            val meeting = Meeting(
+                name = createMeetingDto.name,
+                description = createMeetingDto.description,
+                startDate = createMeetingDto.startDate,
+                endDate = createMeetingDto.endDate,
+                isOnline = createMeetingDto.isOnline,
+                private = createMeetingDto.isPrivate,
+                interests = interestsSet,
+                admin = admin,
+                maxNumberOfParticipants = createMeetingDto.maxNumberParticipants
             )
+            meeting.chat = chatService.createChat(meeting)
+            meetingDao.save(meeting)
         }
 
     fun getMeeting(meetingId: Long): Meeting =
@@ -104,6 +108,7 @@ class MeetingService {
 
     fun deleteMeeting(meetingId: Long) =
         meetingId.doIfExist(meetingDao, logger) { meeting ->
+            chatService.deleteChat(meeting.chat)
             invitationService.removeAllMeetingInvitations(meeting)
             invitationGroupToMeetingService.removeAllMeetingInvitation(meeting)
             meetingDao.delete(meeting)

@@ -2,6 +2,7 @@ package com.meetme.services.auth
 
 import com.meetme.domain.dto.user.EditUserDto
 import com.meetme.doIfExist
+import com.meetme.domain.EntityGetter
 import com.meetme.domain.filter.InterestsFilter
 import com.meetme.domain.filter.NameFilter
 import com.meetme.services.friends.Friendship
@@ -23,7 +24,7 @@ import java.nio.file.Path
 import java.nio.file.Paths
 
 @Service
-class UserService : UserDetailsService {
+class UserService : UserDetailsService, EntityGetter<User> {
 
     private val logger: Logger = LoggerFactory.getLogger(UserService::class.java)
 
@@ -166,4 +167,7 @@ class UserService : UserDetailsService {
             user.photoUrl = imageUrl
             userDao.save(user)
         }
+
+    override fun getEntity(id: Long) = id.getEntity(userDao, logger)
+
 }

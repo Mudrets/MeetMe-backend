@@ -1,5 +1,6 @@
 package com.meetme
 
+import com.meetme.domain.EntityGetter
 import com.meetme.domain.dto.DataResponse
 import com.meetme.domain.dto.meeting.SearchQuery
 import com.meetme.domain.filter.InterestsFilter
@@ -25,6 +26,15 @@ inline fun <reified T> Long.getEntity(dao: JpaRepository<T, Long>, logger: Logge
 @Throws(NoSuchElementException::class)
 inline fun <reified T, M> Long.doIfExist(dao: JpaRepository<T, Long>, logger: Logger, action: (T) -> M): M {
     val entity = this.getEntity(dao, logger)
+    if (entity != null)
+        return action(entity)
+    else
+        throw NoSuchElementException("${T::class.java.simpleName} with id = $this not found")
+}
+
+@Throws(NoSuchElementException::class)
+inline fun <reified T, M> Long.doIfExist(entityGetter: EntityGetter<T>, action: (T) -> M): M {
+    val entity = entityGetter.getEntity(this)
     if (entity != null)
         return action(entity)
     else
