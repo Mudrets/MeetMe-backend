@@ -24,6 +24,7 @@ class WebSecurityConfig : WebSecurityConfigurerAdapter() {
             .addFilterAfter(JwtTokenVerifier(), JwtUsernameAndPasswordAuthenticationFilter::class.java)
             .authorizeRequests()
             .antMatchers("/api/v1/user/register").permitAll()
+            .antMatchers("/uploads/**").permitAll()
             .anyRequest()
             .authenticated()
     }
