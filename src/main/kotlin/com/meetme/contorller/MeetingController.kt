@@ -200,4 +200,5 @@ class MeetingController {
         tryExecute {
             meetingToMeetingDto(meetingService.uploadImage(image, meetingId))
         }
+
 }

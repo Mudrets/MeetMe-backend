@@ -4,9 +4,11 @@ import com.meetme.contorller.FileController
 import com.meetme.services.auth.User
 import com.meetme.services.auth.UserService
 import com.meetme.services.group.Group
+import com.meetme.services.image_store.Image
 import com.meetme.services.meeting.Meeting
 import com.meetme.util.Constants.GROUP_DIR_NAME
 import com.meetme.util.Constants.GROUP_IMAGE_PATH
+import com.meetme.util.Constants.IMAGE_STORE_PATH
 import com.meetme.util.Constants.MEETING_DIR_NAME
 import com.meetme.util.Constants.MEETING_IMAGE_PATH
 import com.meetme.util.Constants.ROOT_IMAGE_DIR
@@ -32,6 +34,7 @@ class FileStoreService {
             User::class.java -> userRootLocation.resolve("$id.png")
             Meeting::class.java -> meetingRootLocation.resolve("$id.png")
             Group::class.java -> groupRootLocation.resolve("$id.png")
+            Image::class.java -> imageStoreRootLocation.resolve("$id.png")
             else -> rootLocation.resolve("$id.png")
         }
 
@@ -40,6 +43,7 @@ class FileStoreService {
             User::class.java -> "$SERVER_ROOT/$USER_IMAGE_PATH/$id.png"
             Meeting::class.java -> "$SERVER_ROOT/$MEETING_IMAGE_PATH/$id.png"
             Group::class.java -> "$SERVER_ROOT/$GROUP_IMAGE_PATH/$id.png"
+            Image::class.java -> "$SERVER_ROOT/$IMAGE_STORE_PATH/$id.png"
             else -> "$SERVER_ROOT/$ROOT_IMAGE_DIR/$id.png"
         }
 
@@ -84,6 +88,7 @@ class FileStoreService {
             "meetings" -> meetingRootLocation.resolve(fileName)
             "users" -> userRootLocation.resolve(fileName)
             "groups" -> groupRootLocation.resolve(fileName)
+            "image_store" -> imageStoreRootLocation.resolve(fileName)
             else -> rootLocation.resolve(fileName)
         }
         if (!Files.exists(path))
@@ -96,6 +101,7 @@ class FileStoreService {
         private val userRootLocation = Path.of(USER_IMAGE_PATH)
         private val meetingRootLocation = Path.of(MEETING_IMAGE_PATH)
         private val groupRootLocation = Path.of(GROUP_IMAGE_PATH)
+        private val imageStoreRootLocation = Path.of(IMAGE_STORE_PATH)
 
         fun init() {
             if (!Files.exists(rootLocation)) {
@@ -109,6 +115,9 @@ class FileStoreService {
             }
             if (!Files.exists(groupRootLocation)) {
                 Files.createDirectory(groupRootLocation)
+            }
+            if (!Files.exists(imageStoreRootLocation)) {
+                Files.createDirectory(imageStoreRootLocation)
             }
         }
     }

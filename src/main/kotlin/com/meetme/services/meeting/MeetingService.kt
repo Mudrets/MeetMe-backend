@@ -3,12 +3,14 @@ package com.meetme.services.meeting
 import com.meetme.services.auth.User
 import com.meetme.services.auth.UserDao
 import com.meetme.doIfExist
+import com.meetme.domain.EntityGetter
 import com.meetme.domain.dto.meeting.CreateMeetingDto
 import com.meetme.domain.dto.meeting.EditMeetingDto
 import com.meetme.domain.dto.meeting.SearchQuery
 import com.meetme.domain.filter.InterestsFilter
 import com.meetme.domain.filter.NameFilter
 import com.meetme.domain.filter.FilterType
+import com.meetme.getEntity
 import com.meetme.services.chat.ChatService
 import com.meetme.services.file.FileStoreService
 import com.meetme.services.invitation.group.InvitationGroupToMeetingService
@@ -25,7 +27,7 @@ import java.time.Instant
 import java.util.*
 
 @Service
-class MeetingService {
+class MeetingService : EntityGetter<Meeting> {
 
     private val logger: Logger = LoggerFactory.getLogger(MeetingService::class.java)
 
@@ -291,4 +293,9 @@ class MeetingService {
             meeting.photoUrl = imageUrl
             meetingDao.save(meeting)
         }
+
+    fun saveMeeting(meeting: Meeting): Meeting = meetingDao.save(meeting)
+
+    override fun getEntity(id: Long): Meeting? =
+        id.getEntity(meetingDao, logger)
 }

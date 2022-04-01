@@ -1,9 +1,11 @@
 package com.meetme.services.meeting
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import com.meetme.domain.filter.entity.FilteredByInterests
 import com.meetme.domain.filter.entity.FilteredByName
 import com.meetme.services.auth.User
 import com.meetme.services.chat.Chat
+import com.meetme.services.image_store.Image
 import com.meetme.services.iterest.Interest
 import javax.persistence.*
 
@@ -63,8 +65,14 @@ data class Meeting(
     val participants: MutableList<User> = mutableListOf(admin),
 
     @OneToOne(targetEntity = Chat::class, cascade = [CascadeType.ALL])
-    var chat: Chat = Chat()
+    var chat: Chat = Chat(),
+
 ) : FilteredByName, FilteredByInterests {
+
+    @JsonIgnore
+    @OneToMany(targetEntity = Image::class, mappedBy = "meeting")
+    val images: MutableList<Image> = mutableListOf()
+
     val numberOfParticipants: Int = participants.size
 
     override val filteredInterests: List<String>
