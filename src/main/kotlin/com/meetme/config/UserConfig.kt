@@ -1,11 +1,11 @@
 package com.meetme.config
 
-import com.meetme.services.auth.User
-import com.meetme.services.auth.UserDao
-import com.meetme.services.chat.Chat
-import com.meetme.services.chat.ChatDao
-import com.meetme.services.meeting.Meeting
-import com.meetme.services.meeting.MeetingDao
+import com.meetme.user.db.User
+import com.meetme.user.db.UserDao
+import com.meetme.chat.db.Chat
+import com.meetme.chat.db.ChatDao
+import com.meetme.meeting.db.Meeting
+import com.meetme.meeting.db.MeetingDao
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.CommandLineRunner
 import org.springframework.context.annotation.Bean

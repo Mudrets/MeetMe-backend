@@ -2,12 +2,10 @@ package com.meetme
 
 import com.meetme.domain.EntityGetter
 import com.meetme.domain.dto.DataResponse
-import com.meetme.domain.dto.meeting.SearchQuery
 import com.meetme.domain.filter.InterestsFilter
 import com.meetme.domain.filter.NameFilter
 import com.meetme.domain.filter.entity.FilteredByInterests
 import com.meetme.domain.filter.entity.FilteredByName
-import com.meetme.services.meeting.Meeting
 import org.slf4j.Logger
 import org.springframework.data.jpa.repository.JpaRepository
 

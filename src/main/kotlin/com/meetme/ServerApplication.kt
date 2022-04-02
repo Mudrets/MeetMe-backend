@@ -1,6 +1,6 @@
 package com.meetme
 
-import com.meetme.services.file.FileStoreService
+import com.meetme.file.FileStoreService
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 
