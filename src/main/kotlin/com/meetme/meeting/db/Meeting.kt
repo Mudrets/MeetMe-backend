@@ -7,6 +7,10 @@ import com.meetme.domain.filter.entity.FilteredByInterests
 import com.meetme.domain.filter.entity.FilteredByName
 import com.meetme.image_store.db.Image
 import com.meetme.interest.db.Interest
+import com.meetme.invitation.db.Invitation
+import java.text.SimpleDateFormat
+import java.time.Instant
+import java.util.*
 import javax.persistence.*
 
 @Entity(name = "Meeting")
@@ -55,8 +59,7 @@ data class Meeting(
     )
     var interests: MutableSet<Interest> = mutableSetOf(),
 
-    @Column(name = "participants")
-    @ManyToMany(targetEntity = User::class)
+    @ManyToMany(targetEntity = User::class, cascade = [CascadeType.PERSIST, CascadeType.MERGE])
     @JoinTable(
         name = "participants_of_meeting",
         joinColumns = [JoinColumn(name = "meeting_id")],
@@ -65,15 +68,29 @@ data class Meeting(
     val participants: MutableList<User> = mutableListOf(admin),
 
     @OneToOne(targetEntity = Chat::class, cascade = [CascadeType.ALL])
-    var chat: Chat = Chat(),
+    var chat: Chat = Chat()
 
-    ) : FilteredByName, FilteredByInterests {
+) : FilteredByName, FilteredByInterests {
 
     @JsonIgnore
     @OneToMany(targetEntity = Image::class, mappedBy = "meeting")
     val images: MutableList<Image> = mutableListOf()
 
+    @JsonIgnore
+    @OneToOne(targetEntity = Invitation::class, mappedBy = "meeting", cascade = [CascadeType.ALL], orphanRemoval = true)
+    val invitation: Invitation? = null
+
     val numberOfParticipants: Int = participants.size
+
+    val isVisitedMeeting: Boolean
+        get() {
+            val now = Date.from(Instant.now())
+            val format = SimpleDateFormat("MM-dd-yyyy HH:mm")
+            return endDate != null && format.parse(endDate).before(now)
+        }
+
+    val isPlannedMeeting: Boolean
+        get() = !isVisitedMeeting
 
     override val filteredInterests: List<String>
         get() = interests.map(Interest::name)

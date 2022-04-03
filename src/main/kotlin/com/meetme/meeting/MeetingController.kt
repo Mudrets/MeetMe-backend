@@ -111,11 +111,7 @@ class MeetingController {
         @RequestBody searchQuery: SearchQuery,
     ): DataResponse<Map<String, List<MeetingDto>>> =
         tryExecute {
-            meetingService.searchInvites(userId, searchQuery)
-                .map { (name, meetings) ->
-                    name to meetings.map(meetingToMeetingDto)
-                }
-                .toMap()
+            meetingService.searchInvitations(userId, searchQuery)
         }
 
     @GetMapping("/{meeting_id}/participants")
@@ -125,46 +121,6 @@ class MeetingController {
         tryExecute {
             meetingService.getParticipants(meetingId)
                 .map(userToUserDto)
-        }
-
-    @PostMapping("/{meeting_id}/invite/{user_id}")
-    fun sendInvitation(
-        @PathVariable("user_id") userId: Long,
-        @PathVariable("meeting_id") meetingId: Long
-    ): DataResponse<Unit?> =
-        tryExecute {
-            meetingService.sendInvitation(userId, meetingId)
-            null
-        }
-
-    @PostMapping("/{meeting_id}/invite")
-    fun sendInvitations(
-        @PathVariable("meeting_id") meetingId: Long,
-        @RequestBody userIds: List<Long>,
-    ): DataResponse<Unit?> =
-        tryExecute {
-            meetingService.sendInvitationToUsers(userIds, meetingId)
-            null
-        }
-
-    @PostMapping("/{meeting_id}/accept/{user_id}")
-    fun acceptInvitation(
-        @PathVariable("user_id") userId: Long,
-        @PathVariable("meeting_id") meetingId: Long
-    ): DataResponse<Unit?> =
-        tryExecute {
-            meetingService.acceptInvitation(userId, meetingId)
-            null
-        }
-
-    @PostMapping("/{meeting_id}/cancel/{user_id}")
-    fun cancelInvitation(
-        @PathVariable("user_id") userId: Long,
-        @PathVariable("meeting_id") meetingId: Long
-    ): DataResponse<Unit?> =
-        tryExecute {
-            meetingService.cancelInvitation(userId, meetingId)
-            null
         }
 
     @GetMapping("/{user_id}/planned")
@@ -184,11 +140,7 @@ class MeetingController {
     @GetMapping("/{user_id}/invites")
     fun getInvitesOnMeetings(@PathVariable("user_id") userId: Long): DataResponse<Map<String, List<MeetingDto>>> =
         tryExecute {
-            meetingService.getInvitesOnMeetings(userId)
-                .map { (name, meetings) ->
-                    name to meetings.map(meetingToMeetingDto)
-                }
-                .toMap()
+            meetingService.searchInvitations(userId, SearchQuery())
         }
 
     @PostMapping("/{meeting_id}/image")

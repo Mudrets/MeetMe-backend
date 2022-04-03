@@ -40,6 +40,16 @@ class ParticipantsController {
             null
         }
 
+    @PostMapping("/{user_id}")
+    fun addParticipant(
+        @PathVariable("group_id") groupId: Long,
+        @PathVariable("user_id") userId: Long,
+    ): DataResponse<Unit?> =
+        tryExecute {
+            groupService.addParticipantToGroup(groupId, userId)
+            null
+        }
+
     @DeleteMapping("/{user_id}")
     fun deleteUser(
         @PathVariable("group_id") groupId: Long,

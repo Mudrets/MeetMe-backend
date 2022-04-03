@@ -9,7 +9,6 @@ interface GroupToGroupDto : (Group) -> GroupDto
 
 class GroupToGroupDtoImpl(
     private val interestsToStrings: InterestsToStrings,
-    private val mediaLinksToMap: MediaLinksToMap,
 ) : GroupToGroupDto {
 
     override fun invoke(group: Group): GroupDto =
@@ -20,7 +19,6 @@ class GroupToGroupDtoImpl(
             description = group.description ?: "",
             photoUrl = group.photoUrl,
             isPrivate = group.private,
-            interests = interestsToStrings(group.interests),
-            socialMediaLinks = mediaLinksToMap(group.socialMediaLinks)
+            interests = interestsToStrings(group.interests)
         )
 }

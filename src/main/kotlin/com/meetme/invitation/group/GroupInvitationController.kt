@@ -1,26 +1,23 @@
-package com.meetme.group
+package com.meetme.invitation.group
 
 import com.meetme.domain.dto.DataResponse
+import com.meetme.invitation.InvitationService
 import com.meetme.tryExecute
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.web.bind.annotation.*
+import org.springframework.beans.factory.annotation.Qualifier
+import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @RequestMapping("/api/v1/groups")
-class InvitationController {
+class GroupInvitationController {
 
+    @Qualifier("groupInvitationService")
     @Autowired
-    private lateinit var groupService: GroupService
-
-    @PostMapping("/{group_id}/invite/{meeting_id}")
-    fun inviteGroupToMeeting(
-        @PathVariable("group_id") groupId: Long,
-        @PathVariable("meeting_id") meetingId: Long,
-    ): DataResponse<Unit?> =
-        tryExecute {
-            groupService.sendInvitationToGroup(groupId, meetingId)
-            null
-        }
+    private lateinit var invitationService: InvitationService
 
     @PostMapping("/invite/{meeting_id}")
     fun invitesGroupsToMeeting(
@@ -28,7 +25,7 @@ class InvitationController {
         @RequestBody groupsIds: List<Long>,
     ): DataResponse<Unit?> =
         tryExecute {
-            groupService.sendInvitationToGroups(groupsIds, meetingId)
+            invitationService.sendInvitations(groupsIds, meetingId)
             null
         }
 
@@ -38,7 +35,7 @@ class InvitationController {
         @PathVariable("meeting_id") meetingId: Long,
     ): DataResponse<Unit?> =
         tryExecute {
-            groupService.acceptInvitation(groupId, meetingId)
+            invitationService.acceptInvitation(groupId, meetingId)
             null
         }
 
@@ -48,7 +45,7 @@ class InvitationController {
         @PathVariable("meeting_id") meetingId: Long,
     ): DataResponse<Unit?> =
         tryExecute {
-            groupService.cancelInvitation(groupId, meetingId)
+            invitationService.cancelInvitation(groupId, meetingId)
             null
         }
 }

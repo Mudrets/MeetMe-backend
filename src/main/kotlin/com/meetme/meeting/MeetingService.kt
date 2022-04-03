@@ -7,6 +7,7 @@ import com.meetme.doIfExist
 import com.meetme.domain.EntityGetter
 import com.meetme.domain.dto.meeting.CreateMeetingDto
 import com.meetme.domain.dto.meeting.EditMeetingDto
+import com.meetme.domain.dto.meeting.MeetingDto
 import com.meetme.domain.dto.meeting.SearchQuery
 import com.meetme.domain.filter.InterestsFilter
 import com.meetme.domain.filter.NameFilter
@@ -14,19 +15,17 @@ import com.meetme.domain.filter.FilterType
 import com.meetme.getEntity
 import com.meetme.invitation.db.Invitation
 import com.meetme.file.FileStoreService
+import com.meetme.group.db.Group
 import com.meetme.interest.InterestService
-import com.meetme.invitation.InvitationGroupToMeetingService
-import com.meetme.invitation.InvitationService
+import com.meetme.invitation.db.InvitationDao
 import com.meetme.meeting.db.Meeting
 import com.meetme.meeting.db.MeetingDao
+import com.meetme.meeting.mapper.MeetingToMeetingDto
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
-import java.text.SimpleDateFormat
-import java.time.Instant
-import java.util.*
 
 @Service
 class MeetingService : EntityGetter<Meeting> {
@@ -49,16 +48,16 @@ class MeetingService : EntityGetter<Meeting> {
     private lateinit var chatService: ChatService
 
     @Autowired
-    private lateinit var invitationService: InvitationService
-
-    @Autowired
-    private lateinit var invitationGroupToMeetingService: InvitationGroupToMeetingService
+    private lateinit var meetingToMeetingDto: MeetingToMeetingDto
 
     @Autowired
     private lateinit var nameFilter: NameFilter
 
     @Autowired
     private lateinit var interestsFilter: InterestsFilter
+
+    @Autowired
+    private lateinit var invitationDao: InvitationDao
 
     private fun Iterable<Meeting>.filter(searchQuery: SearchQuery) =
         this
@@ -113,8 +112,6 @@ class MeetingService : EntityGetter<Meeting> {
     fun deleteMeeting(meetingId: Long) =
         meetingId.doIfExist(meetingDao, logger) { meeting ->
             chatService.deleteChat(meeting.chat)
-            invitationService.removeAllMeetingInvitations(meeting)
-            invitationGroupToMeetingService.removeAllMeetingInvitation(meeting)
             meetingDao.delete(meeting)
         }
 
@@ -130,18 +127,13 @@ class MeetingService : EntityGetter<Meeting> {
             user.meetings.add(meeting)
             meeting.participants.add(user)
             meetingDao.save(meeting)
-            userDao.save(user)
             meeting
         }
 
     fun deleteParticipant(meetingId: Long, userId: Long): Meeting =
         (meetingId to userId).doIfExist(meetingDao, userDao, logger) { meeting, user ->
             if (meeting.admin == user) {
-                user.managedMeetings.remove(meeting)
-                invitationService.removeAllMeetingInvitations(meeting)
-                invitationGroupToMeetingService.removeAllMeetingInvitation(meeting)
                 meetingDao.delete(meeting)
-                userDao.save(user)
                 meeting
             } else {
                 if (!meeting.participants.contains(user))
@@ -150,9 +142,7 @@ class MeetingService : EntityGetter<Meeting> {
                     )
 
                 meeting.participants.remove(user)
-                user.meetings.remove(meeting)
                 meetingDao.save(meeting)
-                userDao.save(user)
                 meeting
             }
         }
@@ -163,11 +153,11 @@ class MeetingService : EntityGetter<Meeting> {
             val userMeetings = user
                 .meetings
                 .union(user.managedMeetings)
-                .filter { meeting -> !isVisitedMeeting(meeting) }
+                .filter(Meeting::isPlannedMeeting)
                 .toSet()
 
             resMap[FilterType.GLOBAL_FILTER] = meetingDao.findAllByPrivate(false)
-                .filter { meeting -> !isVisitedMeeting(meeting) }
+                .filter(Meeting::isPlannedMeeting)
                 .subtract(userMeetings)
                 .filter(searchQuery)
 
@@ -182,32 +172,36 @@ class MeetingService : EntityGetter<Meeting> {
             user
                 .meetings
                 .union(user.managedMeetings)
-                .filter(::isVisitedMeeting)
+                .filter(Meeting::isVisitedMeeting)
                 .filter(searchQuery)
         }
 
-    fun searchInvites(userId: Long, searchQuery: SearchQuery): Map<String, List<Meeting>> =
+    private fun getInvitationsForGroup(group: Group, searchQuery: SearchQuery): List<MeetingDto> =
+        group.invitations
+            .map(Invitation::meeting)
+            .filter(Meeting::isPlannedMeeting)
+            .filter(searchQuery)
+            .map(meetingToMeetingDto)
+
+    private fun getInvitationsForUser(user: User, searchQuery: SearchQuery): List<MeetingDto> =
+        user.invitations
+            .map(Invitation::meeting)
+            .filter(Meeting::isPlannedMeeting)
+            .filter(searchQuery)
+            .map(meetingToMeetingDto)
+
+    fun searchInvitations(userId: Long, searchQuery: SearchQuery): Map<String, List<MeetingDto>> =
         userId.doIfExist(userDao, logger) { user ->
-            val resMap = mutableMapOf<String, List<Meeting>>()
-            val personalInvitesMeetings = invitationService.getAllInvitationsForUser(user)
-                .mapNotNull { invitation -> invitation.meeting }
-                .filter { meeting -> !isVisitedMeeting(meeting) }
-                .filter(searchQuery)
-            resMap["${user.fullName}:${user.id}"] = personalInvitesMeetings
+            val nameWithIdToMeetings = mutableMapOf<String, List<MeetingDto>>()
+            nameWithIdToMeetings["${user.fullName}:${user.id}"] =
+                getInvitationsForUser(user, searchQuery)
 
             user.managedGroup
-                .map { group ->
-                    val meetings = invitationGroupToMeetingService.getAllInvitationForGroup(group)
-                        .mapNotNull { invitation -> invitation.meeting }
-                        .filter { meeting -> !isVisitedMeeting(meeting) }
-                        .filter(searchQuery)
-                    group to meetings
+                .forEach { group ->
+                    nameWithIdToMeetings["${group.name}:${group.id}"] =
+                        getInvitationsForGroup(group, searchQuery)
                 }
-                .forEach { (group, meetings) ->
-                    resMap["${group.name}:${group.id}"] = meetings
-                }
-
-            resMap
+            nameWithIdToMeetings
         }
 
     private fun getAllMeetingsForUser(userId: Long): List<Meeting> =
@@ -217,77 +211,14 @@ class MeetingService : EntityGetter<Meeting> {
 
     fun getVisitedMeetingForUser(userId: Long): List<Meeting> =
         getAllMeetingsForUser(userId)
-            .filter { meeting -> isVisitedMeeting(meeting) }
+            .filter(Meeting::isVisitedMeeting)
 
     fun getPlannedMeetingsForUser(userId: Long): List<Meeting> =
         getAllMeetingsForUser(userId)
-            .filter { meeting -> !isVisitedMeeting(meeting) }
-
-    fun getInvitesOnMeetings(userId: Long): Map<String, List<Meeting>> =
-        userId.doIfExist(userDao, logger) { user ->
-            val resMap = mutableMapOf<String, List<Meeting>>()
-            val personalInvitesMeetings = invitationService.getAllInvitationsForUser(user)
-                .mapNotNull { invitation -> invitation.meeting }
-                .filter { meeting -> !isVisitedMeeting(meeting) }
-            resMap["${user.fullName}:${user.id}"] = personalInvitesMeetings
-
-            user.managedGroup
-                .map { group ->
-                    val meetings = invitationGroupToMeetingService.getAllInvitationForGroup(group)
-                        .mapNotNull { invitation -> invitation.meeting }
-                        .filter { meeting -> !isVisitedMeeting(meeting) }
-                    group to meetings
-                }
-                .forEach { (group, meetings) ->
-                    resMap["${group.name}:${group.id}"] = meetings
-                }
-
-            resMap
-        }
+            .filter(Meeting::isPlannedMeeting)
 
     fun getParticipants(meetingId: Long): List<User> =
         meetingId.doIfExist(meetingDao, logger, Meeting::participants)
-
-    fun sendInvitation(userId: Long, meetingId: Long): Invitation =
-        (userId to meetingId).doIfExist(userDao, meetingDao, logger) { user, meeting ->
-            invitationService.sendInvitation(user, meeting)
-        }
-
-    fun acceptInvitation(userId: Long, meetingId: Long): Invitation =
-        (userId to meetingId).doIfExist(userDao, meetingDao, logger) { user, meeting ->
-            val invitation = invitationService.acceptInvitation(user, meeting)
-            meeting.participants.add(user)
-            user.meetings.add(meeting)
-            meetingDao.save(meeting)
-            userDao.save(user)
-            invitation
-        }
-
-    fun cancelInvitation(userId: Long, meetingId: Long): Invitation =
-        (userId to meetingId).doIfExist(userDao, meetingDao, logger) { user, meeting ->
-            val invitation = invitationService.cancelInvitation(user, meeting)
-            meeting.participants.remove(user)
-            user.meetings.remove(meeting)
-            meetingDao.save(meeting)
-            userDao.save(user)
-            invitation
-        }
-
-    private fun isVisitedMeeting(meeting: Meeting): Boolean {
-        val now = Date.from(Instant.now())
-        val format = SimpleDateFormat("MM-dd-yyyy HH:mm")
-        val endDateStr = meeting.endDate
-        return endDateStr != null && format.parse(endDateStr).before(now)
-    }
-
-    fun sendInvitationToUsers(userIds: List<Long>, meetingId: Long) {
-        (meetingId to userIds).doIfExist(meetingDao, userDao, logger) { meeting, user ->
-            invitationService.sendInvitation(
-                user = user,
-                meeting = meeting,
-            )
-        }
-    }
 
     fun uploadImage(image: MultipartFile, meetingId: Long): Meeting =
         meetingId.doIfExist(meetingDao, logger) { meeting ->

@@ -5,6 +5,7 @@ import com.meetme.media_link.db.MediaLink
 import com.meetme.domain.filter.entity.FilteredByName
 import com.meetme.group.db.Group
 import com.meetme.interest.db.Interest
+import com.meetme.invitation.db.Invitation
 import com.meetme.meeting.db.Meeting
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails
@@ -50,37 +51,40 @@ data class User(
 ) : UserDetails, FilteredByName {
 
     @JsonIgnore
-    @OneToMany(mappedBy = "admin")
+    @OneToMany(mappedBy = "admin", cascade = [CascadeType.REMOVE])
     var managedMeetings: MutableSet<Meeting> = mutableSetOf()
 
     @JsonIgnore
     @ManyToMany(
         targetEntity = Meeting::class,
+        cascade = [CascadeType.PERSIST, CascadeType.MERGE],
         mappedBy = "participants"
     )
     var meetings: MutableSet<Meeting> = mutableSetOf()
 
     @JsonIgnore
-    @OneToMany(mappedBy = "admin")
+    @OneToMany(mappedBy = "admin", cascade = [CascadeType.REMOVE])
     var managedGroup: MutableSet<Group> = mutableSetOf()
 
     @JsonIgnore
     @ManyToMany(
         targetEntity = Group::class,
+        cascade = [CascadeType.PERSIST, CascadeType.MERGE],
         mappedBy = "participants"
     )
     var groups: MutableSet<Group> = mutableSetOf()
 
     @ManyToMany(targetEntity = Interest::class)
-    @JoinTable(
-        name = "interests_of_user",
-        joinColumns = [JoinColumn(name = "user_id")],
-        inverseJoinColumns = [JoinColumn(name = "interest_id")],
-    )
     var interests: Set<Interest> = mutableSetOf()
 
     @OneToMany(targetEntity = MediaLink::class, mappedBy = "user")
     var socialMediaLinks: Set<MediaLink> = mutableSetOf()
+
+    @ManyToMany(targetEntity = Invitation::class, mappedBy = "users")
+    val invitations: MutableList<Invitation> = mutableListOf()
+
+    val allMeetings: Set<Meeting>
+        get() = meetings.union(managedMeetings)
 
     override fun getAuthorities(): MutableCollection<out GrantedAuthority>? = null
 
@@ -101,12 +105,4 @@ data class User(
 
     override val filteredName: String
         get() = fullName
-
-    override fun toString(): String {
-        return "User(" +
-            "id: $id, " +
-            "name: $name, " +
-            "surname: $surname, " +
-            ")"
-    }
 }

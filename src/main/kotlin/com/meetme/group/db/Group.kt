@@ -6,6 +6,7 @@ import com.meetme.meeting.db.Meeting
 import com.meetme.user.db.User
 import com.meetme.domain.filter.entity.FilteredByInterests
 import com.meetme.domain.filter.entity.FilteredByName
+import com.meetme.invitation.db.Invitation
 import javax.persistence.*
 
 @Entity(name = "Groups")
@@ -64,8 +65,8 @@ class Group(
     )
     var interests: Set<Interest> = mutableSetOf(),
 
-    @OneToMany(targetEntity = MediaLink::class, mappedBy = "group")
-    var socialMediaLinks: Set<MediaLink> = mutableSetOf()
+    @ManyToMany(targetEntity = Invitation::class, mappedBy = "groups", cascade = [CascadeType.MERGE])
+    val invitations: MutableList<Invitation> = mutableListOf()
 ) : FilteredByName, FilteredByInterests {
 
     override val filteredInterests: List<String>

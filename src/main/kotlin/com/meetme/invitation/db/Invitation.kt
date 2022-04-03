@@ -1,28 +1,44 @@
 package com.meetme.invitation.db
 
 import com.fasterxml.jackson.annotation.JsonIgnore
+import com.meetme.group.db.Group
 import com.meetme.meeting.db.Meeting
 import com.meetme.user.db.User
 import javax.persistence.*
 
-@Entity(name = "UserInvitation")
+@Entity(name = "Invitation")
 class Invitation(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "user_invitation_id")
+    @Column(name = "invitation_id")
     val id: Long = 0,
 
     @JsonIgnore
-    @ManyToOne(targetEntity = Meeting::class, fetch = FetchType.EAGER)
-    val meeting: Meeting? = null,
+    @OneToOne(targetEntity = Meeting::class)
+    val meeting: Meeting = Meeting(),
 
     @JsonIgnore
-    @ManyToOne(targetEntity = User::class, fetch = FetchType.EAGER)
-    val user: User? = null,
+    @ManyToMany(
+        targetEntity = User::class,
+        cascade = [CascadeType.REFRESH, CascadeType.MERGE, CascadeType.DETACH, CascadeType.PERSIST]
+    )
+    @JoinTable(
+        name = "invitations_of_user",
+        joinColumns = [JoinColumn(name = "invitation_id")],
+        inverseJoinColumns = [JoinColumn(name = "user_id")],
+    )
+    val users: MutableSet<User> = mutableSetOf(),
 
-    @Column(name = "is_column")
-    var isAccepted: Boolean = false,
+    @JsonIgnore
+    @ManyToMany(
+        targetEntity = Group::class,
+        cascade = [CascadeType.REFRESH, CascadeType.MERGE, CascadeType.DETACH, CascadeType.PERSIST]
+    )
+    @JoinTable(
+        name = "invitations_of_group",
+        joinColumns = [JoinColumn(name = "group_id")],
+        inverseJoinColumns = [JoinColumn(name = "invitation_id")],
+    )
+    val groups: MutableSet<Group> = mutableSetOf()
 
-    @Column(name = "is_canceled")
-    var isCanceled: Boolean = false,
 )

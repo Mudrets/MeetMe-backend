@@ -25,10 +25,6 @@ class UserConfig {
 
         val chat1 = Chat()
         val chat2 = Chat()
-        chatDao.saveAll(
-            listOf(chat1, chat2)
-        )
-
 
         val meeting1 = Meeting(
             name = "My birthday",
@@ -52,10 +48,6 @@ class UserConfig {
 
         userDao.saveAll(
             listOf(alex, mariam)
-        )
-
-        meetingDao.saveAll(
-            listOf(meeting1, meeting2)
         )
     }
 }

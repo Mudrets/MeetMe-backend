@@ -10,5 +10,4 @@ data class GroupDto(
     val photoUrl: String?,
     val isPrivate: Boolean,
     val interests: List<String> = listOf(),
-    val socialMediaLinks: Map<String, String> = mapOf()
 )

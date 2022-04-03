@@ -39,7 +39,6 @@ class MapperConfig {
     fun groupToGroupDto(): GroupToGroupDto =
         GroupToGroupDtoImpl(
             interestsToStrings(),
-            mediaLinksToMap(),
         )
 
     @Bean

@@ -40,6 +40,22 @@ inline fun <reified T, M> Long.doIfExist(entityGetter: EntityGetter<T>, action: 
 }
 
 @Throws(NoSuchElementException::class)
+inline fun <reified T1, reified T2, M> Pair<Long, Long>.doIfExist(
+    entityGetter1: EntityGetter<T1>,
+    entityGetter2: EntityGetter<T2>,
+    action: (T1, T2) -> M
+): M {
+    val entity1 = entityGetter1.getEntity(this.first)
+    val entity2 = entityGetter2.getEntity(this.second)
+    if (entity1 != null && entity2 != null)
+        return action(entity1, entity2)
+    else if (entity1 == null)
+        throw NoSuchElementException("${T1::class.java.simpleName} with id = ${this.first} not found")
+    else
+        throw NoSuchElementException("${T2::class.java.simpleName} with id = ${this.second} not found")
+}
+
+@Throws(NoSuchElementException::class)
 inline fun <reified T, M> Pair<Long, Long>.doIfExist(
     dao: JpaRepository<T, Long>,
     logger: Logger, action: (T, T) -> M
