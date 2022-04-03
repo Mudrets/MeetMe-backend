@@ -85,7 +85,7 @@ class GroupController {
     fun getMeetingsOfGroup(@PathVariable("group_id") groupId: Long): DataResponse<List<MeetingDto>> =
         tryExecute {
             groupService.getMeetings(groupId)
-                .map(meetingToMeetingDto)
+                .map { meeting -> meetingToMeetingDto(meeting, null) }
         }
 
     @PostMapping("/{group_id}/image")

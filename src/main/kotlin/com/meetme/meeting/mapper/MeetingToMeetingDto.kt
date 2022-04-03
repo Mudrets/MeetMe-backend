@@ -4,13 +4,13 @@ import com.meetme.domain.dto.meeting.MeetingDto
 import com.meetme.interest.mapper.InterestsToStrings
 import com.meetme.meeting.db.Meeting
 
-interface MeetingToMeetingDto: (Meeting) -> MeetingDto
+interface MeetingToMeetingDto: (Meeting, Long?) -> MeetingDto
 
 class MeetingToMeetingDtoImpl(
     private val interestsToStrings: InterestsToStrings
 ): MeetingToMeetingDto {
 
-    override fun invoke(meeting: Meeting): MeetingDto =
+    override fun invoke(meeting: Meeting, userId: Long?): MeetingDto =
         MeetingDto(
             id = meeting.id,
             adminId = meeting.admin.id,
@@ -25,6 +25,7 @@ class MeetingToMeetingDtoImpl(
             numberOfParticipants = meeting.numberOfParticipants,
             interests = interestsToStrings(meeting.interests),
             imageUrl = meeting.photoUrl,
+            isParticipant = userId?.let { meeting.participants.any { user -> user.id == it } }
         )
 
 }

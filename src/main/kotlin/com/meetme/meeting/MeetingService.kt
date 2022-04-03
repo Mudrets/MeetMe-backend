@@ -181,14 +181,14 @@ class MeetingService : EntityGetter<Meeting> {
             .map(Invitation::meeting)
             .filter(Meeting::isPlannedMeeting)
             .filter(searchQuery)
-            .map(meetingToMeetingDto)
+            .map { meeting -> meetingToMeetingDto(meeting, group.admin.id) }
 
     private fun getInvitationsForUser(user: User, searchQuery: SearchQuery): List<MeetingDto> =
         user.invitations
             .map(Invitation::meeting)
             .filter(Meeting::isPlannedMeeting)
             .filter(searchQuery)
-            .map(meetingToMeetingDto)
+            .map { meeting -> meetingToMeetingDto(meeting, user.id) }
 
     fun searchInvitations(userId: Long, searchQuery: SearchQuery): Map<String, List<MeetingDto>> =
         userId.doIfExist(userDao, logger) { user ->

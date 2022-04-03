@@ -16,4 +16,5 @@ data class MeetingDto(
     val numberOfParticipants: Int = 1,
     val interests: List<String> = listOf(),
     val imageUrl: String? = null,
+    val isParticipant: Boolean? = null,
 )

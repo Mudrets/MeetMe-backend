@@ -9,6 +9,7 @@ import com.meetme.domain.dto.meeting.SearchQuery
 import com.meetme.domain.filter.InterestsFilter
 import com.meetme.domain.filter.NameFilter
 import com.meetme.domain.filter.FilterType
+import com.meetme.meeting.db.Meeting
 import com.meetme.meeting.mapper.MeetingToMeetingDto
 import com.meetme.user.mapper.UserToUserDto
 import com.meetme.tryExecute
@@ -35,17 +36,20 @@ class MeetingController {
     @Autowired
     private lateinit var interestsFilter: InterestsFilter
 
+    private fun Collection<Meeting>.toMeetingDto(userId: Long): List<MeetingDto> =
+        this.map { meeting -> meetingToMeetingDto(meeting, userId) }
+
     @PostMapping("/create")
     fun createMeeting(@RequestBody createMeetingDto: CreateMeetingDto): DataResponse<MeetingDto> =
         tryExecute {
             val newMeeting = meetingService.createMeeting(createMeetingDto)
-            meetingToMeetingDto(newMeeting)
+            meetingToMeetingDto(newMeeting, null)
         }
 
     @GetMapping("/{meeting_id}")
     fun getMeeting(@PathVariable("meeting_id") meetingId: Long): DataResponse<MeetingDto> =
         tryExecute {
-            meetingToMeetingDto(meetingService.getMeeting(meetingId))
+            meetingToMeetingDto(meetingService.getMeeting(meetingId), null)
         }
 
     @PostMapping("/{meeting_id}/edit")
@@ -54,7 +58,7 @@ class MeetingController {
         @RequestBody changes: EditMeetingDto
     ): DataResponse<MeetingDto> =
         tryExecute {
-            meetingToMeetingDto(meetingService.editMeeting(meetingId, changes))
+            meetingToMeetingDto(meetingService.editMeeting(meetingId, changes), null)
         }
 
     @DeleteMapping("/{meeting_id}")
@@ -70,7 +74,7 @@ class MeetingController {
         @PathVariable("user_id") userId: Long,
     ): DataResponse<MeetingDto> =
         tryExecute {
-            meetingToMeetingDto(meetingService.addParticipant(meetingId, userId))
+            meetingToMeetingDto(meetingService.addParticipant(meetingId, userId), userId)
         }
 
     @DeleteMapping("/{meeting_id}/delete/{user_id}")
@@ -79,7 +83,7 @@ class MeetingController {
         @PathVariable("user_id") userId: Long,
     ): DataResponse<MeetingDto> =
         tryExecute {
-            meetingToMeetingDto(meetingService.deleteParticipant(meetingId, userId))
+            meetingToMeetingDto(meetingService.deleteParticipant(meetingId, userId), userId)
         }
 
     @GetMapping("/{user_id}/planned/search")
@@ -90,8 +94,8 @@ class MeetingController {
         tryExecute {
             val map = meetingService.searchPlanned(userId, searchQuery)
             mapOf(
-                FilterType.MY_FILTER.typeName to map[FilterType.MY_FILTER]!!.map(meetingToMeetingDto),
-                FilterType.GLOBAL_FILTER.typeName to map[FilterType.GLOBAL_FILTER]!!.map(meetingToMeetingDto),
+                FilterType.MY_FILTER.typeName to map[FilterType.MY_FILTER]!!.toMeetingDto(userId),
+                FilterType.GLOBAL_FILTER.typeName to map[FilterType.GLOBAL_FILTER]!!.toMeetingDto(userId),
             )
         }
 
@@ -102,7 +106,7 @@ class MeetingController {
     ): DataResponse<List<MeetingDto>> =
         tryExecute {
             meetingService.searchVisited(userId, searchQuery)
-                .map(meetingToMeetingDto)
+                .toMeetingDto(userId)
         }
 
     @GetMapping("/{user_id}/invites/search")
@@ -127,14 +131,14 @@ class MeetingController {
     fun getPlannedMeetings(@PathVariable("user_id") userId: Long): DataResponse<List<MeetingDto>> =
         tryExecute {
             meetingService.getPlannedMeetingsForUser(userId)
-                .map(meetingToMeetingDto)
+                .toMeetingDto(userId)
         }
 
     @GetMapping("/{user_id}/visited")
     fun getVisitedMeetings(@PathVariable("user_id") userId: Long): DataResponse<List<MeetingDto>> =
         tryExecute {
             meetingService.getVisitedMeetingForUser(userId)
-                .map(meetingToMeetingDto)
+                .toMeetingDto(userId)
         }
 
     @GetMapping("/{user_id}/invites")
@@ -149,7 +153,7 @@ class MeetingController {
         @PathVariable("meeting_id") meetingId: Long,
     ): DataResponse<MeetingDto> =
         tryExecute {
-            meetingToMeetingDto(meetingService.uploadImage(image, meetingId))
+            meetingToMeetingDto(meetingService.uploadImage(image, meetingId), null)
         }
 
 }
