@@ -10,5 +10,5 @@ data class CreateMeetingDto(
     val isPrivate: Boolean = false,
     val startDate: String = "",
     val endDate: String? = null,
-    val maxNumberParticipants: Int = 1,
+    val maxNumberOfParticipants: Int = 1,
 )

@@ -81,7 +81,7 @@ class MeetingService : EntityGetter<Meeting> {
                 private = createMeetingDto.isPrivate,
                 interests = interestsSet,
                 admin = admin,
-                maxNumberOfParticipants = createMeetingDto.maxNumberParticipants
+                maxNumberOfParticipants = createMeetingDto.maxNumberOfParticipants
             )
             meeting.chat = chatService.createChat(meeting)
             meetingDao.save(meeting)
