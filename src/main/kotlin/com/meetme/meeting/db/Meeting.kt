@@ -8,6 +8,7 @@ import com.meetme.domain.filter.entity.FilteredByName
 import com.meetme.image_store.db.Image
 import com.meetme.interest.db.Interest
 import com.meetme.invitation.db.Invitation
+import com.meetme.group.db.Post
 import java.text.SimpleDateFormat
 import java.time.Instant
 import java.util.*
@@ -68,7 +69,10 @@ data class Meeting(
     val participants: MutableList<User> = mutableListOf(admin),
 
     @OneToOne(targetEntity = Chat::class, cascade = [CascadeType.ALL])
-    var chat: Chat = Chat()
+    var chat: Chat = Chat(),
+
+    @OneToMany(targetEntity = Post::class, mappedBy = "meeting", cascade = [CascadeType.ALL])
+    val postsWithMeeting: MutableSet<Post> = mutableSetOf()
 
 ) : FilteredByName, FilteredByInterests {
 

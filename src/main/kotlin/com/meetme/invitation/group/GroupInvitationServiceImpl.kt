@@ -3,6 +3,7 @@ package com.meetme.invitation.group
 import com.meetme.group.GroupService
 import com.meetme.invitation.BaseInvitationService
 import com.meetme.invitation.db.Invitation
+import com.meetme.group.db.Post
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 
@@ -14,7 +15,7 @@ class GroupInvitationServiceImpl : BaseInvitationService() {
 
     override fun addInInvitation(ids: List<Long>, invitation: Invitation): List<Long> {
         val groups = groupService.getListOfEntities(ids)
-            .filter { group -> !group.meetings.contains(invitation.meeting) }
+            .filter { group -> !group.containsMeeting(invitation.meeting) }
         invitation.groups.addAll(groups)
         return groups
             .filter { group -> group.admin == invitation.meeting.admin }
@@ -26,7 +27,7 @@ class GroupInvitationServiceImpl : BaseInvitationService() {
         val usersWithoutInvitation = group.participants
             .filter { user -> !user.meetings.contains(invitation.meeting) }
 
-        group.meetings.add(invitation.meeting)
+        group.posts.add(Post(meeting = invitation.meeting, group = group))
         invitation.users.addAll(usersWithoutInvitation)
         invitation.groups.remove(group)
     }

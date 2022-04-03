@@ -3,6 +3,7 @@ package com.meetme.group
 import com.meetme.user.db.UserDao
 import com.meetme.doIfExist
 import com.meetme.domain.ListEntityGetter
+import com.meetme.domain.Store
 import com.meetme.domain.dto.goup.CreateGroupDto
 import com.meetme.domain.dto.goup.EditGroupDto
 import com.meetme.domain.dto.meeting.SearchQuery

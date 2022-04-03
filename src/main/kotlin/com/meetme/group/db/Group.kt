@@ -1,7 +1,6 @@
 package com.meetme.group.db
 
 import com.meetme.interest.db.Interest
-import com.meetme.media_link.db.MediaLink
 import com.meetme.meeting.db.Meeting
 import com.meetme.user.db.User
 import com.meetme.domain.filter.entity.FilteredByInterests
@@ -39,14 +38,8 @@ class Group(
     @ManyToOne(targetEntity = User::class)
     val admin: User = User(),
 
-    @ManyToMany(targetEntity = Meeting::class)
-    @JoinColumn(name = "meeting_id")
-    @JoinTable(
-        name = "meetings_of_group",
-        joinColumns = [JoinColumn(name = "group_id")],
-        inverseJoinColumns = [JoinColumn(name = "meeting_id")],
-    )
-    var meetings: MutableList<Meeting> = mutableListOf(),
+    @OneToMany(targetEntity = Post::class, mappedBy = "group", cascade = [CascadeType.ALL])
+    val posts: MutableSet<Post> = mutableSetOf(),
 
     @Column(name = "participants")
     @ManyToMany(targetEntity = User::class)
@@ -68,6 +61,15 @@ class Group(
     @ManyToMany(targetEntity = Invitation::class, mappedBy = "groups", cascade = [CascadeType.MERGE])
     val invitations: MutableList<Invitation> = mutableListOf()
 ) : FilteredByName, FilteredByInterests {
+
+    fun containsMeeting(meeting: Meeting) =
+        posts
+            .map(Post::meeting)
+            .contains(meeting)
+
+    val meetings: List<Meeting>
+        get() = posts
+            .map(Post::meeting)
 
     override val filteredInterests: List<String>
         get() = interests.map(Interest::name)
