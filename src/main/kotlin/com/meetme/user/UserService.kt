@@ -2,13 +2,12 @@ package com.meetme.user
 
 import com.meetme.domain.dto.user.EditUserDto
 import com.meetme.doIfExist
-import com.meetme.domain.ListEntityGetter
 import com.meetme.domain.Store
 import com.meetme.domain.filter.NameFilter
 import com.meetme.friends.db.Friendship
 import com.meetme.getEntity
 import com.meetme.file.FileStoreService
-import com.meetme.friends.FriendshipService
+import com.meetme.friends.FriendshipServiceImpl
 import com.meetme.interest.InterestService
 import com.meetme.media_link.MediaLinkService
 import com.meetme.meeting.mapper.MeetingToMeetingDto
@@ -32,9 +31,6 @@ class UserService : UserDetailsService, Store<User> {
     private lateinit var userDao: UserDao
 
     @Autowired
-    private lateinit var friendshipService: FriendshipService
-
-    @Autowired
     private lateinit var passwordEncoder: PasswordEncoder
 
     @Autowired
@@ -45,12 +41,6 @@ class UserService : UserDetailsService, Store<User> {
 
     @Autowired
     private lateinit var fileStoreService: FileStoreService
-
-    @Autowired
-    private lateinit var nameFilter: NameFilter
-
-    @Autowired
-    private lateinit var meetingToMeetingDto: MeetingToMeetingDto
 
     override fun loadUserByUsername(username: String): UserDetails? = loadUserByEmail(username)
 
@@ -101,34 +91,6 @@ class UserService : UserDetailsService, Store<User> {
 
     fun checkPassword(user: User, password: String): Boolean = passwordEncoder.matches(password, user.password)
 
-    @Throws(IllegalArgumentException::class)
-    fun addFriend(userId: Long, friendId: Long): Friendship =
-        (userId to friendId).doIfExist(userDao, logger) { user, friend ->
-            friendshipService.createNewFriendship(user, friend)
-        }
-
-
-    @Throws(IllegalArgumentException::class)
-    fun removeFriend(userId: Long, friendId: Long) =
-        (userId to friendId).doIfExist(userDao, logger) { user, friend ->
-            friendshipService.removeFriendShip(user, friend)
-        }
-
-    fun getFriends(userId: Long): List<User> =
-        userId.doIfExist(userDao, logger) { user ->
-            friendshipService.getFriendsOfUser(user)
-        }
-
-    fun getFriendsRequestToUser(userId: Long): List<User> =
-        userId.doIfExist(userDao, logger) { user ->
-            friendshipService.getFriendRequestToUser(user)
-        }
-
-    fun getFriendsRequestFromUser(userId: Long) =
-        userId.doIfExist(userDao, logger) { user ->
-            friendshipService.getFriendRequestFromUser(user)
-        }
-
     fun changeName(userId: Long, newName: String): User? {
         val dbUser = userId.getEntity(userDao, logger)
         dbUser?.name = newName
@@ -138,14 +100,6 @@ class UserService : UserDetailsService, Store<User> {
 
     fun getUser(userId: Long): User =
         userId.doIfExist(userDao, logger) { user -> user }
-
-    fun searchFriends(userId: Long, searchQuery: String): Map<Boolean, List<User>> =
-        userId.doIfExist(userDao, logger) { user ->
-            val friends = friendshipService.getFriendsOfUser(user)
-            userDao.findAll()
-                .filter { nameFilter(it, searchQuery) }
-                .groupBy { friend -> friends.contains(friend) }
-        }
 
     fun editUser(userId: Long, editUserDto: EditUserDto): User =
         userId.doIfExist(userDao, logger) { user ->
@@ -170,6 +124,8 @@ class UserService : UserDetailsService, Store<User> {
             user.photoUrl = imageUrl
             userDao.save(user)
         }
+
+    fun getAllUsers(): List<User> = userDao.findAll()
 
     override fun getEntity(id: Long) = id.getEntity(userDao, logger)
 

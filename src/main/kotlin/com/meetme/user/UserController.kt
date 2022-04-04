@@ -43,39 +43,6 @@ class UserController {
             userToUserDto(user)
         }
 
-    @PostMapping("/{user_id}/friends/{friend_id}")
-    fun addFriend(
-        @PathVariable(name = "user_id") userId: Long,
-        @PathVariable(name = "friend_id") friendId: Long,
-    ): DataResponse<Unit?> =
-        tryExecute {
-            userService.addFriend(userId, friendId)
-            null
-        }
-
-    @DeleteMapping("/{user_id}/friends/{friend_id}")
-    fun removeFriend(
-        @PathVariable(name = "user_id") userId: Long,
-        @PathVariable(name = "friend_id") friendId: Long,
-    ): DataResponse<Unit?> =
-        tryExecute {
-            userService.removeFriend(userId, friendId)
-            null
-        }
-
-    @GetMapping("/{user_id}/friends")
-    fun getFriends(
-        @PathVariable(name = "user_id") userId: Long,
-    ): DataResponse<List<UserDto>> =
-        tryExecute {
-            userService.getFriends(userId).asSequence()
-                .map(userToUserDto)
-                .sortedBy(UserDto::fullName)
-                .toList()
-        }
-
-
-
     @GetMapping("/{user_id}")
     fun getUser(@PathVariable("user_id") userId: Long): DataResponse<User> =
         tryExecute {
