@@ -1,9 +1,6 @@
 package com.meetme.config
 
-import com.meetme.domain.filter.InterestsFilter
-import com.meetme.domain.filter.InterestsFilterImpl
-import com.meetme.domain.filter.NameFilter
-import com.meetme.domain.filter.NameFilterImpl
+import com.meetme.domain.filter.*
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 
@@ -15,4 +12,7 @@ class FilterConfig {
 
     @Bean
     fun interestsFilter(): InterestsFilter = InterestsFilterImpl()
+
+    @Bean
+    fun userFilter(): UserSearchFilter = UserSearchFilterImpl()
 }
