@@ -22,19 +22,10 @@ import org.springframework.web.multipart.MultipartFile
 class MeetingController {
 
     @Autowired
-    private lateinit var meetingService: MeetingService
+    private lateinit var meetingService: MeetingServiceImpl
 
     @Autowired
     private lateinit var meetingToMeetingDto: MeetingToMeetingDto
-
-    @Autowired
-    private lateinit var userToUserDto: UserToUserDto
-
-    @Autowired
-    private lateinit var nameFilter: NameFilter
-
-    @Autowired
-    private lateinit var interestsFilter: InterestsFilter
 
     private fun Collection<Meeting>.toMeetingDto(userId: Long): List<MeetingDto> =
         this.map { meeting -> meetingToMeetingDto(meeting, userId) }
@@ -68,24 +59,6 @@ class MeetingController {
             null
         }
 
-    @PostMapping("/{meeting_id}/add/{user_id}")
-    fun addParticipant(
-        @PathVariable("meeting_id") meetingId: Long,
-        @PathVariable("user_id") userId: Long,
-    ): DataResponse<MeetingDto> =
-        tryExecute {
-            meetingToMeetingDto(meetingService.addParticipant(meetingId, userId), userId)
-        }
-
-    @DeleteMapping("/{meeting_id}/delete/{user_id}")
-    fun deleteParticipant(
-        @PathVariable("meeting_id") meetingId: Long,
-        @PathVariable("user_id") userId: Long,
-    ): DataResponse<MeetingDto> =
-        tryExecute {
-            meetingToMeetingDto(meetingService.deleteParticipant(meetingId, userId), userId)
-        }
-
     @PostMapping("/{user_id}/planned/search")
     fun searchPlanned(
         @PathVariable("user_id") userId: Long,
@@ -116,15 +89,6 @@ class MeetingController {
     ): DataResponse<Map<String, List<MeetingDto>>> =
         tryExecute {
             meetingService.searchInvitations(userId, searchQuery)
-        }
-
-    @GetMapping("/{meeting_id}/participants")
-    fun getParticipants(
-        @PathVariable("meeting_id") meetingId: Long
-    ): DataResponse<List<UserDto>> =
-        tryExecute {
-            meetingService.getParticipants(meetingId)
-                .map(userToUserDto)
         }
 
     @GetMapping("/{user_id}/planned")

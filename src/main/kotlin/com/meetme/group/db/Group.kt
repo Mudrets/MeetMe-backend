@@ -6,6 +6,7 @@ import com.meetme.user.db.User
 import com.meetme.domain.filter.entity.FilteredByInterests
 import com.meetme.domain.filter.entity.FilteredByName
 import com.meetme.invitation.db.Invitation
+import com.meetme.domain.entity.ParticipantsContainer
 import javax.persistence.*
 
 @Entity(name = "Groups")
@@ -48,7 +49,7 @@ class Group(
         joinColumns = [JoinColumn(name = "group_id")],
         inverseJoinColumns = [JoinColumn(name = "user_id")],
     )
-    var participants: MutableList<User> = mutableListOf(admin),
+    override val participants: MutableList<User> = mutableListOf(admin),
 
     @ManyToMany(targetEntity = Interest::class)
     @JoinTable(
@@ -60,7 +61,7 @@ class Group(
 
     @ManyToMany(targetEntity = Invitation::class, mappedBy = "groups", cascade = [CascadeType.MERGE])
     val invitations: MutableList<Invitation> = mutableListOf()
-) : FilteredByName, FilteredByInterests {
+) : FilteredByName, FilteredByInterests, ParticipantsContainer {
 
     fun containsMeeting(meeting: Meeting) =
         posts

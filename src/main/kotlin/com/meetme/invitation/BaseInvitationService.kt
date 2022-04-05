@@ -1,13 +1,9 @@
 package com.meetme.invitation
 
 import com.meetme.doIfExist
-import com.meetme.domain.dto.meeting.MeetingDto
-import com.meetme.group.db.Group
 import com.meetme.invitation.db.Invitation
 import com.meetme.invitation.db.InvitationDao
-import com.meetme.meeting.MeetingService
-import com.meetme.meeting.mapper.MeetingToMeetingDto
-import com.meetme.user.db.User
+import com.meetme.meeting.MeetingServiceImpl
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 
@@ -18,7 +14,7 @@ abstract class BaseInvitationService : InvitationService {
     private lateinit var invitationDao: InvitationDao
 
     @Autowired
-    protected lateinit var meetingService: MeetingService
+    private lateinit var meetingService: MeetingServiceImpl
 
     abstract fun addInInvitation(ids: List<Long>, invitation: Invitation): List<Long>
 

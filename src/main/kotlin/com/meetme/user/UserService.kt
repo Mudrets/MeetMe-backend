@@ -129,7 +129,5 @@ class UserService : UserDetailsService, Store<User> {
 
     override fun getEntity(id: Long) = id.getEntity(userDao, logger)
 
-    override fun save(entity: User) {
-        userDao.save(entity)
-    }
+    override fun save(entity: User) = userDao.save(entity)
 }

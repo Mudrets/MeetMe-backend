@@ -1,6 +1,6 @@
 package com.meetme.invitation.group
 
-import com.meetme.group.GroupService
+import com.meetme.group.GroupServiceImpl
 import com.meetme.invitation.BaseInvitationService
 import com.meetme.invitation.db.Invitation
 import com.meetme.group.db.Post
@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service
 class GroupInvitationServiceImpl : BaseInvitationService() {
 
     @Autowired
-    private lateinit var groupService: GroupService
+    private lateinit var groupService: GroupServiceImpl
 
     override fun addInInvitation(ids: List<Long>, invitation: Invitation): List<Long> {
         val groups = groupService.getListOfEntities(ids)

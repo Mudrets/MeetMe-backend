@@ -9,6 +9,7 @@ import com.meetme.image_store.db.Image
 import com.meetme.interest.db.Interest
 import com.meetme.invitation.db.Invitation
 import com.meetme.group.db.Post
+import com.meetme.domain.entity.ParticipantsContainer
 import java.text.SimpleDateFormat
 import java.time.Instant
 import java.util.*
@@ -66,22 +67,33 @@ data class Meeting(
         joinColumns = [JoinColumn(name = "meeting_id")],
         inverseJoinColumns = [JoinColumn(name = "user_id")],
     )
-    val participants: MutableList<User> = mutableListOf(admin),
+    override val participants: MutableList<User> = mutableListOf(admin),
 
-    @OneToOne(targetEntity = Chat::class, cascade = [CascadeType.ALL])
+    @OneToOne(
+        targetEntity = Chat::class,
+        cascade = [CascadeType.ALL],
+        orphanRemoval = true,
+        fetch = FetchType.LAZY,
+    )
     var chat: Chat = Chat(),
 
     @OneToMany(targetEntity = Post::class, mappedBy = "meeting", cascade = [CascadeType.ALL])
     val postsWithMeeting: MutableSet<Post> = mutableSetOf()
 
-) : FilteredByName, FilteredByInterests {
+) : FilteredByName, FilteredByInterests, ParticipantsContainer {
 
     @JsonIgnore
     @OneToMany(targetEntity = Image::class, mappedBy = "meeting")
     val images: MutableList<Image> = mutableListOf()
 
     @JsonIgnore
-    @OneToOne(targetEntity = Invitation::class, mappedBy = "meeting", cascade = [CascadeType.ALL], orphanRemoval = true)
+    @OneToOne(
+        targetEntity = Invitation::class,
+        mappedBy = "meeting",
+        cascade = [CascadeType.ALL],
+        orphanRemoval = true,
+        fetch = FetchType.LAZY,
+    )
     val invitation: Invitation? = null
 
     val numberOfParticipants: Int = participants.size

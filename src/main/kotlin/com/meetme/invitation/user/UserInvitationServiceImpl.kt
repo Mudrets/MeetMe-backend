@@ -2,8 +2,12 @@ package com.meetme.invitation.user
 
 import com.meetme.invitation.BaseInvitationService
 import com.meetme.invitation.db.Invitation
+import com.meetme.meeting.db.Meeting
+import com.meetme.participants.base.ParticipantsService
+import com.meetme.participants.meeting.MeetingParticipantsService
 import com.meetme.user.UserService
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.stereotype.Service
 
 @Service("userInvitationService")
@@ -11,6 +15,10 @@ class UserInvitationServiceImpl : BaseInvitationService() {
 
     @Autowired
     private lateinit var userService: UserService
+
+    @Qualifier("meetingParticipantsService")
+    @Autowired
+    private lateinit var meetingParticipantsService: ParticipantsService<Meeting>
 
     override fun addInInvitation(ids: List<Long>, invitation: Invitation): List<Long> {
         val users = userService.getListOfEntities(ids)
@@ -24,7 +32,7 @@ class UserInvitationServiceImpl : BaseInvitationService() {
 
     override fun addMeeting(id: Long, invitation: Invitation) {
         val user = checkUser(id, invitation)
-        meetingService.addParticipant(invitation.meeting.id, user.id)
+        meetingParticipantsService.addParticipant(invitation.meeting.id, user.id)
         invitation.users.remove(user)
         userService.save(user)
     }

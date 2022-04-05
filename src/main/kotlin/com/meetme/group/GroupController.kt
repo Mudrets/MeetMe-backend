@@ -19,7 +19,7 @@ import org.springframework.web.multipart.MultipartFile
 class GroupController {
 
     @Autowired
-    private lateinit var groupService: GroupService
+    private lateinit var groupService: GroupServiceImpl
 
     @Autowired
     private lateinit var groupToGroupDto: GroupToGroupDto

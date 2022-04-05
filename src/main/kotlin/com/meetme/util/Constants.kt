@@ -23,4 +23,7 @@ object Constants {
     const val TOKEN_PREFIX = "Bearer "
     const val TOKEN_EXPIRATION_AFTER_DAYS = 14L
     val secretKey: SecretKey = Keys.hmacShaKeyFor(KEY.toByteArray())!!
+
+    //USER
+    const val NON_EXISTENT_USER_ID = -1L
 }

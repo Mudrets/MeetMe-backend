@@ -14,7 +14,7 @@ class Invitation(
     val id: Long = 0,
 
     @JsonIgnore
-    @OneToOne(targetEntity = Meeting::class)
+    @OneToOne(targetEntity = Meeting::class, fetch = FetchType.LAZY)
     val meeting: Meeting = Meeting(),
 
     @JsonIgnore

@@ -1,20 +1,24 @@
-package com.meetme.group
+package com.meetme.participants.group
 
 import com.meetme.domain.dto.DataResponse
 import com.meetme.domain.dto.auth.UserDto
 import com.meetme.domain.dto.goup.GroupDto
+import com.meetme.group.db.Group
 import com.meetme.group.mapper.GroupToGroupDto
-import com.meetme.user.mapper.UserToUserDto
+import com.meetme.participants.base.ParticipantsService
 import com.meetme.tryExecute
+import com.meetme.user.mapper.UserToUserDto
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/api/v1/groups/{group_id}/participants")
-class ParticipantsController {
+class GroupParticipantsController {
 
+    @Qualifier("groupParticipantsService")
     @Autowired
-    private lateinit var groupService: GroupService
+    private lateinit var groupParticipantsService: ParticipantsService<Group>
 
     @Autowired
     private lateinit var userToUserDto: UserToUserDto
@@ -25,37 +29,36 @@ class ParticipantsController {
     @GetMapping
     fun getParticipants(@PathVariable("group_id") groupId: Long): DataResponse<List<UserDto>> =
         tryExecute {
-            groupService.getParticipants(groupId)
+            groupParticipantsService.getParticipants(groupId)
                 .map(userToUserDto)
                 .sortedBy(UserDto::fullName)
-        }
-
-    @PostMapping
-    fun addParticipant(
-        @PathVariable("group_id") groupId: Long,
-        @RequestBody userIds: List<Long>,
-    ): DataResponse<Unit?> =
-        tryExecute {
-            groupService.addParticipantsToGroup(groupId, userIds)
-            null
         }
 
     @PostMapping("/{user_id}")
     fun addParticipant(
         @PathVariable("group_id") groupId: Long,
         @PathVariable("user_id") userId: Long,
+    ): DataResponse<GroupDto> =
+        tryExecute {
+            groupToGroupDto(groupParticipantsService.addParticipant(userId, groupId))
+        }
+
+    @PostMapping
+    fun addParticipants(
+        @PathVariable("group_id") groupId: Long,
+        @RequestBody userIds: List<Long>,
     ): DataResponse<Unit?> =
         tryExecute {
-            groupService.addParticipantToGroup(groupId, userId)
+            groupParticipantsService.addParticipants(userIds, groupId)
             null
         }
 
     @DeleteMapping("/{user_id}")
-    fun deleteUser(
+    fun removeParticipant(
         @PathVariable("group_id") groupId: Long,
         @PathVariable("user_id") userId: Long,
     ): DataResponse<GroupDto> =
         tryExecute {
-            groupToGroupDto(groupService.deleteUser(groupId, userId))
+            groupToGroupDto(groupParticipantsService.removeParticipant(userId, groupId))
         }
 }
