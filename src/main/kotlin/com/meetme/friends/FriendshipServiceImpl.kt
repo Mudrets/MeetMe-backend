@@ -45,6 +45,7 @@ class FriendshipServiceImpl : FriendshipService {
 
     private fun getAllFriends(user: User): List<User> =
         friendshipDao.findAllByUser1OrUser2(user, user)
+            .filter(Friendship::isFriendship)
             .map { friendship -> friendship.getFriend(user) }
 
     override fun getFriendRequestToUser(userId: Long): List<User> =

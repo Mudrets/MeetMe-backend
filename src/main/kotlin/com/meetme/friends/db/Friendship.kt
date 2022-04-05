@@ -32,6 +32,9 @@ class Friendship(
     @Column(name = "accept_from_user2")
     var acceptFromUser2: Boolean = false,
 ) {
+    val isFriendship: Boolean
+        get() = acceptFromUser1 && acceptFromUser2
+
     val canceledFriendship: Boolean
         get() = !acceptFromUser1 && !acceptFromUser2
 

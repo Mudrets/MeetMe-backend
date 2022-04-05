@@ -86,7 +86,7 @@ class MeetingController {
             meetingToMeetingDto(meetingService.deleteParticipant(meetingId, userId), userId)
         }
 
-    @GetMapping("/{user_id}/planned/search")
+    @PostMapping("/{user_id}/planned/search")
     fun searchPlanned(
         @PathVariable("user_id") userId: Long,
         @RequestBody searchQuery: SearchQuery
