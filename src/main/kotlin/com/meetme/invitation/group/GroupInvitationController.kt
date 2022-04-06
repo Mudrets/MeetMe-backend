@@ -19,16 +19,6 @@ class GroupInvitationController {
     @Autowired
     private lateinit var invitationService: InvitationService
 
-    @PostMapping("/invite/{meeting_id}")
-    fun invitesGroupsToMeeting(
-        @PathVariable("meeting_id") meetingId: Long,
-        @RequestBody groupsIds: List<Long>,
-    ): DataResponse<Unit?> =
-        tryExecute {
-            invitationService.sendInvitations(groupsIds, meetingId)
-            null
-        }
-
     @PostMapping("/{group_id}/accept/{meeting_id}")
     fun acceptInvitation(
         @PathVariable("group_id") groupId: Long,
