@@ -84,7 +84,7 @@ class FileStoreService {
             "meetings" -> meetingRootLocation.resolve(fileName)
             "users" -> userRootLocation.resolve(fileName)
             "groups" -> groupRootLocation.resolve(fileName)
-            "image_store" -> imageStoreRootLocation.resolve(fileName)
+            "imageStore" -> imageStoreRootLocation.resolve(fileName)
             else -> rootLocation.resolve(fileName)
         }
         if (!Files.exists(path))
