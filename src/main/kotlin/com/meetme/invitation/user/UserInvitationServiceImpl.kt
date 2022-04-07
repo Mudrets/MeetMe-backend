@@ -32,7 +32,7 @@ class UserInvitationServiceImpl : BaseInvitationService() {
 
     override fun addMeeting(id: Long, invitation: Invitation) {
         val user = checkUser(id, invitation)
-        meetingParticipantsService.addParticipant(invitation.meeting.id, user.id)
+        meetingParticipantsService.addParticipant(user.id, invitation.meeting.id)
         invitation.users.remove(user)
         userService.save(user)
     }
