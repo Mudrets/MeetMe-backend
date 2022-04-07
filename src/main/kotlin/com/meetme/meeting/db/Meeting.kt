@@ -102,7 +102,8 @@ data class Meeting(
         get() {
             val now = Date.from(Instant.now())
             val format = SimpleDateFormat("MM-dd-yyyy HH:mm")
-            return endDate != null && format.parse(endDate).before(now)
+            val dateStr = endDate ?: startDate
+            return format.parse(dateStr).before(now)
         }
 
     val isPlannedMeeting: Boolean
