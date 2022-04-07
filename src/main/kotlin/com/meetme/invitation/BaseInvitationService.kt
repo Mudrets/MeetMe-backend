@@ -24,11 +24,13 @@ abstract class BaseInvitationService : InvitationService {
 
     final override fun sendInvitations(ids: List<Long>, meetingId: Long) {
         meetingId.doIfExist(meetingService) { meeting ->
-            val invitation =
-                invitationDao.findByMeeting(meetingId) ?: Invitation(meeting = meeting)
-            val instantAcceptList = addInInvitation(ids, invitation)
-            invitationDao.save(invitation)
-            instantAcceptList.forEach { id -> acceptInvitation(id, meetingId) }
+            synchronized(lock) {
+                val invitation =
+                    invitationDao.findByMeeting(meetingId) ?: Invitation(meeting = meeting)
+                val instantAcceptList = addInInvitation(ids, invitation)
+                invitationDao.save(invitation)
+                instantAcceptList.forEach { id -> acceptInvitation(id, meetingId) }
+            }
         }
     }
 
@@ -47,4 +49,8 @@ abstract class BaseInvitationService : InvitationService {
     private fun getInvitation(meetingId: Long): Invitation =
         invitationDao.findByMeeting(meetingId)
             ?: throw IllegalArgumentException("Invitation on the meeting with id $meetingId does not exist")
+
+    companion object {
+        val lock = Any()
+    }
 }
