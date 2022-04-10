@@ -4,7 +4,6 @@ import com.meetme.domain.dto.user.EditUserDto
 import com.meetme.doIfExist
 import com.meetme.domain.Store
 import com.meetme.getEntity
-import com.meetme.file.FileStoreService
 import com.meetme.interest.InterestService
 import com.meetme.media_link.MediaLinkService
 import com.meetme.user.db.User
@@ -34,9 +33,6 @@ class UserService : UserDetailsService, Store<Long, User> {
 
     @Autowired
     private lateinit var mediaLinkService: MediaLinkService
-
-    @Autowired
-    private lateinit var fileStoreService: FileStoreService
 
     override fun loadUserByUsername(username: String): UserDetails? = loadUserByEmail(username)
 
@@ -111,13 +107,6 @@ class UserService : UserDetailsService, Store<Long, User> {
                 interests = interestsSet
                 socialMediaLinks = links
             }
-            userDao.save(user)
-        }
-
-    fun uploadImage(file: MultipartFile, userId: Long): User =
-        userId.doIfExist(userDao, logger) { user ->
-            val imageUrl = fileStoreService.store(file, user::class.java, user.id)
-            user.photoUrl = imageUrl
             userDao.save(user)
         }
 

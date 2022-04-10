@@ -57,14 +57,5 @@ class UserController {
         tryExecute {
             userToUserDto(userService.editUser(userId, editUserDto))
         }
-
-    @PostMapping("/{user_id}/image")
-    fun uploadImage(
-        @RequestParam("image") image: MultipartFile,
-        @PathVariable("user_id") userId: Long,
-    ): DataResponse<UserDto> =
-        tryExecute {
-            userToUserDto(userService.uploadImage(image, userId))
-        }
 }
 

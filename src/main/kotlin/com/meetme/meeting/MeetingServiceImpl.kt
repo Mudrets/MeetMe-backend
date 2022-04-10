@@ -1,23 +1,15 @@
 package com.meetme.meeting
 
 import com.meetme.chat.ChatService
-import com.meetme.user.db.UserDao
 import com.meetme.doIfExist
 import com.meetme.domain.AllEntitiesGetter
 import com.meetme.domain.dto.meeting.CreateMeetingDto
 import com.meetme.domain.dto.meeting.EditMeetingDto
-import com.meetme.domain.dto.meeting.MeetingDto
-import com.meetme.domain.dto.meeting.SearchMeetingDto
-import com.meetme.domain.filter.FilterType
 import com.meetme.getEntity
-import com.meetme.file.FileStoreService
-import com.meetme.group.db.Group
 import com.meetme.interest.InterestService
-import com.meetme.invitation.db.Invitation
 import com.meetme.meeting.db.Meeting
 import com.meetme.meeting.db.MeetingDao
-import com.meetme.meeting.mapper.MeetingToMeetingDto
-import com.meetme.user.db.User
+import com.meetme.user.UserService
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -33,10 +25,7 @@ class MeetingServiceImpl : MeetingService, AllEntitiesGetter<Meeting> {
     private lateinit var meetingDao: MeetingDao
 
     @Autowired
-    private lateinit var fileStoreService: FileStoreService
-
-    @Autowired
-    private lateinit var userDao: UserDao
+    private lateinit var userService: UserService
 
     @Autowired
     private lateinit var interestService: InterestService
@@ -45,7 +34,7 @@ class MeetingServiceImpl : MeetingService, AllEntitiesGetter<Meeting> {
     private lateinit var chatService: ChatService
 
     fun createMeeting(createMeetingDto: CreateMeetingDto): Meeting =
-        createMeetingDto.adminId.doIfExist(userDao, logger) { admin ->
+        createMeetingDto.adminId.doIfExist(userService) { admin ->
             val interestsSet =
                 interestService.convertToInterestEntityAndAddNewInterests(interests = createMeetingDto.interests)
 
@@ -90,13 +79,6 @@ class MeetingServiceImpl : MeetingService, AllEntitiesGetter<Meeting> {
         meetingId.doIfExist(meetingDao, logger) { meeting ->
             chatService.deleteChat(meeting.chat)
             meetingDao.delete(meeting)
-        }
-
-    fun uploadImage(image: MultipartFile, meetingId: Long): Meeting =
-        meetingId.doIfExist(meetingDao, logger) { meeting ->
-            val imageUrl = fileStoreService.store(image, meeting::class.java, meeting.id)
-            meeting.photoUrl = imageUrl
-            meetingDao.save(meeting)
         }
 
     override fun save(entity: Meeting) = meetingDao.save(entity)

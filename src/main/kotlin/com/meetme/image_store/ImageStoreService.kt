@@ -8,6 +8,4 @@ interface ImageStoreService {
     fun uploadImage(image: MultipartFile, meetingId: Long): List<String>
 
     fun getImages(meetingId: Long): List<String>
-
-    fun saveImage(image: Image): Image
 }

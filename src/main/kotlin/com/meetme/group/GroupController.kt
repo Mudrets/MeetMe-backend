@@ -65,13 +65,4 @@ class GroupController {
             groupService.getMeetings(groupId)
                 .map { meeting -> meetingToMeetingDto(meeting, null) }
         }
-
-    @PostMapping("/{group_id}/image")
-    fun uploadImage(
-        @RequestParam("image") image: MultipartFile,
-        @PathVariable("group_id") groupId: Long,
-    ): DataResponse<GroupDto> =
-        tryExecute {
-            groupToGroupDto(groupService.uploadImage(image, groupId))
-        }
 }

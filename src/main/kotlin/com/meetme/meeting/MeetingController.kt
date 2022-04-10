@@ -23,9 +23,6 @@ class MeetingController {
     @Autowired
     private lateinit var meetingToMeetingDto: MeetingToMeetingDto
 
-    private fun Collection<Meeting>.toMeetingDto(userId: Long): List<MeetingDto> =
-        this.map { meeting -> meetingToMeetingDto(meeting, userId) }
-
     @PostMapping("/create")
     fun createMeeting(@RequestBody createMeetingDto: CreateMeetingDto): DataResponse<MeetingDto> =
         tryExecute {
@@ -54,14 +51,4 @@ class MeetingController {
             meetingService.deleteMeeting(meetingId)
             null
         }
-
-    @PostMapping("/{meeting_id}/image")
-    fun uploadImage(
-        @RequestParam("image") image: MultipartFile,
-        @PathVariable("meeting_id") meetingId: Long,
-    ): DataResponse<MeetingDto> =
-        tryExecute {
-            meetingToMeetingDto(meetingService.uploadImage(image, meetingId), null)
-        }
-
 }

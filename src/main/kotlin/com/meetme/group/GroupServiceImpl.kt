@@ -4,12 +4,7 @@ import com.meetme.user.db.UserDao
 import com.meetme.doIfExist
 import com.meetme.domain.dto.goup.CreateGroupDto
 import com.meetme.domain.dto.goup.EditGroupDto
-import com.meetme.domain.dto.meeting.SearchMeetingDto
-import com.meetme.domain.filter.CollectionFilter
-import com.meetme.domain.filter.StringFilter
-import com.meetme.domain.filter.FilterType
 import com.meetme.meeting.db.Meeting
-import com.meetme.file.FileStoreService
 import com.meetme.getEntity
 import com.meetme.group.db.Group
 import com.meetme.group.db.GroupDao
@@ -33,9 +28,6 @@ class GroupServiceImpl : GroupService {
 
     @Autowired
     private lateinit var interestService: InterestService
-
-    @Autowired
-    private lateinit var fileStoreService: FileStoreService
 
     fun createGroup(createGroupDto: CreateGroupDto): Group =
         createGroupDto.adminId.doIfExist(userDao, logger) { admin ->
@@ -85,13 +77,6 @@ class GroupServiceImpl : GroupService {
 
     fun getMeetings(groupId: Long): List<Meeting> =
         groupId.doIfExist(groupDao, logger) { group -> group.meetings }
-
-    fun uploadImage(file: MultipartFile, groupId: Long): Group =
-        groupId.doIfExist(groupDao, logger) { group ->
-            val imageUrl = fileStoreService.store(file, group::class.java, group.id)
-            group.photoUrl = imageUrl
-            groupDao.save(group)
-        }
 
     override fun save(entity: Group): Group = groupDao.save(entity)
 
