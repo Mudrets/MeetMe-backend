@@ -8,10 +8,11 @@ import com.meetme.domain.filter.*
 import com.meetme.group.db.Group
 import com.meetme.interest.mapper.InterestsToStrings
 import com.meetme.meeting.db.Meeting
-import com.meetme.user.db.User
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import java.text.SimpleDateFormat
 
 @Configuration
 class FilterConfig {
@@ -29,11 +30,48 @@ class FilterConfig {
                 (!isVisited && type == MeetingType.PLANNED)
     }
 
+    @Qualifier("endDateFilter")
+    @Bean
+    fun endDateFilter() = object : Filter<Meeting, String?> {
+        override fun invoke(meeting: Meeting, filterEndDate: String?): Boolean {
+            if (filterEndDate == null)
+                return true
+            val endDateStr = meeting.endDate ?: meeting.startDate
+            val format = SimpleDateFormat("MM-dd-yyyy HH:mm")
+            val endDate = format.parse(endDateStr)
+            val filterDate = format.parse(filterEndDate)
+            return filterDate.before(endDate)
+        }
+    }
+
+    @Qualifier("startDateFilter")
+    @Bean
+    fun startDateFilter() = object : Filter<Meeting, String?> {
+        override fun invoke(meeting: Meeting, filterStartDate: String?): Boolean {
+            if (filterStartDate == null)
+                return true
+            val startDateStr = meeting.startDate
+            val format = SimpleDateFormat("MM-dd-yyyy HH:mm")
+            val startDate = format.parse(startDateStr)
+            val filterDate = format.parse(filterStartDate)
+            return filterDate.after(startDate)
+        }
+    }
+
+    @Bean
+    fun maxNumberOfParticipantsFilter() = object : Filter<Int, Int?> {
+        override fun invoke(maxNumberParticipants: Int, filterNumber: Int?): Boolean =
+            filterNumber == null || maxNumberParticipants <= filterNumber
+    }
+
     @Bean
     fun meetingFilter(
         @Autowired nameFilter: Filter<String, String>,
         @Autowired interestFilter: Filter<Collection<*>, Collection<*>>,
         @Autowired typeFilter: Filter<Boolean, MeetingType>,
+        @Qualifier("startDateFilter") @Autowired startDateFilter: Filter<Meeting, String?>,
+        @Qualifier("endDateFilter") @Autowired endDateFilter: Filter<Meeting, String?>,
+        @Autowired maxNumberOfParticipantsFilter: Filter<Int, Int?>,
         @Autowired interestsToString: InterestsToStrings,
     ) = object : Filter<Meeting, SearchMeetingDto> {
         override fun invoke(meeting: Meeting, searchMeetingDto: SearchMeetingDto): Boolean {
@@ -41,7 +79,9 @@ class FilterConfig {
 
             return nameFilter(meeting.name, searchMeetingDto.searchQuery) &&
                 interestFilter(stringInterestList, searchMeetingDto.interests) &&
-                typeFilter(meeting.isVisitedMeeting, searchMeetingDto.type)
+                typeFilter(meeting.isVisitedMeeting, searchMeetingDto.type) &&
+                startDateFilter(meeting, searchMeetingDto.startDate) &&
+                maxNumberOfParticipantsFilter(meeting.maxNumberOfParticipants, searchMeetingDto.maxNumberOfParticipants)
         }
     }
     

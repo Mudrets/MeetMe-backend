@@ -6,5 +6,7 @@ data class SearchMeetingDto(
     val searchQuery: String = "",
     val interests: List<String> = listOf(),
     val maxNumberOfParticipants: Int? = null,
+    val startDate: String? = null,
+    val endDate: String? = null,
     var type: MeetingType = MeetingType.PLANNED,
 )
