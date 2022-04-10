@@ -1,7 +1,7 @@
 package com.meetme.domain
 
-interface ListEntityGetter<out T> : EntityGetter<T> {
+interface ListEntityGetter<Identifier, out Entity> : EntityGetter<Identifier, Entity> {
 
-    fun getListOfEntities(ids: List<Long>): List<T> =
-        ids.mapNotNull(::getEntity)
+    fun getListOfEntities(identifiers: List<Identifier>): List<Entity> =
+        identifiers.mapNotNull(::getEntity)
 }

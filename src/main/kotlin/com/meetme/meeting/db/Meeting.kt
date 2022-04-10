@@ -3,8 +3,6 @@ package com.meetme.meeting.db
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.meetme.chat.db.Chat
 import com.meetme.user.db.User
-import com.meetme.domain.filter.entity.FilteredByInterests
-import com.meetme.domain.filter.entity.FilteredByName
 import com.meetme.image_store.db.Image
 import com.meetme.interest.db.Interest
 import com.meetme.invitation.db.Invitation
@@ -80,7 +78,7 @@ data class Meeting(
     @OneToMany(targetEntity = Post::class, mappedBy = "meeting", cascade = [CascadeType.ALL])
     val postsWithMeeting: MutableSet<Post> = mutableSetOf()
 
-) : FilteredByName, FilteredByInterests, ParticipantsContainer {
+) : ParticipantsContainer {
 
     @JsonIgnore
     @OneToMany(targetEntity = Image::class, mappedBy = "meeting")
@@ -108,10 +106,4 @@ data class Meeting(
 
     val isPlannedMeeting: Boolean
         get() = !isVisitedMeeting
-
-    override val filteredInterests: List<String>
-        get() = interests.map(Interest::name)
-
-    override val filteredName: String
-        get() = name
 }

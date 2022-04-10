@@ -5,7 +5,7 @@ import com.meetme.domain.dto.DataResponse
 import com.meetme.domain.dto.goup.EditGroupDto
 import com.meetme.domain.dto.goup.GroupDto
 import com.meetme.domain.dto.meeting.MeetingDto
-import com.meetme.domain.dto.meeting.SearchQuery
+import com.meetme.domain.dto.meeting.SearchMeetingDto
 import com.meetme.domain.filter.FilterType
 import com.meetme.group.mapper.GroupToGroupDto
 import com.meetme.meeting.mapper.MeetingToMeetingDto
@@ -57,28 +57,6 @@ class GroupController {
         tryExecute {
             groupService.deleteGroup(groupId, userId)
             null
-        }
-
-    @GetMapping("/user/{user_id}")
-    fun getGroups(
-        @PathVariable("user_id") userId: Long,
-    ): DataResponse<List<GroupDto>> =
-        tryExecute {
-            groupService.getGroupsForUser(userId)
-                .map(groupToGroupDto)
-        }
-
-    @GetMapping("/{user_id}/search")
-    fun search(
-        @PathVariable("user_id") userId: Long,
-        @RequestBody searchQuery: SearchQuery
-    ): DataResponse<Map<String, List<GroupDto>>> =
-        tryExecute {
-            val map = groupService.search(userId, searchQuery)
-            mapOf(
-                FilterType.MY_FILTER.typeName to map[FilterType.MY_FILTER]!!.map(groupToGroupDto),
-                FilterType.GLOBAL_FILTER.typeName to map[FilterType.GLOBAL_FILTER]!!.map(groupToGroupDto),
-            )
         }
 
     @GetMapping("/{group_id}/meetings")

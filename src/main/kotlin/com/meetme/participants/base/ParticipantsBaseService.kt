@@ -16,7 +16,7 @@ abstract class ParticipantsBaseService<T : ParticipantsContainer>(
     @Autowired
     private lateinit var userService: UserService
 
-    protected lateinit var service: StoreService<T>
+    protected lateinit var service: StoreService<Long, T>
 
     abstract fun checkEntityBeforeAdd(entity: T, user: User)
 

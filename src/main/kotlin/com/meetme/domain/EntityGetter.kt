@@ -1,5 +1,5 @@
 package com.meetme.domain
 
-interface EntityGetter<out T> {
-    fun getEntity(id: Long): T?
+interface EntityGetter<in Identifier, out Entity> {
+    fun getEntity(identifier: Identifier): Entity?
 }

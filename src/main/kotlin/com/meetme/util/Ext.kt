@@ -2,10 +2,8 @@ package com.meetme
 
 import com.meetme.domain.EntityGetter
 import com.meetme.domain.dto.DataResponse
-import com.meetme.domain.filter.InterestsFilter
-import com.meetme.domain.filter.NameFilter
-import com.meetme.domain.filter.entity.FilteredByInterests
-import com.meetme.domain.filter.entity.FilteredByName
+import com.meetme.domain.filter.CollectionFilter
+import com.meetme.domain.filter.StringFilter
 import org.slf4j.Logger
 import org.springframework.data.jpa.repository.JpaRepository
 
@@ -31,7 +29,7 @@ inline fun <reified T, M> Long.doIfExist(dao: JpaRepository<T, Long>, logger: Lo
 }
 
 @Throws(NoSuchElementException::class)
-inline fun <reified T, M> Long.doIfExist(entityGetter: EntityGetter<T>, action: (T) -> M): M {
+inline fun <reified T, I, M> I.doIfExist(entityGetter: EntityGetter<I, T>, action: (T) -> M): M {
     val entity = entityGetter.getEntity(this)
     if (entity != null)
         return action(entity)
@@ -40,9 +38,9 @@ inline fun <reified T, M> Long.doIfExist(entityGetter: EntityGetter<T>, action: 
 }
 
 @Throws(NoSuchElementException::class)
-inline fun <reified T1, reified T2, M> Pair<Long, Long>.doIfExist(
-    entityGetter1: EntityGetter<T1>,
-    entityGetter2: EntityGetter<T2>,
+inline fun <reified T1, reified T2, I1, I2, M> Pair<I1, I2>.doIfExist(
+    entityGetter1: EntityGetter<I1, T1>,
+    entityGetter2: EntityGetter<I2, T2>,
     action: (T1, T2) -> M
 ): M {
     val entity1 = entityGetter1.getEntity(this.first)
@@ -56,8 +54,8 @@ inline fun <reified T1, reified T2, M> Pair<Long, Long>.doIfExist(
 }
 
 @Throws(NoSuchElementException::class)
-inline fun <reified T, M> Pair<Long, Long>.doIfExist(
-    entityGetter: EntityGetter<T>,
+inline fun <reified T, I, M> Pair<I, I>.doIfExist(
+    entityGetter: EntityGetter<I, T>,
     action: (T, T) -> M
 ): M {
     val entity1 = entityGetter.getEntity(this.first)
@@ -136,19 +134,3 @@ inline fun <reified T1, reified T2, M> Pair<Long, List<Long>>.doIfExist(
     if (exceptionMessage.isNotBlank())
         throw NoSuchElementException(exceptionMessage.trim())
 }
-
-inline fun <reified T : FilteredByName> Iterable<T>.filter(nameFilter: NameFilter, searchQuery: String) =
-    this
-        .filter { nameFilter(it, searchQuery) }
-
-inline fun <reified T : FilteredByInterests> Iterable<T>.filter(interestsFilter: InterestsFilter, interests: Collection<String>) =
-    this
-        .filter { interestsFilter(it, interests) }
-
-inline fun <reified T : FilteredByName> Sequence<T>.filter(nameFilter: NameFilter, searchQuery: String) =
-    this
-        .filter { nameFilter(it, searchQuery) }
-
-inline fun <reified T : FilteredByInterests> Sequence<T>.filter(interestsFilter: InterestsFilter, interests: Collection<String>) =
-    this
-        .filter { interestsFilter(it, interests) }

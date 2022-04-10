@@ -1,17 +1,13 @@
 package com.meetme.meeting
 
 import com.meetme.domain.dto.DataResponse
-import com.meetme.domain.dto.auth.UserDto
 import com.meetme.domain.dto.meeting.CreateMeetingDto
 import com.meetme.domain.dto.meeting.EditMeetingDto
 import com.meetme.domain.dto.meeting.MeetingDto
-import com.meetme.domain.dto.meeting.SearchQuery
-import com.meetme.domain.filter.InterestsFilter
-import com.meetme.domain.filter.NameFilter
+import com.meetme.domain.dto.meeting.SearchMeetingDto
 import com.meetme.domain.filter.FilterType
 import com.meetme.meeting.db.Meeting
 import com.meetme.meeting.mapper.MeetingToMeetingDto
-import com.meetme.user.mapper.UserToUserDto
 import com.meetme.tryExecute
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.*
@@ -57,58 +53,6 @@ class MeetingController {
         tryExecute {
             meetingService.deleteMeeting(meetingId)
             null
-        }
-
-    @PostMapping("/{user_id}/planned/search")
-    fun searchPlanned(
-        @PathVariable("user_id") userId: Long,
-        @RequestBody searchQuery: SearchQuery
-    ): DataResponse<Map<String, List<MeetingDto>>> =
-        tryExecute {
-            val map = meetingService.searchPlanned(userId, searchQuery)
-            mapOf(
-                FilterType.MY_FILTER.typeName to map[FilterType.MY_FILTER]!!.toMeetingDto(userId),
-                FilterType.GLOBAL_FILTER.typeName to map[FilterType.GLOBAL_FILTER]!!.toMeetingDto(userId),
-            )
-        }
-
-    @GetMapping("/{user_id}/visited/search")
-    fun searchVisited(
-        @PathVariable("user_id") userId: Long,
-        @RequestBody searchQuery: SearchQuery,
-    ): DataResponse<List<MeetingDto>> =
-        tryExecute {
-            meetingService.searchVisited(userId, searchQuery)
-                .toMeetingDto(userId)
-        }
-
-    @GetMapping("/{user_id}/invites/search")
-    fun searchInvites(
-        @PathVariable("user_id") userId: Long,
-        @RequestBody searchQuery: SearchQuery,
-    ): DataResponse<Map<String, List<MeetingDto>>> =
-        tryExecute {
-            meetingService.searchInvitations(userId, searchQuery)
-        }
-
-    @GetMapping("/{user_id}/planned")
-    fun getPlannedMeetings(@PathVariable("user_id") userId: Long): DataResponse<List<MeetingDto>> =
-        tryExecute {
-            meetingService.getPlannedMeetingsForUser(userId)
-                .toMeetingDto(userId)
-        }
-
-    @GetMapping("/{user_id}/visited")
-    fun getVisitedMeetings(@PathVariable("user_id") userId: Long): DataResponse<List<MeetingDto>> =
-        tryExecute {
-            meetingService.getVisitedMeetingForUser(userId)
-                .toMeetingDto(userId)
-        }
-
-    @GetMapping("/{user_id}/invites")
-    fun getInvitesOnMeetings(@PathVariable("user_id") userId: Long): DataResponse<Map<String, List<MeetingDto>>> =
-        tryExecute {
-            meetingService.searchInvitations(userId, SearchQuery())
         }
 
     @PostMapping("/{meeting_id}/image")

@@ -2,9 +2,10 @@ package com.meetme.friends
 
 import com.meetme.domain.dto.DataResponse
 import com.meetme.domain.dto.auth.UserDto
-import com.meetme.domain.filter.UserSearchFilter
+import com.meetme.domain.filter.Filter
 import com.meetme.user.mapper.UserToUserDto
 import com.meetme.tryExecute
+import com.meetme.user.db.User
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.*
 
@@ -19,7 +20,7 @@ class FriendshipController {
     private lateinit var friendshipService: FriendshipService
 
     @Autowired
-    private lateinit var userSearchFilter: UserSearchFilter
+    private lateinit var userFilter: Filter<UserDto, String>
 
     @GetMapping("/to")
     fun getFriendRequestTo(
@@ -27,10 +28,9 @@ class FriendshipController {
         @RequestParam("query") searchQuery: String,
     ): DataResponse<List<UserDto>> =
         tryExecute {
-            userSearchFilter.searchString = searchQuery
             friendshipService.getFriendRequestToUser(userId).asSequence()
                 .map(userToUserDto)
-                .filter(userSearchFilter)
+                .filter { friend -> userFilter(friend, searchQuery) }
                 .sortedBy(UserDto::fullName)
                 .toList()
         }
@@ -41,10 +41,9 @@ class FriendshipController {
         @RequestParam("query") searchQuery: String,
     ): DataResponse<List<UserDto>> =
         tryExecute {
-            userSearchFilter.searchString = searchQuery
             friendshipService.getFriendRequestFromUser(userId).asSequence()
                 .map(userToUserDto)
-                .filter(userSearchFilter)
+                .filter { friend -> userFilter(friend, searchQuery) }
                 .sortedBy(UserDto::fullName)
                 .toList()
         }
@@ -66,12 +65,11 @@ class FriendshipController {
         @RequestParam("query") searchQuery: String,
     ): DataResponse<Map<String, List<UserDto>>> =
         tryExecute {
-            userSearchFilter.searchString = searchQuery
             friendshipService.getAllPeopleWithFriends(userId).entries
                 .associate { (key, users) ->
                     key.status to users
                         .map(userToUserDto)
-                        .filter(userSearchFilter)
+                        .filter { friend -> userFilter(friend, searchQuery) }
                 }
         }
 

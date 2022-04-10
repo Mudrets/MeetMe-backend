@@ -1,6 +1,6 @@
-package com.meetme.domain.dto.meeting
+package com.meetme.domain.dto.goup
 
-data class SearchQuery(
+data class SearchGroupDto(
     val searchQuery: String = "",
     val interests: List<String> = listOf(),
 )

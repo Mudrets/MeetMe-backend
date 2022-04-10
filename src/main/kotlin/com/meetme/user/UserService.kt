@@ -3,14 +3,10 @@ package com.meetme.user
 import com.meetme.domain.dto.user.EditUserDto
 import com.meetme.doIfExist
 import com.meetme.domain.Store
-import com.meetme.domain.filter.NameFilter
-import com.meetme.friends.db.Friendship
 import com.meetme.getEntity
 import com.meetme.file.FileStoreService
-import com.meetme.friends.FriendshipServiceImpl
 import com.meetme.interest.InterestService
 import com.meetme.media_link.MediaLinkService
-import com.meetme.meeting.mapper.MeetingToMeetingDto
 import com.meetme.user.db.User
 import com.meetme.user.db.UserDao
 import org.slf4j.Logger
@@ -23,7 +19,7 @@ import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
 
 @Service
-class UserService : UserDetailsService, Store<User> {
+class UserService : UserDetailsService, Store<Long, User> {
 
     private val logger: Logger = LoggerFactory.getLogger(UserService::class.java)
 
@@ -127,7 +123,7 @@ class UserService : UserDetailsService, Store<User> {
 
     fun getAllUsers(): List<User> = userDao.findAll()
 
-    override fun getEntity(id: Long) = id.getEntity(userDao, logger)
+    override fun getEntity(identifier: Long) = identifier.getEntity(userDao, logger)
 
     override fun save(entity: User) = userDao.save(entity)
 }

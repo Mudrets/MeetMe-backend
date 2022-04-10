@@ -2,7 +2,6 @@ package com.meetme.user.db
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.meetme.media_link.db.MediaLink
-import com.meetme.domain.filter.entity.FilteredByName
 import com.meetme.group.db.Group
 import com.meetme.interest.db.Interest
 import com.meetme.invitation.db.Invitation
@@ -48,7 +47,7 @@ data class User(
     var photoUrl: String = "",
 
 
-) : UserDetails, FilteredByName {
+) : UserDetails {
 
     @JsonIgnore
     @OneToMany(mappedBy = "admin", cascade = [CascadeType.REMOVE])
@@ -64,7 +63,7 @@ data class User(
 
     @JsonIgnore
     @OneToMany(mappedBy = "admin", cascade = [CascadeType.REMOVE])
-    var managedGroup: MutableSet<Group> = mutableSetOf()
+    var managedGroups: MutableSet<Group> = mutableSetOf()
 
     @JsonIgnore
     @ManyToMany(
@@ -86,6 +85,9 @@ data class User(
     val allMeetings: Set<Meeting>
         get() = meetings.union(managedMeetings)
 
+    val allGroups: Set<Group>
+        get() = groups.union(managedGroups)
+
     override fun getAuthorities(): MutableCollection<out GrantedAuthority>? = null
 
     override fun getPassword(): String? = password
@@ -103,6 +105,6 @@ data class User(
     val fullName: String
         get() = "$name${if (surname.isNotBlank()) " $surname" else ""}"
 
-    override val filteredName: String
-        get() = fullName
+    val nameWithId: String
+        get() = "$name:$id"
 }
