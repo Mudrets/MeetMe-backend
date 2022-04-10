@@ -1,11 +1,9 @@
 package com.meetme.file
 
 import com.meetme.domain.dto.DataResponse
-import com.meetme.domain.dto.meeting.MeetingDto
 import com.meetme.tryExecute
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
-import org.springframework.core.io.ByteArrayResource
 import org.springframework.core.io.Resource
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
@@ -14,9 +12,7 @@ import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
 
-
 @Controller
-@RequestMapping("/uploads")
 class FileController {
 
     @Qualifier("meetingFileStoreService")
@@ -39,22 +35,22 @@ class FileController {
             .body(inputStream)
     }
 
-    @GetMapping("/meetings/{file_name}", produces = [MediaType.IMAGE_PNG_VALUE, MediaType.IMAGE_JPEG_VALUE])
+    @GetMapping("/uploads/meetings/{file_name}", produces = [MediaType.IMAGE_PNG_VALUE, MediaType.IMAGE_JPEG_VALUE])
     fun getMeetingImage(
         @PathVariable("file_name") fileName: String,
     ): ResponseEntity<Resource> = meetingFileStoreService.returnImage(fileName)
 
-    @GetMapping("/groups/{file_name}", produces = [MediaType.IMAGE_PNG_VALUE, MediaType.IMAGE_JPEG_VALUE])
+    @GetMapping("/uploads/groups/{file_name}", produces = [MediaType.IMAGE_PNG_VALUE, MediaType.IMAGE_JPEG_VALUE])
     fun getGroupImage(
         @PathVariable("file_name") fileName: String,
     ): ResponseEntity<Resource> = groupFileStoreService.returnImage(fileName)
 
-    @GetMapping("/users/{file_name}", produces = [MediaType.IMAGE_PNG_VALUE, MediaType.IMAGE_JPEG_VALUE])
+    @GetMapping("/uploads/users/{file_name}", produces = [MediaType.IMAGE_PNG_VALUE, MediaType.IMAGE_JPEG_VALUE])
     fun getUsersImage(
         @PathVariable("file_name") fileName: String,
     ): ResponseEntity<Resource> = userFileStoreService.returnImage(fileName)
 
-    @PostMapping("/meetings/{meeting_id}")
+    @PostMapping("/api/v1/meetings/{meeting_id}/image")
     fun uploadMeetingImage(
         @RequestParam("image") image: MultipartFile,
         @PathVariable("meeting_id") meetingId: Long,
@@ -63,7 +59,7 @@ class FileController {
             meetingFileStoreService.store(image, meetingId)
         }
 
-    @PostMapping("/users/{user_id}")
+    @PostMapping("/api/v1/users/{user_id}/image")
     fun uploadUserImage(
         @RequestParam("image") image: MultipartFile,
         @PathVariable("user_id") userId: Long,
@@ -72,7 +68,7 @@ class FileController {
             userFileStoreService.store(image, userId)
         }
 
-    @PostMapping("/groups/{group_id}")
+    @PostMapping("/api/v1/groups/{group_id}/image")
     fun uploadGroupImage(
         @RequestParam("image") image: MultipartFile,
         @PathVariable("group_id") groupId: Long,
