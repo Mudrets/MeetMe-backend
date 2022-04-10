@@ -1,11 +1,6 @@
 package com.meetme.chat.db
 
-import javax.persistence.Column
-import javax.persistence.Entity
-import javax.persistence.GeneratedValue
-import javax.persistence.GenerationType
-import javax.persistence.Id
-import javax.persistence.OneToMany
+import javax.persistence.*
 
 @Entity(name = "chat")
 class Chat(
@@ -14,6 +9,6 @@ class Chat(
     @Column(name = "chat_id")
     val id: Long = 1,
 
-    @OneToMany(targetEntity = Message::class, mappedBy = "chat")
+    @OneToMany(targetEntity = Message::class, mappedBy = "chat", fetch = FetchType.EAGER)
     val messages: MutableList<Message> = mutableListOf()
 )
