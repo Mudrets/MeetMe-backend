@@ -1,13 +1,10 @@
 package com.meetme.meeting.search
 
-import com.meetme.doIfExist
 import com.meetme.domain.dto.meeting.SearchMeetingDto
 import com.meetme.domain.filter.Filter
 import com.meetme.domain.service.search.*
 import com.meetme.meeting.MeetingService
 import com.meetme.meeting.db.Meeting
-import com.meetme.user.UserService
-import com.meetme.user.db.User
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.stereotype.Service
@@ -27,7 +24,7 @@ class MeetingGlobalSearchForEntityService @Autowired constructor(
 
 
     override val globalSearchService: GlobalSearchService<SearchMeetingDto, Meeting>
-        get() = object : BaseGlobalSearchService<SearchMeetingDto, Meeting>(meetingService, filter) {
+        get() = object : BaseGlobalSearchService<SearchMeetingDto, Meeting, Long>(meetingService, filter) {
 
         override fun prepareForResult(filteredEntities: List<Meeting>): List<Meeting> =
             filteredEntities

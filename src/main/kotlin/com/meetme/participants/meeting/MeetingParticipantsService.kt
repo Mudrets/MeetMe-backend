@@ -1,5 +1,6 @@
 package com.meetme.participants.meeting
 
+import com.meetme.group.GroupService
 import com.meetme.meeting.MeetingService
 import com.meetme.meeting.db.Meeting
 import com.meetme.participants.base.ParticipantsBaseService
@@ -9,16 +10,10 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 
 @Service("meetingParticipantsService")
-class MeetingParticipantsService : ParticipantsBaseService<Meeting>(
-    "Meeting with id = %s does not exist"
-) {
-
-    @Autowired
-    private lateinit var meetingService: MeetingService
-
-    override fun initService() {
-        service = meetingService
-    }
+class MeetingParticipantsService @Autowired constructor(
+    userService: UserService,
+    meetingService: MeetingService,
+) : ParticipantsBaseService<Meeting>(userService, meetingService) {
 
     override fun checkEntityBeforeAdd(entity: Meeting, user: User) {
         if (entity.numberOfParticipants >= entity.maxNumberOfParticipants)
@@ -42,6 +37,5 @@ class MeetingParticipantsService : ParticipantsBaseService<Meeting>(
 
     override fun removeContainerFromUser(container: Meeting, user: User) {
         user.meetings.remove(container)
-
     }
 }

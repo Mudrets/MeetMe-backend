@@ -4,7 +4,7 @@ import com.meetme.doIfExist
 import com.meetme.domain.dto.meeting.SearchMeetingDto
 import com.meetme.domain.service.search.SearchForEntityService
 import com.meetme.meeting.db.Meeting
-import com.meetme.user.UserService
+import com.meetme.user.UserServiceImpl
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.stereotype.Service
@@ -21,7 +21,7 @@ class InvitationSearchServiceImpl : InvitationSearchService {
     private lateinit var invitationSearchForGroupService: SearchForEntityService<Long, SearchMeetingDto, Meeting>
 
     @Autowired
-    private lateinit var userService: UserService
+    private lateinit var userService: UserServiceImpl
 
     private fun userInvitations(userId: Long, query: SearchMeetingDto) =
         invitationSearchForUserService.search(userId, query)

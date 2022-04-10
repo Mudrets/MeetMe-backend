@@ -10,14 +10,13 @@ import com.meetme.user.db.User
 import com.meetme.user.mapper.UserToUserDto
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.*
-import org.springframework.web.multipart.MultipartFile
 
 @RestController
 @RequestMapping("/api/v1/user")
 class UserController {
 
     @Autowired
-    private lateinit var userService: UserService
+    private lateinit var userService: UserServiceImpl
 
     @Autowired
     private lateinit var userToUserDto: UserToUserDto
@@ -25,18 +24,14 @@ class UserController {
     @PostMapping("/register")
     fun register(@RequestBody credentials: RegisterCredentialsDto): DataResponse<UserDto> =
         tryExecute {
-            val user = userService.createNewUserByEmailAndPass(
-                email = credentials.email,
-                password = credentials.password,
-                fullName = credentials.fullName
-            )
+            val user = userService.create(credentials)
             userToUserDto(user)
         }
 
     @PostMapping("/login")
     fun login(@RequestBody credentials: LoginCredentialsDto): DataResponse<UserDto> =
         tryExecute {
-            val user = userService.loginUserByEmailAndPassword(
+            val user = userService.loginUser(
                 email = credentials.email,
                 password = credentials.password,
             )
@@ -46,7 +41,7 @@ class UserController {
     @GetMapping("/{user_id}")
     fun getUser(@PathVariable("user_id") userId: Long): DataResponse<User> =
         tryExecute {
-            userService.getUser(userId)
+            userService.get(userId)
         }
 
     @PostMapping("{user_id}/edit")
@@ -55,7 +50,7 @@ class UserController {
         @RequestBody editUserDto: EditUserDto,
     ): DataResponse<UserDto> =
         tryExecute {
-            userToUserDto(userService.editUser(userId, editUserDto))
+            userToUserDto(userService.update(userId, editUserDto))
         }
 }
 

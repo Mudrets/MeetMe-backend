@@ -1,10 +1,10 @@
 package com.meetme.domain.service.search
 
-import com.meetme.domain.AllEntitiesGetter
+import com.meetme.domain.EntityGetter
 import com.meetme.domain.filter.Filter
 
-abstract class BaseGlobalSearchService<Query, Entity>(
-    private val allEntitiesGetter: AllEntitiesGetter<Entity>,
+abstract class BaseGlobalSearchService<Query, Entity, Identifier>(
+    private val allEntitiesGetter: EntityGetter<Identifier, Entity>,
     private val filter: Filter<Entity, Query>,
 ) : GlobalSearchService<Query, Entity> {
 

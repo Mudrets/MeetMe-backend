@@ -4,8 +4,7 @@ import com.meetme.invitation.BaseInvitationService
 import com.meetme.invitation.db.Invitation
 import com.meetme.meeting.db.Meeting
 import com.meetme.participants.base.ParticipantsService
-import com.meetme.participants.meeting.MeetingParticipantsService
-import com.meetme.user.UserService
+import com.meetme.user.UserServiceImpl
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.stereotype.Service
@@ -14,14 +13,14 @@ import org.springframework.stereotype.Service
 class UserInvitationServiceImpl : BaseInvitationService() {
 
     @Autowired
-    private lateinit var userService: UserService
+    private lateinit var userService: UserServiceImpl
 
     @Qualifier("meetingParticipantsService")
     @Autowired
     private lateinit var meetingParticipantsService: ParticipantsService<Meeting>
 
     override fun addInInvitation(ids: List<Long>, invitation: Invitation): List<Long> {
-        val users = userService.getListOfEntities(ids)
+        val users = userService.getList(ids)
             .filter { user -> !user.allMeetings.contains(invitation.meeting) }
         invitation.users.addAll(users)
 

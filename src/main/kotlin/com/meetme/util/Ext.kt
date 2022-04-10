@@ -2,8 +2,6 @@ package com.meetme
 
 import com.meetme.domain.EntityGetter
 import com.meetme.domain.dto.DataResponse
-import com.meetme.domain.filter.CollectionFilter
-import com.meetme.domain.filter.StringFilter
 import org.slf4j.Logger
 import org.springframework.data.jpa.repository.JpaRepository
 
@@ -30,11 +28,8 @@ inline fun <reified T, M> Long.doIfExist(dao: JpaRepository<T, Long>, logger: Lo
 
 @Throws(NoSuchElementException::class)
 inline fun <reified T, I, M> I.doIfExist(entityGetter: EntityGetter<I, T>, action: (T) -> M): M {
-    val entity = entityGetter.getEntity(this)
-    if (entity != null)
-        return action(entity)
-    else
-        throw NoSuchElementException("${T::class.java.simpleName} with id = $this not found")
+    val entity = entityGetter.get(this)
+    return action(entity)
 }
 
 @Throws(NoSuchElementException::class)
@@ -43,14 +38,9 @@ inline fun <reified T1, reified T2, I1, I2, M> Pair<I1, I2>.doIfExist(
     entityGetter2: EntityGetter<I2, T2>,
     action: (T1, T2) -> M
 ): M {
-    val entity1 = entityGetter1.getEntity(this.first)
-    val entity2 = entityGetter2.getEntity(this.second)
-    if (entity1 != null && entity2 != null)
-        return action(entity1, entity2)
-    else if (entity1 == null)
-        throw NoSuchElementException("${T1::class.java.simpleName} with id = ${this.first} not found")
-    else
-        throw NoSuchElementException("${T2::class.java.simpleName} with id = ${this.second} not found")
+    val entity1 = entityGetter1.get(this.first)
+    val entity2 = entityGetter2.get(this.second)
+    return action(entity1, entity2)
 }
 
 @Throws(NoSuchElementException::class)
@@ -58,14 +48,9 @@ inline fun <reified T, I, M> Pair<I, I>.doIfExist(
     entityGetter: EntityGetter<I, T>,
     action: (T, T) -> M
 ): M {
-    val entity1 = entityGetter.getEntity(this.first)
-    val entity2 = entityGetter.getEntity(this.second)
-    if (entity1 != null && entity2 != null)
-        return action(entity1, entity2)
-    else if (entity1 == null)
-        throw NoSuchElementException("${T::class.java.simpleName} with id = ${this.first} not found")
-    else
-        throw NoSuchElementException("${T::class.java.simpleName} with id = ${this.second} not found")
+    val entity1 = entityGetter.get(this.first)
+    val entity2 = entityGetter.get(this.second)
+    return action(entity1, entity2)
 }
 
 @Throws(NoSuchElementException::class)

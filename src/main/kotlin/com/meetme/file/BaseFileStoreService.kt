@@ -1,6 +1,6 @@
 package com.meetme.file
 
-import com.meetme.user.UserService
+import com.meetme.user.UserServiceImpl
 import com.meetme.util.Constants
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -16,7 +16,7 @@ open class BaseFileStoreService<T>(
     private val rootImageUrl: String,
 ) : FileStoreService<T> {
 
-    private val logger: Logger = LoggerFactory.getLogger(UserService::class.java)
+    private val logger: Logger = LoggerFactory.getLogger(UserServiceImpl::class.java)
 
     init {
         if (!Files.exists(rootLocation))

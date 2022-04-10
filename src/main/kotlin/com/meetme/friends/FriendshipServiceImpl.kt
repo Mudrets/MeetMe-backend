@@ -5,7 +5,7 @@ import com.meetme.user.db.User
 import com.meetme.friends.db.Friendship
 import com.meetme.friends.db.FriendshipDao
 import com.meetme.friends.enums.FriendshipStatus
-import com.meetme.user.UserService
+import com.meetme.user.UserServiceImpl
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 
@@ -16,7 +16,7 @@ class FriendshipServiceImpl : FriendshipService {
     private lateinit var friendshipDao: FriendshipDao
 
     @Autowired
-    private lateinit var userService: UserService
+    private lateinit var userService: UserServiceImpl
 
     private fun getFriendship(user1: User, user2: User): Friendship? =
         friendshipDao.findByUser1AndUser2(user1, user2)
@@ -63,7 +63,7 @@ class FriendshipServiceImpl : FriendshipService {
 
     override fun getAllPeopleWithFriends(userId: Long): Map<FriendshipStatus, List<User>> =
         userId.doIfExist(userService) { user ->
-            val allUsers = userService.getAllUsers().subtract(listOf(user).toSet())
+            val allUsers = userService.getAll().subtract(listOf(user).toSet())
             val friends = getAllFriends(user)
             val resMap = mapOf(
                 FriendshipStatus.Friend to mutableListOf<User>(),

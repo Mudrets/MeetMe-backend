@@ -6,9 +6,10 @@ import com.meetme.domain.filter.Filter
 import com.meetme.domain.service.search.*
 import com.meetme.group.GroupService
 import com.meetme.group.db.Group
-import com.meetme.user.UserService
+import com.meetme.user.UserServiceImpl
 import com.meetme.user.db.User
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.expression.spel.ast.Identifier
 import org.springframework.stereotype.Service
 
 @Service
@@ -22,10 +23,10 @@ class GroupGlobalSearchForEntityService :
     private lateinit var groupService: GroupService
 
     @Autowired
-    private lateinit var userService: UserService
+    private lateinit var userService: UserServiceImpl
 
     override val globalSearchService: GlobalSearchService<SearchGroupDto, Group>
-        get() = object : BaseGlobalSearchService<SearchGroupDto, Group>(groupService, filter) {
+        get() = object : BaseGlobalSearchService<SearchGroupDto, Group, Long>(groupService, filter) {
 
             override fun prepareForResult(filteredEntities: List<Group>): List<Group> =
                 filteredEntities

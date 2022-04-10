@@ -14,7 +14,7 @@ class GroupInvitationServiceImpl : BaseInvitationService() {
     private lateinit var groupService: GroupServiceImpl
 
     override fun addInInvitation(ids: List<Long>, invitation: Invitation): List<Long> {
-        val groups = groupService.getListOfEntities(ids)
+        val groups = groupService.getList(ids)
             .filter { group -> !group.containsMeeting(invitation.meeting) }
         invitation.groups.addAll(groups)
         return groups

@@ -3,17 +3,16 @@ package com.meetme.group
 import com.meetme.user.db.UserDao
 import com.meetme.doIfExist
 import com.meetme.domain.dto.goup.CreateGroupDto
-import com.meetme.domain.dto.goup.EditGroupDto
+import com.meetme.domain.dto.goup.UpdateGroupDto
 import com.meetme.meeting.db.Meeting
-import com.meetme.getEntity
 import com.meetme.group.db.Group
 import com.meetme.group.db.GroupDao
 import com.meetme.interest.InterestService
+import com.meetme.user.UserService
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
-import org.springframework.web.multipart.MultipartFile
 
 @Service
 class GroupServiceImpl : GroupService {
@@ -24,22 +23,22 @@ class GroupServiceImpl : GroupService {
     private lateinit var groupDao: GroupDao
 
     @Autowired
-    private lateinit var userDao: UserDao
+    private lateinit var userService: UserService
 
     @Autowired
     private lateinit var interestService: InterestService
 
-    fun createGroup(createGroupDto: CreateGroupDto): Group =
-        createGroupDto.adminId.doIfExist(userDao, logger) { admin ->
+    override fun create(data: CreateGroupDto): Group =
+        data.adminId.doIfExist(userService) { admin ->
             val interestsSet =
-                interestService.convertToInterestEntityAndAddNewInterests(interests = createGroupDto.interests)
+                interestService.convertToInterestEntityAndAddNewInterests(interests = data.interests)
 
             val group = Group(
-                name = createGroupDto.name,
-                description = createGroupDto.description,
+                name = data.name,
+                description = data.description,
                 interests = interestsSet,
                 admin = admin,
-                private = createGroupDto.isPrivate,
+                private = data.isPrivate,
             )
 
             groupDao.save(group)
@@ -48,42 +47,33 @@ class GroupServiceImpl : GroupService {
     fun getGroup(groupId: Long): Group =
         groupId.doIfExist(groupDao, logger) { group -> group }
 
-    fun deleteGroup(groupId: Long, userId: Long) =
-        (groupId to userId).doIfExist(groupDao, userDao, logger) { group, user ->
-            if (group.admin != user)
-                throw IllegalArgumentException(
-                    "User with id = $userId does not have permission to delete the group with id = $groupId"
-                )
-            group.invitations.forEach { it.groups.remove(group) }
-            groupDao.save(group)
-            groupDao.delete(group)
-        }
-
-    fun editGroup(groupId: Long, editCredentials: EditGroupDto): Group =
-        groupId.doIfExist(groupDao, logger) { group ->
+    override fun update(identifier: Long, data: UpdateGroupDto): Group =
+        identifier.doIfExist(groupDao, logger) { group ->
             val interestsSet =
-                interestService.convertToInterestEntityAndAddNewInterests(interests = editCredentials.interests)
+                interestService.convertToInterestEntityAndAddNewInterests(interests = data.interests)
 
             group.apply {
-                name = editCredentials.name
-                description = editCredentials.description
-                photoUrl = editCredentials.photoUrl
-                private = editCredentials.isPrivate
+                name = data.name
+                description = data.description
+                photoUrl = data.photoUrl
+                private = data.isPrivate
                 interests = interestsSet
             }
 
             groupDao.save(group)
         }
 
-    fun getMeetings(groupId: Long): List<Meeting> =
+    override fun getMeetings(groupId: Long): List<Meeting> =
         groupId.doIfExist(groupDao, logger) { group -> group.meetings }
 
     override fun save(entity: Group): Group = groupDao.save(entity)
 
-    override fun getEntity(identifier: Long): Group? =
-        identifier.getEntity(groupDao, logger)
+    override fun delete(entity: Group) = groupDao.delete(entity)
 
-    override fun getAll(): List<Group> {
-        TODO("Not yet implemented")
-    }
+    override fun deleteByIdentifier(identifier: Long) = groupDao.deleteById(identifier)
+
+    override fun get(identifier: Long): Group =
+        identifier.doIfExist(groupDao, logger) { it }
+
+    override fun getAll(): List<Group> = groupDao.findAll()
 }

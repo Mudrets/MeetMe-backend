@@ -1,22 +1,19 @@
 package com.meetme.participants.group
 
+import com.meetme.domain.StoreService
 import com.meetme.group.GroupService
 import com.meetme.group.db.Group
 import com.meetme.participants.base.ParticipantsBaseService
+import com.meetme.user.UserService
 import com.meetme.user.db.User
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 
 @Service("groupParticipantsService")
-class GroupParticipantsService : ParticipantsBaseService<Group>(
-    "Group with id = %s does not exist"
-) {
-    @Autowired
-    private lateinit var groupService: GroupService
-
-    override fun initService() {
-        service = groupService
-    }
+class GroupParticipantsService @Autowired constructor(
+    userService: UserService,
+    groupService: GroupService,
+) : ParticipantsBaseService<Group>(userService, groupService) {
 
     override fun checkEntityBeforeAdd(entity: Group, user: User) {
         if (entity.participants.contains(user))

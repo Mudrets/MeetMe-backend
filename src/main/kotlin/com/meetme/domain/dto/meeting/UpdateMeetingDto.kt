@@ -1,6 +1,6 @@
 package com.meetme.domain.dto.meeting
 
-data class EditMeetingDto(
+data class UpdateMeetingDto(
     val name: String,
     val description: String,
     val startDate: String,

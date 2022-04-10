@@ -6,7 +6,7 @@ import com.meetme.domain.filter.Filter
 import com.meetme.domain.service.search.BaseSearchForEntityService
 import com.meetme.invitation.db.Invitation
 import com.meetme.meeting.db.Meeting
-import com.meetme.user.UserService
+import com.meetme.user.UserServiceImpl
 import com.meetme.user.db.User
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
@@ -17,7 +17,7 @@ class InvitationSearchForUserService @Autowired constructor(
 ) : BaseSearchForEntityService<User, Long, SearchMeetingDto, Meeting>(filter) {
 
     @Autowired
-    private lateinit var userService: UserService
+    private lateinit var userService: UserServiceImpl
 
     override fun getEntityWithCheck(identifier: Long): User =
         identifier.doIfExist(userService) { it }

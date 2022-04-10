@@ -1,22 +1,20 @@
 package com.meetme.participants.base
 
-import com.meetme.StoreService
 import com.meetme.doIfExist
+import com.meetme.domain.CrudService
+import com.meetme.domain.EntityGetter
+import com.meetme.domain.StoreService
 import com.meetme.domain.entity.ParticipantsContainer
 import com.meetme.user.UserService
+import com.meetme.user.UserServiceImpl
 import com.meetme.user.db.User
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 
-@Service
 abstract class ParticipantsBaseService<T : ParticipantsContainer>(
-    private val errorString: String = "Entity with id = %d does not exist"
+    private val userService: UserService,
+    private val service: StoreService<T, Long>,
 ) : ParticipantsService<T> {
-
-    @Autowired
-    private lateinit var userService: UserService
-
-    protected lateinit var service: StoreService<Long, T>
 
     abstract fun checkEntityBeforeAdd(entity: T, user: User)
 
@@ -26,12 +24,8 @@ abstract class ParticipantsBaseService<T : ParticipantsContainer>(
 
     abstract fun removeContainerFromUser(container: T, user: User)
 
-    abstract fun initService()
-
     private fun getContainer(participantContainerId: Long): T {
-        initService()
-        return service.getEntity(participantContainerId)
-            ?: throw IllegalArgumentException(errorString.format(participantContainerId))
+        return service.get(participantContainerId)
     }
 
     final override fun addParticipant(userId: Long, participantContainerId: Long): T =
@@ -44,7 +38,7 @@ abstract class ParticipantsBaseService<T : ParticipantsContainer>(
         }
 
     final override fun addParticipants(userIds: List<Long>, participantContainerId: Long): T {
-        val users = userService.getListOfEntities(userIds)
+        val users = userService.getList(userIds)
         val container = getContainer(participantContainerId)
         users.forEach { user ->
             checkEntityBeforeAdd(container, user)

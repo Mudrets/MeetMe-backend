@@ -1,10 +1,8 @@
 package com.meetme.meeting
 
-import com.meetme.StoreService
-import com.meetme.domain.AllEntitiesGetter
+import com.meetme.domain.CrudService
+import com.meetme.domain.dto.meeting.CreateMeetingDto
+import com.meetme.domain.dto.meeting.UpdateMeetingDto
 import com.meetme.meeting.db.Meeting
-import org.springframework.stereotype.Service
 
-@Service
-interface MeetingService : StoreService<Long, Meeting>, AllEntitiesGetter<Meeting> {
-}
+interface MeetingService : CrudService<CreateMeetingDto, UpdateMeetingDto, Long, Meeting>

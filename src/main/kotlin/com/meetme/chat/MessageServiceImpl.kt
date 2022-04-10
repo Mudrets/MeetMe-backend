@@ -4,7 +4,7 @@ import com.meetme.chat.db.Chat
 import com.meetme.chat.db.Message
 import com.meetme.chat.db.MessageDao
 import com.meetme.doIfExist
-import com.meetme.user.UserService
+import com.meetme.user.UserServiceImpl
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
@@ -20,7 +20,7 @@ class MessageServiceImpl : MessageService {
     private lateinit var messageDao: MessageDao
 
     @Autowired
-    private lateinit var userService: UserService
+    private lateinit var userService: UserServiceImpl
 
     override fun sendMessage(content: String, userId: Long, chat: Chat): Message =
         userId.doIfExist(userService) { user ->

@@ -1,7 +1,7 @@
 package com.meetme.file
 
 import com.meetme.doIfExist
-import com.meetme.user.UserService
+import com.meetme.user.UserServiceImpl
 import com.meetme.util.Constants.SERVER_ROOT
 import com.meetme.util.Constants.USER_DIR_NAME
 import com.meetme.util.Constants.USER_IMAGE_PATH
@@ -18,7 +18,7 @@ class UserFileStoreService : BaseFileStoreService<Long>(
 ) {
 
     @Autowired
-    private lateinit var userService: UserService
+    private lateinit var userService: UserServiceImpl
 
     override fun store(file: MultipartFile, id: Long): String =
         id.doIfExist(userService) { user ->

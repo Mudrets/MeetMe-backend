@@ -2,17 +2,14 @@ package com.meetme.group
 
 import com.meetme.domain.dto.goup.CreateGroupDto
 import com.meetme.domain.dto.DataResponse
-import com.meetme.domain.dto.goup.EditGroupDto
+import com.meetme.domain.dto.goup.UpdateGroupDto
 import com.meetme.domain.dto.goup.GroupDto
 import com.meetme.domain.dto.meeting.MeetingDto
-import com.meetme.domain.dto.meeting.SearchMeetingDto
-import com.meetme.domain.filter.FilterType
 import com.meetme.group.mapper.GroupToGroupDto
 import com.meetme.meeting.mapper.MeetingToMeetingDto
 import com.meetme.tryExecute
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.*
-import org.springframework.web.multipart.MultipartFile
 
 @RestController
 @RequestMapping("/api/v1/groups")
@@ -31,16 +28,16 @@ class GroupController {
     @PostMapping("/create")
     fun createGroup(@RequestBody createGroupDto: CreateGroupDto): DataResponse<GroupDto> =
         tryExecute {
-            groupToGroupDto(groupService.createGroup(createGroupDto))
+            groupToGroupDto(groupService.create(createGroupDto))
         }
 
     @PostMapping("/{group_id}/edit")
     fun editGroup(
         @PathVariable("group_id") groupId: Long,
-        @RequestBody editCredentials: EditGroupDto,
+        @RequestBody editCredentials: UpdateGroupDto,
     ): DataResponse<GroupDto> =
         tryExecute {
-            groupToGroupDto(groupService.editGroup(groupId, editCredentials))
+            groupToGroupDto(groupService.update(groupId, editCredentials))
         }
 
     @GetMapping("/{group_id}")
@@ -55,7 +52,7 @@ class GroupController {
         @PathVariable("user_id") userId: Long,
     ): DataResponse<Unit?> =
         tryExecute {
-            groupService.deleteGroup(groupId, userId)
+            groupService.deleteByIdentifier(groupId)
             null
         }
 

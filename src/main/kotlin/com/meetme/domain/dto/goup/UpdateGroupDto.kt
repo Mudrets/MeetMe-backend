@@ -1,6 +1,6 @@
 package com.meetme.domain.dto.goup
 
-data class EditGroupDto(
+data class UpdateGroupDto(
     val name: String,
     val description: String,
     val photoUrl: String?,
