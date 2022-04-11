@@ -4,7 +4,7 @@ import com.meetme.util.doIfExist
 import com.meetme.service.meeting.MeetingService
 import com.meetme.util.Constants.MEETING_DIR_NAME
 import com.meetme.util.Constants.MEETING_IMAGE_PATH
-import com.meetme.util.Constants.SERVER_ROOT
+import com.meetme.util.Constants.SERVER_IMAGE_ROOT
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
@@ -14,7 +14,7 @@ import java.nio.file.Path
 class MeetingFileStoreService : BaseFileStoreService<Long>(
     pathOfStore = Path.of(MEETING_IMAGE_PATH),
     entityOfStorageName = "Meeting",
-    rootImageUrl = "${SERVER_ROOT}/${MEETING_DIR_NAME}"
+    rootImageUrl = "${SERVER_IMAGE_ROOT}/${MEETING_DIR_NAME}"
 ) {
 
     @Autowired

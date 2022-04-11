@@ -15,7 +15,7 @@ import java.nio.file.Path
 class ImageStoreServiceImpl : BaseFileStoreService<Long>(
     pathOfStore = Path.of(Constants.IMAGE_STORE_PATH),
     entityOfStorageName = "Image",
-    rootImageUrl = "${Constants.SERVER_ROOT}/${Constants.IMAGE_STORE_DIR_NAME}"
+    rootImageUrl = "${Constants.SERVER_IMAGE_ROOT}/${Constants.IMAGE_STORE_DIR_NAME}"
 ), ImageStoreService {
 
     @Autowired

@@ -2,7 +2,7 @@ package com.meetme.service.file
 
 import com.meetme.util.doIfExist
 import com.meetme.service.user.UserServiceImpl
-import com.meetme.util.Constants.SERVER_ROOT
+import com.meetme.util.Constants.SERVER_IMAGE_ROOT
 import com.meetme.util.Constants.USER_DIR_NAME
 import com.meetme.util.Constants.USER_IMAGE_PATH
 import org.springframework.beans.factory.annotation.Autowired
@@ -14,7 +14,7 @@ import java.nio.file.Path
 class UserFileStoreService : BaseFileStoreService<Long>(
     pathOfStore = Path.of(USER_IMAGE_PATH),
     entityOfStorageName = "User",
-    rootImageUrl = "${SERVER_ROOT}/${USER_DIR_NAME}"
+    rootImageUrl = "${SERVER_IMAGE_ROOT}/${USER_DIR_NAME}"
 ) {
 
     @Autowired
