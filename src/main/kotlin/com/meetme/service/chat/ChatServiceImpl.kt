@@ -61,7 +61,7 @@ class ChatServiceImpl : ChatService {
     private fun getMessageList(chat: Chat, anchor: Long, messagesNumber: Int): List<Message> {
         val reversedMessages = chat.messages.sortedByDescending(Message::timestamp)
         if (anchor == 0L) {
-            val endIndex = min(messagesNumber + 1, reversedMessages.size)
+            val endIndex = min(messagesNumber, reversedMessages.size)
             return reversedMessages.subList(0, endIndex)
         }
 
