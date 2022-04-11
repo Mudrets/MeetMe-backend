@@ -1,4 +1,4 @@
-package com.meetme
+package com.meetme.util
 
 import com.meetme.domain.EntityGetter
 import com.meetme.domain.dto.DataResponse

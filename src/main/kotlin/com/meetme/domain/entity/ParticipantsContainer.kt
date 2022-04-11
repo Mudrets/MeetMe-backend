@@ -1,6 +1,6 @@
 package com.meetme.domain.entity
 
-import com.meetme.user.db.User
+import com.meetme.db.user.User
 
 interface ParticipantsContainer {
 

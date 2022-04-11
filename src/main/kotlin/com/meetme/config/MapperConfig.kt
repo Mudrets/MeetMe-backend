@@ -1,17 +1,17 @@
 package com.meetme.config
 
-import com.meetme.chat.mapper.MessageToMessageDto
-import com.meetme.chat.mapper.MessageToMessageDtoImpl
-import com.meetme.group.mapper.GroupToGroupDto
-import com.meetme.group.mapper.GroupToGroupDtoImpl
-import com.meetme.interest.mapper.InterestsToStrings
-import com.meetme.interest.mapper.InterestsToStringsImpl
-import com.meetme.media_link.mapper.MediaLinksToMap
-import com.meetme.media_link.mapper.MediaLinksToMapImpl
-import com.meetme.meeting.mapper.MeetingToMeetingDto
-import com.meetme.meeting.mapper.MeetingToMeetingDtoImpl
-import com.meetme.user.mapper.UserToUserDto
-import com.meetme.user.mapper.UserToUserDtoImpl
+import com.meetme.service.chat.mapper.MessageToMessageDto
+import com.meetme.service.chat.mapper.MessageToMessageDtoImpl
+import com.meetme.service.group.mapper.GroupToGroupDto
+import com.meetme.service.group.mapper.GroupToGroupDtoImpl
+import com.meetme.service.interest.mapper.InterestsToStrings
+import com.meetme.service.interest.mapper.InterestsToStringsImpl
+import com.meetme.service.media_link.mapper.MediaLinksToMap
+import com.meetme.service.media_link.mapper.MediaLinksToMapImpl
+import com.meetme.service.meeting.mapper.MeetingToMeetingDto
+import com.meetme.service.meeting.mapper.MeetingToMeetingDtoImpl
+import com.meetme.service.user.mapper.UserToUserDto
+import com.meetme.service.user.mapper.UserToUserDtoImpl
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 

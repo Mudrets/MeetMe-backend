@@ -5,9 +5,9 @@ import com.meetme.domain.dto.goup.SearchGroupDto
 import com.meetme.domain.dto.meeting.SearchMeetingDto
 import com.meetme.domain.dto.meeting.enums.MeetingType
 import com.meetme.domain.filter.*
-import com.meetme.group.db.Group
-import com.meetme.interest.mapper.InterestsToStrings
-import com.meetme.meeting.db.Meeting
+import com.meetme.db.group.Group
+import com.meetme.service.interest.mapper.InterestsToStrings
+import com.meetme.db.meeting.Meeting
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.context.annotation.Bean
