@@ -32,7 +32,7 @@ open class BaseFileStoreService<T>(
             contentType.endsWith(".jpeg")
     }
 
-    private fun getImageUrl(id: T) = "$rootImageUrl/$id"
+    private fun getImageUrl(id: T) = "$rootImageUrl/$id.png"
 
     override fun isCorrectFile(file: MultipartFile): Boolean {
         if (file.isEmpty || file.originalFilename.isNullOrEmpty()) {
@@ -53,7 +53,7 @@ open class BaseFileStoreService<T>(
             throw IllegalArgumentException("Incorrect file")
 
         try {
-            val path = pathOfStore.resolve(id.toString())
+            val path = pathOfStore.resolve("$id.png")
             Files.deleteIfExists(path)
             Files.copy(file.inputStream, path)
             logger.debug("$entityOfStorageName's image with id = $id uploaded in the storage by path ")

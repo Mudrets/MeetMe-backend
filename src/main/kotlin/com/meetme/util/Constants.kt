@@ -16,7 +16,8 @@ object Constants {
     const val IMAGE_STORE_PATH = "$ROOT_IMAGE_DIR/$IMAGE_STORE_DIR_NAME"
 
     // SERVER
-    const val SERVER_IMAGE_ROOT = "http://localhost:8080/uploads"
+    const val SERVER_ROOT = "http://localhost:8080"
+    const val SERVER_IMAGE_ROOT = "$SERVER_ROOT/uploads"
 
     //JWT
     private const val KEY = "securesecuresecuresecuresecuresecuresecuresecuresecuresecuresecuresecuresecuresecure"
