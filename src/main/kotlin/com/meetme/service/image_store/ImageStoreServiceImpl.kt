@@ -1,7 +1,7 @@
 package com.meetme.service.image_store
 
 import com.meetme.util.doIfExist
-import com.meetme.db.chat.file.BaseFileStoreService
+import com.meetme.service.file.BaseFileStoreService
 import com.meetme.db.image_store.Image
 import com.meetme.db.image_store.ImageDao
 import com.meetme.service.meeting.MeetingServiceImpl

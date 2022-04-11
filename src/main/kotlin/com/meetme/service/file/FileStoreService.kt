@@ -1,4 +1,4 @@
-package com.meetme.db.chat.file
+package com.meetme.service.file
 
 import org.springframework.core.io.ByteArrayResource
 import org.springframework.web.multipart.MultipartFile

@@ -1,4 +1,4 @@
-package com.meetme.db.chat.file
+package com.meetme.service.file
 
 import com.meetme.domain.dto.DataResponse
 import com.meetme.util.tryExecute
@@ -12,7 +12,8 @@ import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
 
-@Controller
+@RestController
+@RequestMapping("/")
 class FileController {
 
     @Qualifier("meetingFileStoreService")
@@ -59,7 +60,7 @@ class FileController {
             meetingFileStoreService.store(image, meetingId)
         }
 
-    @PostMapping("/api/v1/users/{user_id}/image")
+    @PostMapping("/api/v1/user/{user_id}/image")
     fun uploadUserImage(
         @RequestParam("image") image: MultipartFile,
         @PathVariable("user_id") userId: Long,

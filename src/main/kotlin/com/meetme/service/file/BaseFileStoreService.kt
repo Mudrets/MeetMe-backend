@@ -1,4 +1,4 @@
-package com.meetme.db.chat.file
+package com.meetme.service.file
 
 import com.meetme.service.user.UserServiceImpl
 import com.meetme.util.Constants
