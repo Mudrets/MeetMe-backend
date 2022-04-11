@@ -26,7 +26,7 @@ class MessageWebSocketController {
     @SendTo("/api/v1/chat/received")
     fun sendMessage(sendMessageRequestDto: SendMessageRequestDto): DataResponse<MessageDto> =
         tryExecute {
-            val messageIdDto = chatService.sendMessage(sendMessageRequestDto)
-            messageToMessageDto(messageService.getMessage(messageIdDto.messageId))
+            val messageId = chatService.sendMessage(sendMessageRequestDto)
+            messageToMessageDto(messageService.getMessage(messageId))
         }
 }

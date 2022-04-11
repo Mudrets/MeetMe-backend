@@ -3,12 +3,10 @@ package com.meetme.chat
 import com.meetme.domain.dto.DataResponse
 import com.meetme.domain.dto.chat.GetMessagesRequestDto
 import com.meetme.domain.dto.chat.MessageDto
-import com.meetme.domain.dto.chat.MessageIdDto
 import com.meetme.domain.dto.chat.SendMessageRequestDto
 import com.meetme.tryExecute
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.DeleteMapping
-import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PatchMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
@@ -27,7 +25,7 @@ class MessageController {
     @Autowired
     private lateinit var chatService: ChatService
 
-    @PostMapping
+    @PostMapping("/get")
     fun getMessages(
         @RequestBody getMessagesRequestDto: GetMessagesRequestDto,
     ): DataResponse<List<MessageDto>> =
@@ -36,7 +34,7 @@ class MessageController {
     @PostMapping
     fun sendMessage(
         @RequestBody sendMessageRequestDto: SendMessageRequestDto,
-    ): DataResponse<MessageIdDto> =
+    ): DataResponse<Long> =
         tryExecute { chatService.sendMessage(sendMessageRequestDto) }
 
     @DeleteMapping("/{message_id}")

@@ -8,7 +8,6 @@ import com.meetme.doIfExist
 import com.meetme.domain.dto.chat.GetMessagesRequestDto
 import com.meetme.domain.dto.chat.MessageDto
 import com.meetme.domain.dto.chat.SendMessageRequestDto
-import com.meetme.domain.dto.chat.MessageIdDto
 import com.meetme.meeting.db.Meeting
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -38,7 +37,7 @@ class ChatServiceImpl : ChatService {
         chatDao.delete(chat)
     }
 
-    override fun sendMessage(sendMessageRequestDto: SendMessageRequestDto): MessageIdDto =
+    override fun sendMessage(sendMessageRequestDto: SendMessageRequestDto): Long =
         sendMessageRequestDto.chatId.doIfExist(chatDao, logger) { chat ->
             val message = messageService.sendMessage(
                 chat = chat,
@@ -47,7 +46,7 @@ class ChatServiceImpl : ChatService {
             )
             chat.messages.add(message)
             chatDao.save(chat)
-            MessageIdDto(messageId = message.id)
+            message.id
         }
 
     override fun getMessages(requestData: GetMessagesRequestDto): List<MessageDto> =
