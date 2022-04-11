@@ -25,7 +25,8 @@ class MeetingToMeetingDtoImpl(
             numberOfParticipants = meeting.numberOfParticipants,
             interests = interestsToStrings(meeting.interests),
             imageUrl = meeting.photoUrl,
-            isParticipant = userId?.let { meeting.participants.any { user -> user.id == it } }
+            isParticipant = userId?.let { meeting.participants.any { user -> user.id == it } },
+            chatId = meeting.chat.id
         )
 
 }

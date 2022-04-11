@@ -27,7 +27,7 @@ class MessageController {
     @Autowired
     private lateinit var chatService: ChatService
 
-    @GetMapping
+    @PostMapping
     fun getMessages(
         @RequestBody getMessagesRequestDto: GetMessagesRequestDto,
     ): DataResponse<List<MessageDto>> =
