@@ -13,7 +13,7 @@ class MessageToMessageDtoImpl : MessageToMessageDto {
             content = message.content,
             senderFullName = message.sender.fullName,
             senderId = message.sender.id,
-            timestamp = message.timestamp,
+            date = message.stringDate,
         )
 
 }

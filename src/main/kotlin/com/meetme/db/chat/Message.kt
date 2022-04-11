@@ -1,6 +1,8 @@
 package com.meetme.db.chat
 
 import com.meetme.db.user.User
+import java.text.SimpleDateFormat
+import java.util.*
 import javax.persistence.*
 
 @Entity(name = "messages")
@@ -29,4 +31,11 @@ class Message(
         cascade = [CascadeType.ALL]
     )
     val chat: Chat = Chat(),
-)
+) {
+    val stringDate: String
+        get() {
+            val date = Date(timestamp)
+            val format = SimpleDateFormat("MM-dd-yyyy HH:mm")
+            return format.format(date)
+        }
+}
