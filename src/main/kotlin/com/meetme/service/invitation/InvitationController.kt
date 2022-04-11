@@ -26,7 +26,7 @@ class InvitationController {
     ): DataResponse<Unit?> =
         tryExecute {
             userInvitationService.sendInvitations(invitationDto.users, meetingId)
-            groupInvitationService.sendInvitations(invitationDto.group, meetingId)
+            groupInvitationService.sendInvitations(invitationDto.groups, meetingId)
             null
         }
 }
