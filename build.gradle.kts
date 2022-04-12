@@ -27,12 +27,16 @@ dependencies {
 	implementation("org.webjars:stomp-websocket:2.3.4")
 	implementation("io.jsonwebtoken:jjwt-api:0.11.2")
 	implementation("org.springframework.boot:spring-boot-starter-websocket")
+
 	runtimeOnly("io.jsonwebtoken:jjwt-impl:0.11.2")
 	runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.11.2")
 	runtimeOnly("org.springframework.boot:spring-boot-devtools")
 	runtimeOnly("org.postgresql:postgresql")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 	testImplementation("org.springframework.security:spring-security-test")
+	testImplementation(platform("org.junit:junit-bom:5.8.2"))
+	testImplementation("org.junit.jupiter:junit-jupiter")
+	testImplementation("org.mockito.kotlin:mockito-kotlin:4.0.0")
 }
 
 tasks.withType<JavaCompile> {

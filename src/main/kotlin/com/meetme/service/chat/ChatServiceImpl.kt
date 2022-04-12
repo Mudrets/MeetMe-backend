@@ -12,15 +12,12 @@ import org.springframework.stereotype.Service
 import kotlin.math.min
 
 @Service
-class ChatServiceImpl : ChatService {
+class ChatServiceImpl @Autowired constructor(
+    private var chatDao: ChatDao,
+    private var messageService: MessageService,
+) : ChatService {
 
     private val logger = LoggerFactory.getLogger(ChatServiceImpl::class.java)
-
-    @Autowired
-    private lateinit var chatDao: ChatDao
-
-    @Autowired
-    private lateinit var messageService: MessageService
 
     override fun createChat(): Chat {
         val newChat = Chat()
@@ -59,6 +56,8 @@ class ChatServiceImpl : ChatService {
     }
 
     private fun getMessageList(chat: Chat, anchor: Long, messagesNumber: Int): List<Message> {
+        if (messagesNumber < 0)
+            throw IllegalArgumentException("messagesNumber must be not negative")
         val reversedMessages = chat.messages.sortedByDescending(Message::timestamp)
         if (anchor == 0L) {
             val endIndex = min(messagesNumber, reversedMessages.size)
