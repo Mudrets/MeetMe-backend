@@ -18,7 +18,7 @@ class InvitationSearchController {
     @Autowired
     private lateinit var meetingToMeetingDto: MeetingToMeetingDto
 
-    @GetMapping("/search")
+    @PostMapping("/search")
     fun searchInvites(
         @PathVariable("user_id") userId: Long,
         @RequestBody searchMeetingDto: SearchMeetingDto,
