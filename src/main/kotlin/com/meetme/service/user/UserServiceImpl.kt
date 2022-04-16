@@ -14,25 +14,41 @@ import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 
+/**
+ * Реализация сервиса для работы с пользователем.
+ */
 @Service
-class UserServiceImpl : UserService {
+class UserServiceImpl @Autowired constructor(
+    /**
+     * Data access object предоставляющий доступ к таблице пользователей в базе данных.
+     */
+    private val userDao: UserDao,
+    /**
+     * Шифровщик для пароля.
+     */
+    private val passwordEncoder: PasswordEncoder,
+    /**
+     * Сервис для работы с интересами.
+     */
+    private val interestService: InterestService,
+    /**
+     * Сервис для работы с ссылками на социальные сети.
+     */
+    private val mediaLinkService: MediaLinkService,
+): UserService {
 
+    /**
+     * Логгер для логгирования
+     */
     private val logger: Logger = LoggerFactory.getLogger(UserServiceImpl::class.java)
-
-    @Autowired
-    private lateinit var userDao: UserDao
-
-    @Autowired
-    private lateinit var passwordEncoder: PasswordEncoder
-
-    @Autowired
-    private lateinit var interestService: InterestService
-
-    @Autowired
-    private lateinit var mediaLinkService: MediaLinkService
 
     override fun loadUserByUsername(username: String): UserDetails? = loadUserByEmail(username)
 
+    /**
+     * Создает пользователя по переданным данным.
+     * @param data данные для создания пользователя.
+     * @return Возращает созданного пользователя.
+     */
     override fun create(data: RegisterCredentialsDto): User {
         if (userDao.findByEmail(data.email) != null)
             throw IllegalArgumentException("User with email ${data.email} already exists")
@@ -57,6 +73,12 @@ class UserServiceImpl : UserService {
         return user
     }
 
+    /**
+     * Изменяет пользователя в соответствии с переданными данными.
+     * @param identifier идентификатор пользователя.
+     * @param data данные для изменения пользователя.
+     * @return Возвращает измененного пользователя.
+     */
     override fun update(identifier: Long, data: EditUserDto): User =
         identifier.doIfExist(userDao, logger) { user ->
             val interestsSet =
@@ -74,15 +96,37 @@ class UserServiceImpl : UserService {
             userDao.save(user)
         }
 
+    /**
+     * Получает пользователя по переданному идентификатору.
+     * @param identifier идентификатор.
+     * @return Возвращает полученного пользователя.
+     */
     override fun get(identifier: Long): User =
         identifier.doIfExist(userDao, logger) { it }
 
+    /**
+     * Получает всех существующих пользователей.
+     * @return Возвращает список всех пользователей.
+     */
     override fun getAll(): List<User> = userDao.findAll()
 
+    /**
+     * Сохроняет пользователя в хранилище.
+     * @param entity сохраняемая пользователя.
+     * @return Возвращает сохраненного пользователя.
+     */
     override fun save(entity: User) = userDao.save(entity)
 
+    /**
+     * Удаляет переданную пользователя.
+     * @param entity удаляемый пользователя.
+     */
     override fun delete(entity: User) = userDao.delete(entity)
 
+    /**
+     * Удаляет пользователя по переданному идентификатору.
+     * @param identifier идентификатор удаляемого пользователя.
+     */
     override fun deleteByIdentifier(identifier: Long) = userDao.deleteById(identifier)
 
     private fun getName(fullName: String): String = fullName.split(' ')[0]

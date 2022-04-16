@@ -12,20 +12,32 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.web.bind.annotation.*
 
+/**
+ * Контроллер, обрабатывающий запросы, связанные с участниками группы.
+ */
 @RestController
 @RequestMapping("/api/v1/groups/{group_id}/participants")
-class GroupParticipantsController {
-
+class GroupParticipantsController @Autowired constructor(
+    /**
+     * Сервис для работы с участниками группы.
+     */
     @Qualifier("groupParticipantsService")
-    @Autowired
-    private lateinit var groupParticipantsService: ParticipantsService<Group>
+    private val groupParticipantsService: ParticipantsService<Group>,
+    /**
+     * Маппер, преобразующий User в UserDto.
+     */
+    private val userToUserDto: UserToUserDto,
+    /**
+     * Маппер, преобразующий Group в GroupDto.
+     */
+    private val groupToGroupDto: GroupToGroupDto,
+) {
 
-    @Autowired
-    private lateinit var userToUserDto: UserToUserDto
-
-    @Autowired
-    private lateinit var groupToGroupDto: GroupToGroupDto
-
+    /**
+     * Обработчик HTTP GET запроса по url /api/v1/groups/{group_id}/participants для получения
+     * списка участников группы.
+     * @param groupId идентификатор группы.
+     */
     @GetMapping
     fun getParticipants(@PathVariable("group_id") groupId: Long): DataResponse<List<UserDto>> =
         tryExecute {
@@ -34,6 +46,12 @@ class GroupParticipantsController {
                 .sortedBy(UserDto::fullName)
         }
 
+    /**
+     * Обработчик HTTP POST запроса по url /api/v1/groups/{group_id}/participants/{user_id} для добавляния
+     * нового участника в группу.
+     * @param groupId идентификатор группы.
+     * @param userId идентификатор добавляемого пользователя.
+     */
     @PostMapping("/{user_id}")
     fun addParticipant(
         @PathVariable("group_id") groupId: Long,
@@ -43,6 +61,12 @@ class GroupParticipantsController {
             groupToGroupDto(groupParticipantsService.addParticipant(userId, groupId))
         }
 
+    /**
+     * Обработчик HTTP POST запроса по url /api/v1/groups/{group_id}/participants для добавление
+     * участников в группу.
+     * @param groupId идентификатор группы.
+     * @param userIds список идентификаторов добавляемых пользователей.
+     */
     @PostMapping
     fun addParticipants(
         @PathVariable("group_id") groupId: Long,
@@ -53,6 +77,12 @@ class GroupParticipantsController {
             null
         }
 
+    /**
+     * Обработчик HTTP DELETE запроса по url /api/v1/groups/{group_id}/participants/{user_id} для удаления
+     * участника из группы.
+     * @param groupId идентификатор группы.
+     * @param userId идентификатор добавляемого пользователя.
+     */
     @DeleteMapping("/{user_id}")
     fun removeParticipant(
         @PathVariable("group_id") groupId: Long,

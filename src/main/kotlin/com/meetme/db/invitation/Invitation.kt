@@ -6,17 +6,29 @@ import com.meetme.db.meeting.Meeting
 import com.meetme.db.user.User
 import javax.persistence.*
 
+/**
+ * Хранит данные о приглашении на мероприятие. Представляет из себя модель таблицы в базе данных.
+ */
 @Entity(name = "Invitation")
 class Invitation(
+    /**
+     * Идентификатор.
+     */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "invitation_id")
     val id: Long = 0,
 
+    /**
+     * Мероприятие, на которое было отправленно приглашение.
+     */
     @JsonIgnore
     @OneToOne(targetEntity = Meeting::class, fetch = FetchType.LAZY)
     val meeting: Meeting = Meeting(),
 
+    /**
+     * Сет пользователей, которым было отправленно приглашение на мероприятие.
+     */
     @JsonIgnore
     @ManyToMany(
         targetEntity = User::class,
@@ -29,6 +41,9 @@ class Invitation(
     )
     val users: MutableSet<User> = mutableSetOf(),
 
+    /**
+     * Сет групп, которым было отправленно приглашение на мероприятие.
+     */
     @JsonIgnore
     @ManyToMany(
         targetEntity = Group::class,

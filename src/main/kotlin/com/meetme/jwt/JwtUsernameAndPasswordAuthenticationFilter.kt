@@ -16,6 +16,9 @@ import javax.servlet.FilterChain
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
+/**
+ * Создает JWT-токен для пользователя
+ */
 class JwtUsernameAndPasswordAuthenticationFilter(
     private val myAuthenticationManager: AuthenticationManager
 ) : UsernamePasswordAuthenticationFilter() {

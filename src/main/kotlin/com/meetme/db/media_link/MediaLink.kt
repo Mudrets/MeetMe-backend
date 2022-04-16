@@ -5,8 +5,14 @@ import com.meetme.db.group.Group
 import com.meetme.db.user.User
 import javax.persistence.*
 
+/**
+ * Хранит данные о ссылке на социальную сеть. Представляет из себя модель таблицы в базе данных.
+ */
 @Entity
 data class MediaLink(
+    /**
+     * Идентификатор.
+     */
     @Id
     @SequenceGenerator(
         name = "link_sequence",
@@ -20,21 +26,22 @@ data class MediaLink(
     @Column(name = "media_link_id")
     val id: Long = 0,
 
+    /**
+     * Название социальной сети.
+     */
     @Column(name = "name")
     var name: String? = null,
 
+    /**
+     * Ссылка на социальную сеть.
+     */
     @Column(name = "link")
     var link: String = "",
 ) {
 
-    @JsonIgnore
-    @ManyToOne(
-        targetEntity = Group::class,
-        fetch = FetchType.EAGER,
-        cascade = [CascadeType.ALL]
-    )
-    var group: Group? = null
-
+    /**
+     * Пользователь, у которого указана эта ссылка на социальную сеть.
+     */
     @JsonIgnore
     @ManyToOne(
         targetEntity = User::class,
@@ -42,6 +49,9 @@ data class MediaLink(
     )
     var user: User? = null
 
+    /**
+     * Возвращает строковое предстваление ссылки.
+     */
     override fun toString(): String {
         return "MeetingLink(" +
             "id: $id, " +

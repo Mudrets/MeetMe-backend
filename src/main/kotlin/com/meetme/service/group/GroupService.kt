@@ -7,7 +7,15 @@ import com.meetme.db.group.Group
 import com.meetme.db.meeting.Meeting
 import org.springframework.stereotype.Service
 
+/**
+ * Сервис для работы с группами.
+ */
 @Service
 interface GroupService : CrudService<CreateGroupDto, UpdateGroupDto, Long, Group> {
+    /**
+     * Получает список мероприятий в которых группа принимает участие.
+     * @param groupId идентификатор группы.
+     * @return Возвращает список мероприятий, в которых группа принимает участие.
+     */
     fun getMeetings(groupId: Long): List<Meeting>
 }

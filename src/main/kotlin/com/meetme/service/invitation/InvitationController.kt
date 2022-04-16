@@ -7,18 +7,30 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.web.bind.annotation.*
 
+/**
+ * Контроллер, обрабатывающий запрос на отправление приглашения на мероприятия
+ */
 @RestController
 @RequestMapping("/api/v1/meetings/{meeting_id}/invite")
-class InvitationController {
-
+class InvitationController @Autowired constructor(
+    /**
+     * Сервис для работы с приглашениями пользователя на мероприятия.
+     */
     @Qualifier("userInvitationService")
-    @Autowired
-    private lateinit var userInvitationService: InvitationService
-
+    private val userInvitationService: InvitationService,
+    /**
+     * Сервис для работы с приглашениями групп на мероприятия.
+     */
     @Qualifier("groupInvitationService")
-    @Autowired
-    private lateinit var groupInvitationService: InvitationService
+    private val groupInvitationService: InvitationService,
+) {
 
+    /**
+     * Обработчик HTTP POST запроса по url /api/v1/meetings/{meeting_id}/invite для отправления
+     * приглашений на мероприятия.
+     * @param meetingId идентификатор мероприятия.
+     * @param invitationDto идентификаторы сущностей, приглашаемых на мероприятие.
+     */
     @PostMapping
     fun sendInvitations(
         @PathVariable("meeting_id") meetingId: Long,

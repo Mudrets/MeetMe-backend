@@ -14,15 +14,32 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import java.text.SimpleDateFormat
 
+/**
+ * Класс предоставляющий зависимости для фильтрации
+ * во время поиска.
+ */
 @Configuration
 class FilterConfig {
 
+    /**
+     * Фильтр по имени.
+     * @return Возвращает фильтер для реализации поиска по имени.
+     */
     @Bean
     fun nameFilter(): Filter<String, String> = StringFilter()
 
+
+    /**
+     * Фильтр по интересам.
+     * @return Возвращает фильтр доя реализации посика по интересам.
+     */
     @Bean
     fun interestsFilter(): Filter<Collection<*>, Collection<*>> = CollectionFilter()
 
+    /**
+     * Фильтр по типу мепроприятия.
+     * @return Возращает фильтр для реализации поиска по типу мероприятия.
+     */
     @Bean
     fun typeFilter() = object : Filter<Boolean, MeetingType> {
         override fun invoke(isVisited: Boolean, type: MeetingType): Boolean =
@@ -30,6 +47,10 @@ class FilterConfig {
                 (!isVisited && type == MeetingType.PLANNED)
     }
 
+    /**
+     * Фильтр по дате окончания.
+     * @return Возвращает фильтр для реализации поиска по дате.
+     */
     @Qualifier("endDateFilter")
     @Bean
     fun endDateFilter() = object : Filter<Meeting, String?> {
@@ -44,6 +65,10 @@ class FilterConfig {
         }
     }
 
+    /**
+     * Фильтр по дате начала.
+     * @return Возвращает фильтр для реализации поиска по дате.
+     */
     @Qualifier("startDateFilter")
     @Bean
     fun startDateFilter() = object : Filter<Meeting, String?> {
@@ -58,12 +83,27 @@ class FilterConfig {
         }
     }
 
+    /**
+     * Фильтр по дате окончания.
+     * @return Возвращает фильтр для реализации поиска по дате.
+     */
     @Bean
     fun maxNumberOfParticipantsFilter() = object : Filter<Int, Int?> {
         override fun invoke(maxNumberParticipants: Int, filterNumber: Int?): Boolean =
             filterNumber == null || maxNumberParticipants <= filterNumber
     }
 
+    /**
+     * Фильтр мероприятий.
+     * @param nameFilter фильтр по имени;
+     * @param interestFilter фильтр по интересам;
+     * @param typeFilter фильтр по типу мероприятия;
+     * @param startDateFilter фильтр по дате начала мероприятия;
+     * @param endDateFilter фильтр по дате конца мероприятия;
+     * @param maxNumberOfParticipantsFilter фильтр по максимальному количеству человек на мероприятии;
+     * @param interestsToString маппер интеревсов в список строк;
+     * @return Возвращает фильтр для реализации посика мероприятий по переданным параметрам.
+     */
     @Bean
     fun meetingFilter(
         @Autowired nameFilter: Filter<String, String>,
@@ -84,7 +124,14 @@ class FilterConfig {
                 maxNumberOfParticipantsFilter(meeting.maxNumberOfParticipants, searchMeetingDto.maxNumberOfParticipants)
         }
     }
-    
+
+    /**
+     * Фильтр групп.
+     * @param nameFilter фильтр по названию группы;
+     * @param interestFilter фильтр по интересам;
+     * @param interestsToString маппер интеревсов в список строк;
+     * @return Возвращает фильтр для реализации поиска групп по переданным параметрам.
+     */
     @Bean
     fun groupFilter(
         @Autowired nameFilter: Filter<String, String>,
@@ -99,6 +146,11 @@ class FilterConfig {
         }
     }
 
+    /**
+     * Фильтр пользователей.
+     * @param nameFilter фильтр по имени;
+     * @return Возвращает фильтр для реализации поиска пользователей по имени.
+     */
     @Bean
     fun userFilter(
         @Autowired nameFilter: Filter<String, String>,

@@ -10,16 +10,24 @@ import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
 import java.nio.file.Path
 
+/**
+ * Реализация сервиса для работы с файлами пользователя.
+ */
 @Service("userFileStoreService")
-class UserFileStoreService : BaseFileStoreService<Long>(
+class UserFileStoreService @Autowired constructor(
+    private val userService: UserServiceImpl,
+) : BaseFileStoreService<Long>(
     pathOfStore = Path.of(USER_IMAGE_PATH),
     entityOfStorageName = "User",
     rootImageUrl = "${SERVER_IMAGE_ROOT}/${USER_DIR_NAME}"
 ) {
-
-    @Autowired
-    private lateinit var userService: UserServiceImpl
-
+    /**
+     * Сохраняет переданный файл корневой директории с именем, переданного
+     * идентификатора.
+     * @param file сохраняемый файл.
+     * @param id идентификатор пользователя для которой сохраняется файл.
+     * @return Возвращает url для получения файла.
+     */
     override fun store(file: MultipartFile, id: Long): String =
         id.doIfExist(userService) { user ->
             val photoUrl = super.store(file, id)

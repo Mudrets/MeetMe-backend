@@ -22,7 +22,7 @@ object Constants {
     //JWT
     private const val KEY = "securesecuresecuresecuresecuresecuresecuresecuresecuresecuresecuresecuresecuresecure"
     const val TOKEN_PREFIX = "Bearer "
-    const val TOKEN_EXPIRATION_AFTER_DAYS = 14L
+    const val TOKEN_EXPIRATION_AFTER_DAYS = 21L
     val secretKey: SecretKey = Keys.hmacShaKeyFor(KEY.toByteArray())!!
 
     //USER

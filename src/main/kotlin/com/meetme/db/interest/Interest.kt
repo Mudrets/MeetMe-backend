@@ -6,8 +6,14 @@ import com.meetme.db.user.User
 import com.meetme.db.group.Group
 import javax.persistence.*
 
+/**
+ * Хранит данные об инетерсе. Представляет из себя модель таблицы в базе данных.
+ */
 @Entity(name = "Interest")
 data class Interest(
+    /**
+     * Идентификатор.
+     */
     @Id
     @SequenceGenerator(
         name = "interest_sequence",
@@ -21,6 +27,9 @@ data class Interest(
     @Column(name = "interest_id")
     val id: Long = 0,
 
+    /**
+     * Название интереса.
+     */
     @Column(
         name = "name",
         unique = true,
@@ -28,6 +37,9 @@ data class Interest(
     val name: String = "",
 ) {
 
+    /**
+     * Сет мероприятий с данным интересом.
+     */
     @JsonIgnore
     @ManyToMany(
         targetEntity = Meeting::class,
@@ -35,6 +47,9 @@ data class Interest(
     )
     var meetings: Set<Meeting> = setOf()
 
+    /**
+     * Сет групп с данным интересом.
+     */
     @JsonIgnore
     @ManyToMany(
         targetEntity = Group::class,
@@ -42,6 +57,9 @@ data class Interest(
     )
     var groups: Set<Group> = setOf()
 
+    /**
+     * Сет пользователей с данным интересом.
+     */
     @JsonIgnore
     @ManyToMany(
         targetEntity = User::class,
@@ -49,6 +67,9 @@ data class Interest(
     )
     var users: Set<User> = setOf()
 
+    /**
+     * Прдоставляет строковое представление интереса.
+     */
     override fun toString(): String {
         return "Interest(" +
             "id: $id, " +

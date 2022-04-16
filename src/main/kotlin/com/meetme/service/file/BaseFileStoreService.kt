@@ -10,12 +10,27 @@ import java.io.IOException
 import java.nio.file.Files
 import java.nio.file.Path
 
+/**
+ * Базовая реализация сервиса для работы с файлами.
+ */
 open class BaseFileStoreService<T>(
+    /**
+     * Путь до места хранения файлов.
+     */
     private val pathOfStore: Path,
+    /**
+     * Название сущности, которая использует файл.
+     */
     private val entityOfStorageName: String,
+    /**
+     * Корневой url для получения файлов указанной сущности.
+     */
     private val rootImageUrl: String,
 ) : FileStoreService<T> {
 
+    /**
+     * Логгер для логгирования.
+     */
     private val logger: Logger = LoggerFactory.getLogger(UserServiceImpl::class.java)
 
     init {
@@ -26,14 +41,29 @@ open class BaseFileStoreService<T>(
             Files.createDirectory(pathOfStore)
     }
 
+    /**
+     * Проверяет является ли тип файла корректным для хранилища.
+     * @param contentType тип файла.
+     * @return Возвращает True если тип файла корректный и False в противном случае.
+     */
     private fun isSupportedContentType(contentType: String): Boolean {
         return contentType.endsWith(".png") ||
             contentType.endsWith(".jpg") ||
             contentType.endsWith(".jpeg")
     }
 
+    /**
+     * Получает url к файлу по его идентификатору.
+     * @param id идентификатор.
+     */
     private fun getImageUrl(id: T) = "$rootImageUrl/$id.png"
 
+    /**
+     * Проверяет ялвяется ли файл корректным.
+     * @param file сохраняемый файл.
+     * @return Возвращает True если файл является корректным и False
+     * в противном случае.
+     */
     override fun isCorrectFile(file: MultipartFile): Boolean {
         if (file.isEmpty || file.originalFilename.isNullOrEmpty()) {
             return false
@@ -48,6 +78,13 @@ open class BaseFileStoreService<T>(
         return true
     }
 
+    /**
+     * Сохраняет переданный файл корневой директории с именем, переданного
+     * идентификатора.
+     * @param file сохраняемый файл.
+     * @param id идентификатор сущности для которой сохраняется файл.
+     * @return Возвращает url для получения файла.
+     */
     override fun store(file: MultipartFile, id: T): String {
         if (!isCorrectFile(file))
             throw IllegalArgumentException("Incorrect file")
@@ -64,6 +101,11 @@ open class BaseFileStoreService<T>(
         }
     }
 
+    /**
+     * Получает изображение по переданному названию.
+     * @param fileName название файла.
+     * @return Возвращет ByteArrayResource требуемого файла.
+     */
     override fun getImage(fileName: String): ByteArrayResource {
         val path = pathOfStore.resolve(fileName)
         if (!Files.exists(path))

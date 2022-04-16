@@ -14,6 +14,9 @@ import javax.servlet.FilterChain
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
+/**
+ * Подтверждает корректность JWT-токена
+ */
 class JwtTokenVerifier : OncePerRequestFilter() {
     override fun doFilterInternal(
         request: HttpServletRequest,

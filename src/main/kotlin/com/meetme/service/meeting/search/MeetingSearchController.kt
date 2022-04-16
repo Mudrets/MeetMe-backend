@@ -13,20 +13,34 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.web.bind.annotation.*
 
+/**
+ * Контроллер, для работы с поиском мероприятий.
+ */
 @RestController
 @RequestMapping("/api/v1/meetings")
-class MeetingSearchController {
-
+class MeetingSearchController @Autowired constructor(
+    /**
+     * Сервис для поиска мероприятий для пользователя.
+     */
     @Qualifier("meetingSearchForUserService")
-    @Autowired
-    private lateinit var meetingSearchForUserService: SearchForEntityService<Long, SearchMeetingDto, Meeting>
-
-    @Autowired
-    private lateinit var meetingGlobalSearchForEntityServiceService: GlobalSearchForEntityService<Long, SearchMeetingDto, Meeting>
-
-    @Autowired
-    private lateinit var meetingToMeetingDto: MeetingToMeetingDto
-
+    private val meetingSearchForUserService: SearchForEntityService<Long, SearchMeetingDto, Meeting>,
+    /**
+     * Сервис для глобального поиска мероприятий.
+     */
+    private val meetingGlobalSearchForEntityServiceService: GlobalSearchForEntityService<Long, SearchMeetingDto, Meeting>,
+    /**
+     * Маппер, преобзращующий Meeting в MeetingDto.
+     */
+    private val meetingToMeetingDto: MeetingToMeetingDto,
+) {
+    /**
+     * Ищет запланированные мероприятия для пользователя с переданным идентификатором.
+     * @param userId идентификатор пользователя.
+     * @param searchMeetingDto поисковой запрос.
+     * @return Возвращает Map<String, List<SearchedEntity>> где по ключу my
+     * находится результат локального поиска, а по ключу global результат глобального
+     * поиска.
+     */
     private fun searchPlannedMeetings(
         userId: Long,
         searchMeetingDto: SearchMeetingDto = SearchMeetingDto()
@@ -39,6 +53,13 @@ class MeetingSearchController {
             }
     }
 
+    /**
+     * Ищет посещенные пользователем мероприятия.
+     * @param userId идентификатор пользователя.
+     * @param searchMeetingDto поисковой запрос.
+     * @return Возвращает List<MeetingDto> содержащий в себе информацию
+     * обо всех посещенных мероприятиях, удовлетворяющих поисковым запросам.
+     */
     private fun searchVisitedMeetings(
         userId: Long,
         searchMeetingDto: SearchMeetingDto = SearchMeetingDto()
@@ -48,6 +69,12 @@ class MeetingSearchController {
             .map { meeting -> meetingToMeetingDto(meeting, userId) }
     }
 
+    /**
+     * Обработчик HTTP POST запроса по url /api/v1/meetings/{user_id}/planned/search для посика
+     * запланированных мероприятий пользователей.
+     * @param userId идентификатор пользователя.
+     * @param searchMeetingDto поисковыой запрос.
+     */
     @PostMapping("/{user_id}/planned/search")
     fun searchPlanned(
         @PathVariable("user_id") userId: Long,
@@ -57,6 +84,12 @@ class MeetingSearchController {
             searchPlannedMeetings(userId, searchMeetingDto)
         }
 
+    /**
+     * Обработчик HTTP POST запроса по url /api/v1/meetings/{user_id}/visited/search для поиска
+     * посещенных мероприятий пользователя.
+     * @param userId идентификатор пользователя.
+     * @param searchMeetingDto поисковыой запрос.
+     */
     @PostMapping("/{user_id}/visited/search")
     fun searchVisited(
         @PathVariable("user_id") userId: Long,
@@ -66,6 +99,11 @@ class MeetingSearchController {
             searchVisitedMeetings(userId, searchMeetingDto)
         }
 
+    /**
+     * Обработчик HTTP POST запроса по url /api/v1/meetings/{user_id}/planned для получения
+     * запланированных мероприятий пользователя.
+     * @param userId идентификатор пользователя.
+     */
     @GetMapping("/{user_id}/planned")
     fun getPlannedMeetings(@PathVariable("user_id") userId: Long): DataResponse<List<MeetingDto>> =
         tryExecute {
@@ -74,6 +112,11 @@ class MeetingSearchController {
                 .map { meeting -> meetingToMeetingDto(meeting, userId) }
         }
 
+    /**
+     * Обработчик HTTP POST запроса по url /api/v1/meetings/{user_id}/visited для получения
+     * посещенных мероприятий пользователя.
+     * @param userId идентификатор пользователя.
+     */
     @GetMapping("/{user_id}/visited")
     fun getVisitedMeetings(@PathVariable("user_id") userId: Long): DataResponse<List<MeetingDto>> =
         tryExecute {

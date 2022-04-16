@@ -12,12 +12,21 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 
+/**
+ * Предоставляет исполняемый код для наполнения базы данных пользователями.
+ */
 @Configuration
 class UserConfig {
 
+    /**
+     * Шифратор, используемый для шифрования пароля перед его сохранением в базу данных.
+     */
     @Autowired
     private lateinit var passwordEncoder: BCryptPasswordEncoder
 
+    /**
+     * Создает несколько пользователей перед запуском программы.
+     */
     @Bean
     fun userCommandLineRunner(userDao: UserDao, meetingDao: MeetingDao, chatDao: ChatDao) = CommandLineRunner {
         val alex = User(email = "lol@kek.com", password = passwordEncoder.encode("123456"))

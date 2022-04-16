@@ -9,26 +9,35 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.stereotype.Service
 
+/**
+ * Реализация сервиса глобального поиска мероприятий для определенной сущности.
+ */
 @Service
 class MeetingGlobalSearchForEntityService @Autowired constructor(
+    /**
+     * Сервис для локального посика сущностей.
+     */
     @Qualifier("meetingSearchForUserService")
-    override val searchForEntityService: SearchForEntityService<Long, SearchMeetingDto, Meeting>
-):
-    BaseGlobalSearchForEntityService<Long, SearchMeetingDto, Meeting>() {
+    override val searchForEntityService: SearchForEntityService<Long, SearchMeetingDto, Meeting>,
+    /**
+     * Фильтр мероприятий по поисковому запросу.
+     */
+    private val filter: Filter<Meeting, SearchMeetingDto>,
+    /**
+     * Сервис для работы с мероприятиями.
+     */
+    private val meetingService: MeetingService,
+) : BaseGlobalSearchForEntityService<Long, SearchMeetingDto, Meeting>() {
 
-    @Autowired
-    private lateinit var filter: Filter<Meeting, SearchMeetingDto>
-
-    @Autowired
-    private lateinit var meetingService: MeetingService
-
-
+    /**
+     * Сервис для глобального поиска сущностей.
+     */
     override val globalSearchService: GlobalSearchService<SearchMeetingDto, Meeting>
         get() = object : BaseGlobalSearchService<SearchMeetingDto, Meeting, Long>(meetingService, filter) {
 
         override fun prepareForResult(filteredEntities: List<Meeting>): List<Meeting> =
             filteredEntities
-                .filter { meeting -> !meeting.private }
+                .filter { meeting -> !meeting.isPrivate }
                 .sortedBy(Meeting::name)
     }
 }

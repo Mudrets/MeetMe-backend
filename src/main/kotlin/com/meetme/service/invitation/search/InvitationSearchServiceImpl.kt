@@ -9,26 +9,51 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.stereotype.Service
 
+/**
+ * Реализация сервиса для работы с приглашениями.
+ */
 @Service
-class InvitationSearchServiceImpl : InvitationSearchService {
-
+class InvitationSearchServiceImpl @Autowired constructor(
+    /**
+     * Сервис для поиска приглашений на мероприятия для пользователя.
+     */
     @Qualifier("invitationSearchForUserService")
-    @Autowired
-    private lateinit var invitationSearchForUserService: SearchForEntityService<Long, SearchMeetingDto, Meeting>
-
+    private val invitationSearchForUserService: SearchForEntityService<Long, SearchMeetingDto, Meeting>,
+    /**
+     * Серсив для приглашений на мероприятия для группы.
+     */
     @Qualifier("invitationSearchForGroupService")
-    @Autowired
-    private lateinit var invitationSearchForGroupService: SearchForEntityService<Long, SearchMeetingDto, Meeting>
-
-    @Autowired
-    private lateinit var userService: UserServiceImpl
-
+    private val invitationSearchForGroupService: SearchForEntityService<Long, SearchMeetingDto, Meeting>,
+    /**
+     * Сервис для работы с пользователем.
+     */
+    private val userService: UserServiceImpl,
+) : InvitationSearchService {
+    /**
+     * Ищет список приглашения пользователя с переданным идентификатором.
+     * @param userId идентификатор пользователя.
+     * @param query запрос для посика мероприятий.
+     * @return Возвращает список найденных мероприятий.
+     */
     private fun userInvitations(userId: Long, query: SearchMeetingDto) =
         invitationSearchForUserService.search(userId, query)
 
+    /**
+     * Ищет список приглашения пользователя с переданным идентификатором.
+     * @param groupId идентификатор группы.
+     * @param query запрос для посика мероприятий.
+     * @return Возвращает список найденных мероприятий.
+     */
     private fun groupInvitations(groupId: Long, query: SearchMeetingDto) =
         invitationSearchForGroupService.search(groupId, query)
 
+    /**
+     * Поиск мероприятий, на которые приглашен пользоваетель по
+     * переданному поисковому запросу.
+     * @param userId идентификатор пользователя.
+     * @param query поисковой запрос.
+     * @return Возвращает список найденных мероприятий.
+     */
     override fun search(userId: Long, query: SearchMeetingDto): Map<String, List<Meeting>> =
         userId.doIfExist(userService) { user ->
             val nameWithIdToMeetings = mutableMapOf<String, List<Meeting>>()

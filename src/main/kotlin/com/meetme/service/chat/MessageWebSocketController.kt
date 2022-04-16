@@ -10,18 +10,28 @@ import org.springframework.messaging.handler.annotation.MessageMapping
 import org.springframework.messaging.handler.annotation.SendTo
 import org.springframework.stereotype.Controller
 
+/**
+ * Контроллер, обрабатывающий запросы для работы с сообщениями по протоколу WebSocket.
+ */
 @Controller
-class MessageWebSocketController {
+class MessageWebSocketController @Autowired constructor(
+    /**
+     * Сервис для работы с чатом.
+     */
+    private val chatService: ChatService,
+    /**
+     * Сервис для работы с сообщениями.
+     */
+    private val messageService: MessageService,
+    /**
+     * Маппер, преобразующий Message в MessageDto.
+     */
+    private val messageToMessageDto: MessageToMessageDto,
+) {
 
-    @Autowired
-    private lateinit var chatService: ChatService
-
-    @Autowired
-    private lateinit var messageService: MessageService
-
-    @Autowired
-    private lateinit var messageToMessageDto: MessageToMessageDto
-
+    /**
+     * Обработчик WebSocket запроса по url /api/v1/websocket/chat/messages для отправления сообщений
+     */
     @MessageMapping("/messages")
     @SendTo("/api/v1/chat/received")
     fun sendMessage(sendMessageRequestDto: SendMessageRequestDto): DataResponse<MessageDto> =

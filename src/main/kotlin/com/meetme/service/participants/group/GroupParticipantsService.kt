@@ -8,12 +8,20 @@ import com.meetme.db.user.User
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 
+/**
+ * Реализация сервиса для работы с участниками группы.
+ */
 @Service("groupParticipantsService")
 class GroupParticipantsService @Autowired constructor(
     userService: UserService,
     groupService: GroupService,
 ) : ParticipantsBaseService<Group>(userService, groupService) {
 
+    /**
+     * Проверяет группу перед тем как добавить в нее пользователя.
+     * @param entity группа, хранящая пользователей.
+     * @param user пользователь.
+     */
     override fun checkEntityBeforeAdd(entity: Group, user: User) {
         if (entity.participants.contains(user))
             throw IllegalArgumentException(
@@ -21,6 +29,11 @@ class GroupParticipantsService @Autowired constructor(
             )
     }
 
+    /**
+     * Проверяет группу перед тем как удалить из нее пользователя.
+     * @param entity группа, хранящая пользователей.
+     * @param user пользователь.
+     */
     override fun checkEntityBeforeRemove(entity: Group, user: User) {
         if (!entity.participants.contains(user))
             throw IllegalArgumentException(
@@ -28,10 +41,20 @@ class GroupParticipantsService @Autowired constructor(
             )
     }
 
+    /**
+     * Добавляет пользователя в группу.
+     * @param container группа, хранящая пользователей.
+     * @param user пользователь.
+     */
     override fun addContainerToUser(container: Group, user: User) {
         user.groups.add(container)
     }
 
+    /**
+     * Удаляет пользователя из группы.
+     * @param container группа, хранящая пользователей.
+     * @param user пользователь.
+     */
     override fun removeContainerFromUser(container: Group, user: User) {
         user.groups.remove(container)
     }

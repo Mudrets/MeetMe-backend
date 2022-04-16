@@ -1,22 +1,18 @@
 package com.meetme.service.interest
 
 import com.meetme.db.interest.Interest
-import com.meetme.db.interest.InterestDao
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.stereotype.Service
 
-@Service
-class InterestService {
+/**
+ * Сервис для работы с интересами.
+ */
+interface InterestService {
 
-    @Autowired
-    private lateinit var interestDao: InterestDao
+    /**
+     * Преобразует Set<String>, представляющий список названий интеревсов в
+     * MutableSet<Interest>.
+     * @param interests сет названий интересов.
+     * @return Возвращает сет созданного или полеченного из хранилища сета интересов.
+     */
+    fun convertToInterestEntityAndAddNewInterests(interests: Set<String>): MutableSet<Interest>
 
-    fun convertToInterestEntityAndAddNewInterests(interests: Set<String>): MutableSet<Interest> {
-        val interestsSet = mutableSetOf<Interest>()
-        for (interestName in interests) {
-            val dbInterest = interestDao.findByName(interestName) ?: interestDao.save(Interest(name = interestName))
-            interestsSet.add(dbInterest)
-        }
-        return interestsSet
-    }
 }

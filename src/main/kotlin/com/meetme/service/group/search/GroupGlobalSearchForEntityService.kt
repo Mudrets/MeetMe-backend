@@ -11,28 +11,31 @@ import com.meetme.db.user.User
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 
+/**
+ * Реализация сервиса глобального поиска групп для пользователя.
+ */
 @Service
-class GroupGlobalSearchForEntityService :
-    BaseGlobalSearchForEntityService<Long, SearchGroupDto, Group>() {
+class GroupGlobalSearchForEntityService @Autowired constructor(
+    private val filter: Filter<Group, SearchGroupDto>,
+    private val groupService: GroupService,
+    private val userService: UserServiceImpl,
+) : BaseGlobalSearchForEntityService<Long, SearchGroupDto, Group>() {
 
-    @Autowired
-    private lateinit var filter: Filter<Group, SearchGroupDto>
-
-    @Autowired
-    private lateinit var groupService: GroupService
-
-    @Autowired
-    private lateinit var userService: UserServiceImpl
-
+    /**
+     * Сервис для глобального поиска групп.
+     */
     override val globalSearchService: GlobalSearchService<SearchGroupDto, Group>
         get() = object : BaseGlobalSearchService<SearchGroupDto, Group, Long>(groupService, filter) {
 
             override fun prepareForResult(filteredEntities: List<Group>): List<Group> =
                 filteredEntities
-                    .filter { group -> !group.private }
+                    .filter { group -> !group.isPrivate }
                     .sortedBy(Group::name)
         }
 
+    /**
+     * Сервис для локального посика групп, к которым некоторый пользователь имеет отношение.
+     */
     override val searchForEntityService: SearchForEntityService<Long, SearchGroupDto, Group>
         get() = object : BaseSearchForEntityService<User, Long, SearchGroupDto, Group>(filter) {
 

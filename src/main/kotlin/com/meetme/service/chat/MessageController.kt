@@ -16,19 +16,29 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 
+/**
+ * Контроллер, обрабатывающий запросы для работы с сообщениями.
+ */
 @RestController
 @RequestMapping("/api/v1/chat/messages")
-class MessageController {
-
-    @Autowired
-    private lateinit var messageService: MessageService
-
-    @Autowired
-    private lateinit var messageToMessageDto: MessageToMessageDto
-
-    @Autowired
-    private lateinit var chatService: ChatService
-
+class MessageController @Autowired constructor(
+    /**
+     * Сервис для работы с сообщениями.
+     */
+    private val messageService: MessageService,
+    /**
+     * Маппер, преобразующий Message в MessageDto.
+     */
+    private val messageToMessageDto: MessageToMessageDto,
+    /**
+     * Сервис для работы с чатом.
+     */
+    private var chatService: ChatService,
+) {
+    /**
+     * Обработчик HTTP POST запроса по url /api/v1/chat/messages/get для получения
+     * списка сообщений.
+     */
     @PostMapping("/get")
     fun getMessages(
         @RequestBody getMessagesRequestDto: GetMessagesRequestDto,
@@ -38,12 +48,18 @@ class MessageController {
                 .map(messageToMessageDto)
         }
 
+    /**
+     * Обработчик HTTP POST запроса по url /api/v1/chat/messages для отправления сообщения.
+     */
     @PostMapping
     fun sendMessage(
         @RequestBody sendMessageRequestDto: SendMessageRequestDto,
     ): DataResponse<Long> =
         tryExecute { chatService.sendMessage(sendMessageRequestDto) }
 
+    /**
+     * Обработчик HTTP DELETE запроса по url /api/v1/chat/messages для удаления сообщения.
+     */
     @DeleteMapping("/{message_id}")
     fun deleteMessage(
         @PathVariable("message_id") messageId: Long,
@@ -53,6 +69,9 @@ class MessageController {
             null
         }
 
+    /**
+     * Обработчик HTTP PATCH запроса по url /api/v1/chat/messages для редактирования сообщения.
+     */
     @PatchMapping("/{message_id}")
     fun editMessage(
         @PathVariable("message_id") messageId: Long,
