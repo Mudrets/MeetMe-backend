@@ -20,7 +20,7 @@ class UserController @Autowired constructor(
     /**
      * Сервис для работы с пользователем.
      */
-    private val userService: UserServiceImpl,
+    private val userService: UserService,
     /**
      * Маппер, преобразующий User в UserDto.
      */
@@ -68,13 +68,40 @@ class UserController @Autowired constructor(
      * @param userId идентификатор пользователя.
      * @param editUserDto данные для редактирования пользователя.
      */
-    @PostMapping("{user_id}/edit")
+    @PostMapping("/{user_id}/edit")
     fun editUser(
         @PathVariable("user_id") userId: Long,
         @RequestBody editUserDto: EditUserDto,
     ): DataResponse<UserDto> =
         tryExecute {
             userToUserDto(userService.update(userId, editUserDto))
+        }
+
+    /**
+     * Обработчик HTTP POST запроса по url /api/v1/user/{user_id}/verify/{code} для активации
+     * аккаунта пользователя.
+     * @param userId идентификатор пользователя.
+     * @param code код подтверждения регистрации.
+     */
+    @PostMapping("{user_id}/verify/{code}")
+    fun verifyUser(
+        @PathVariable("user_id") userId: Long,
+        @PathVariable("code") code: String,
+    ): DataResponse<UserDto> =
+        tryExecute {
+            userToUserDto(userService.verifyAccount(code, userId))
+        }
+
+    /**
+     * Обработчик HTTP POST запроса по url /api/v1/user/{user_id}/send_new_code для отправления нового
+     * кода активации аккаунта на почту.
+     * @param userId идентификатор пользователя.
+     */
+    @PostMapping("{user_id}/send_new_code")
+    fun sendNewCode(@PathVariable("user_id") userId: Long): DataResponse<Unit?> =
+        tryExecute {
+            userService.sendNewAccountCode(userId)
+            null
         }
 }
 

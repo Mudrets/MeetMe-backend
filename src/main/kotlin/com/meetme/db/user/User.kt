@@ -47,7 +47,7 @@ data class User(
      * Почта пользователя.
      */
     @Column(unique = true)
-    var email: String? = null,
+    var email: String = "",
 
     /**
      * Телефон пользователя.
@@ -73,6 +73,17 @@ data class User(
     @Column(name = "photo_url")
     var photoUrl: String = "",
 
+    /**
+     * Флаг активации аккаунта.
+     */
+    @Column(name = "is_active_account")
+    var isActiveAccount: Boolean = false,
+
+    /**
+     * Код активации аккаунта пользователя.
+     */
+    @Column(name = "activation_code")
+    var activationCode: String? = null
 
 ) : UserDetails {
 

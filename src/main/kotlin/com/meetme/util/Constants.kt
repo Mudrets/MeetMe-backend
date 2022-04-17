@@ -25,6 +25,12 @@ object Constants {
     const val TOKEN_EXPIRATION_AFTER_DAYS = 21L
     val secretKey: SecretKey = Keys.hmacShaKeyFor(KEY.toByteArray())!!
 
+    //EMAIL
+    const val HOST = "smtp.gmail.com"
+    const val EMAIL_PORT = 587
+    const val EMAIL_FOR_SENDING = "meetme.info.noreply@gmail.com"
+    const val EMAIL_PASSWORD = "meetme2604"
+
     //USER
     const val NON_EXISTENT_USER_ID = -1L
 }

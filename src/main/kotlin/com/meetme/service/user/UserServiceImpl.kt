@@ -7,12 +7,14 @@ import com.meetme.service.interest.InterestService
 import com.meetme.service.media_link.MediaLinkService
 import com.meetme.db.user.User
 import com.meetme.db.user.UserDao
+import com.meetme.service.email.EmailService
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
+import kotlin.random.Random
 
 /**
  * Реализация сервиса для работы с пользователем.
@@ -35,7 +37,11 @@ class UserServiceImpl @Autowired constructor(
      * Сервис для работы с ссылками на социальные сети.
      */
     private val mediaLinkService: MediaLinkService,
-): UserService {
+    /**
+     * Сервис для отправления писем на почту.
+     */
+    private val emailService: EmailService,
+) : UserService {
 
     /**
      * Логгер для логгирования
@@ -50,8 +56,11 @@ class UserServiceImpl @Autowired constructor(
      * @return Возращает созданного пользователя.
      */
     override fun create(data: RegisterCredentialsDto): User {
-        if (userDao.findByEmail(data.email) != null)
+        val userFromDb = userDao.findByEmail(data.email)
+        if (userFromDb != null && userFromDb.isActiveAccount)
             throw IllegalArgumentException("User with email ${data.email} already exists")
+        else if (userFromDb != null)
+            userDao.delete(userFromDb)
 
         val newUser = userDao.save(
             User(
@@ -61,17 +70,69 @@ class UserServiceImpl @Autowired constructor(
                 surname = getSurname(data.fullName),
             )
         )
-
+        sendAccountCode(newUser)
         logger.debug("User $newUser created")
+
         return newUser
     }
 
+    /**
+     * Вход в аккаун пользователя с помщью электронной почты и пароля.
+     * @param email электронная почта.
+     * @param password пароль.
+     * @return Возвращается пользователь с переданной электронной почтой
+     * и паролем.
+     */
     override fun loginUser(email: String, password: String): User {
         val user = loadUserByEmail(email)
         if (!checkPassword(user, password))
             throw IllegalArgumentException("Incorrect password")
+        if (!user.isActiveAccount)
+            throw IllegalArgumentException("Account is not activate")
         return user
     }
+
+    /**
+     * Отправялет пользователю на почту код активации.
+     * @param user пользователь, которому на почту будет отправлен код
+     */
+    private fun sendAccountCode(user: User) {
+        if (user.isActiveAccount)
+            throw IllegalArgumentException("User already activated")
+        val code = generateActivationCode()
+        user.activationCode = code
+        userDao.save(user)
+        emailService.sendMessage(
+            user.email,
+            "Код активации MeetMe",
+            "Код активации аккаунта: $code\nДля активации аккаунта введите этот код в приложении"
+        )
+    }
+
+    /**
+     * Проверяет отправленный код и если он совпадает с кодом подтверждения аккаунта
+     * то аккаунт пользователя активируется.
+     * @param code код подтверждения почты.
+     * @param userId идентификатор пользователя.
+     * @return Возвращает данные о пользователе.
+     */
+    override fun verifyAccount(code: String, userId: Long): User =
+        userId.doIfExist(userDao, logger) { user ->
+            if (user.activationCode != code)
+                throw IllegalArgumentException("Incorrect activation code")
+            user.isActiveAccount = true
+            userDao.save(user)
+            return user
+        }
+
+    /**
+     * Повторно отправляет код активации аккаунта на почту.
+     * @param userId идентификатор пользователя.
+     */
+    override fun sendNewAccountCode(userId: Long) =
+        userId.doIfExist(userDao, logger) { user ->
+            sendAccountCode(user)
+        }
 
     /**
      * Изменяет пользователя в соответствии с переданными данными.
@@ -152,4 +213,11 @@ class UserServiceImpl @Autowired constructor(
 
         return dbUser
     }
+
+    /**
+     * Создает код для активации аккаунта пользователя.
+     */
+    private fun generateActivationCode(): String =
+        Random.nextInt(0, 10000).toString().padStart(4, '0')
+
 }

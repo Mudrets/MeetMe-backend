@@ -20,4 +20,19 @@ interface UserService :
      * и паролем.
      */
     fun loginUser(email: String, password: String): User
+
+    /**
+     * Проверяет отправленный код и если он совпадает с кодом подтверждения аккаунта
+     * то аккаунт пользователя активируется.
+     * @param code код подтверждения почты.
+     * @param userId идентификатор пользователя.
+     * @return Возвращает данные о пользователе.
+     */
+    fun verifyAccount(code: String, userId: Long): User
+
+    /**
+     * Повторно отправляет код активации аккаунта на почту.
+     * @param userId электронная почта для отправки кода.
+     */
+    fun sendNewAccountCode(userId: Long)
 }
