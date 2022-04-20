@@ -4,7 +4,8 @@ import com.meetme.util.doIfExist
 import com.meetme.domain.dto.meeting.SearchMeetingDto
 import com.meetme.domain.service.search.SearchForEntityService
 import com.meetme.db.meeting.Meeting
-import com.meetme.service.user.UserServiceImpl
+import com.meetme.db.user.User
+import com.meetme.domain.EntityGetter
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.stereotype.Service
@@ -27,7 +28,7 @@ class InvitationSearchServiceImpl @Autowired constructor(
     /**
      * Сервис для работы с пользователем.
      */
-    private val userService: UserServiceImpl,
+    private val userGetter: EntityGetter<Long, User>,
 ) : InvitationSearchService {
     /**
      * Ищет список приглашения пользователя с переданным идентификатором.
@@ -55,9 +56,9 @@ class InvitationSearchServiceImpl @Autowired constructor(
      * @return Возвращает список найденных мероприятий.
      */
     override fun search(userId: Long, query: SearchMeetingDto): Map<String, List<Meeting>> =
-        userId.doIfExist(userService) { user ->
+        userId.doIfExist(userGetter) { user ->
             val nameWithIdToMeetings = mutableMapOf<String, List<Meeting>>()
-            nameWithIdToMeetings[user.nameWithId] = userInvitations(userId, query)
+            nameWithIdToMeetings["User:${user.id}"] = userInvitations(userId, query)
             user.managedGroups.forEach { group ->
                 nameWithIdToMeetings[group.nameWithId] = groupInvitations(group.id, query)
             }
