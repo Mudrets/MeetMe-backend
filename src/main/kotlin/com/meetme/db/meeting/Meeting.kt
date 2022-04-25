@@ -151,7 +151,8 @@ data class Meeting(
     /**
      * Количество участников мероприятия.
      */
-    val numberOfParticipants: Int = participants.size
+    val numberOfParticipants: Int
+        get() = participants.size
 
     /**
      * Проверяет является ли мероприятие посещенным.
